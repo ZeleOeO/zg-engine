@@ -8,8 +8,11 @@ use wgpu::{
 };
 use winit::{event_loop::ActiveEventLoop, keyboard::KeyCode};
 
-use crate::{shapes::Shapes, texture::CustomTexture};
 use std::mem;
+
+use crate::renderer::resources::{mesh::Mesh, texture::CustomTexture};
+pub mod context;
+pub mod resources;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, Pod, Zeroable)]
@@ -43,7 +46,7 @@ impl Vertex {
 pub struct AppGraphicsEngine {
     pub render_pipeline: RenderPipeline,
     pub texture: CustomTexture,
-    pub shapes: Shapes,
+    pub shapes: Mesh,
     pub frame: f32,
 }
 
@@ -58,7 +61,7 @@ impl AppGraphicsEngine {
 
         let shader = device.create_shader_module(wgpu::include_wgsl!("../shaders/shader.wgsl"));
 
-        let shapes = Shapes::display_shapes(device);
+        let shapes = Mesh::cube(device);
 
         // Which means this layout is only for our texure
         let render_pipeline_layout = device.create_pipeline_layout(&PipelineLayoutDescriptor {

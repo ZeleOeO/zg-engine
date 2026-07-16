@@ -5,10 +5,10 @@ use wgpu::{
     util::{BufferInitDescriptor, DeviceExt},
 };
 
-use crate::app_graphics_engine::Vertex;
+use crate::renderer::Vertex;
 
 #[derive(Debug)]
-pub struct Shapes {
+pub struct Mesh {
     pub index_buffer: Option<Buffer>,
     pub vertex_buffer: Buffer,
     pub num_to_draw: u32,
@@ -17,8 +17,62 @@ pub struct Shapes {
     pub uniform_buffer_bind_group: Option<BindGroup>,
 }
 
-impl Shapes {
-    pub fn display_shapes(device: &Device) -> Self {
+impl Mesh {
+    pub fn new(device: &Device, vertices: &[Vertex], indices: &[u32]) -> Self {
+        let uniform_buffer = device.create_buffer(&BufferDescriptor {
+            label: Some("Shape Uniform Buffer"),
+            size: std::mem::size_of::<f32>() as BufferAddress,
+            mapped_at_creation: false,
+            usage: BufferUsages::UNIFORM | BufferUsages::COPY_DST,
+        });
+
+        let uniform_buffer_bind_group_layout =
+            device.create_bind_group_layout(&BindGroupLayoutDescriptor {
+                label: Some("Uniform Buffer Bind Group Layout"),
+                entries: &[BindGroupLayoutEntry {
+                    binding: 0,
+                    visibility: ShaderStages::VERTEX,
+                    ty: wgpu::BindingType::Buffer {
+                        ty: wgpu::BufferBindingType::Uniform,
+                        has_dynamic_offset: false,
+                        min_binding_size: None,
+                    },
+                    count: None,
+                }],
+            });
+
+        let uniform_buffer_bind_group = device.create_bind_group(&BindGroupDescriptor {
+            label: Some("Uniform Buffer Bind Group"),
+            entries: &[BindGroupEntry {
+                binding: 0,
+                resource: uniform_buffer.as_entire_binding(),
+            }],
+            layout: &uniform_buffer_bind_group_layout,
+        });
+
+        let vertex_buffer = device.create_buffer_init(&BufferInitDescriptor {
+            label: Some("Vertex Buffer"),
+            contents: bytemuck::cast_slice(&vertices),
+            usage: BufferUsages::VERTEX,
+        });
+
+        let index_buffer = device.create_buffer_init(&BufferInitDescriptor {
+            label: Some("Index Buffer"),
+            contents: bytemuck::cast_slice(&indices),
+            usage: BufferUsages::INDEX,
+        });
+
+        Self {
+            num_to_draw: vertices.len() as u32,
+            index_buffer: Some(index_buffer),
+            vertex_buffer,
+            uniform_buffer: Some(uniform_buffer),
+            uniform_buffer_bind_group_layout: Some(uniform_buffer_bind_group_layout),
+            uniform_buffer_bind_group: Some(uniform_buffer_bind_group),
+        }
+    }
+
+    pub fn cube(device: &Device) -> Self {
         let vertices: &[Vertex] = &[
             // Front face (z = 0.5)
             Vertex {
@@ -133,56 +187,6 @@ impl Shapes {
             20, 21, 22, 20, 22, 23,
         ];
 
-        let uniform_buffer = device.create_buffer(&BufferDescriptor {
-            label: Some("Shape Uniform Buffer"),
-            size: std::mem::size_of::<f32>() as BufferAddress,
-            mapped_at_creation: false,
-            usage: BufferUsages::UNIFORM | BufferUsages::COPY_DST,
-        });
-
-        let uniform_buffer_bind_group_layout =
-            device.create_bind_group_layout(&BindGroupLayoutDescriptor {
-                label: Some("Uniform Buffer Bind Group Layout"),
-                entries: &[BindGroupLayoutEntry {
-                    binding: 0,
-                    visibility: ShaderStages::VERTEX,
-                    ty: wgpu::BindingType::Buffer {
-                        ty: wgpu::BufferBindingType::Uniform,
-                        has_dynamic_offset: false,
-                        min_binding_size: None,
-                    },
-                    count: None,
-                }],
-            });
-
-        let uniform_buffer_bind_group = device.create_bind_group(&BindGroupDescriptor {
-            label: Some("Uniform Buffer Bind Group"),
-            entries: &[BindGroupEntry {
-                binding: 0,
-                resource: uniform_buffer.as_entire_binding(),
-            }],
-            layout: &uniform_buffer_bind_group_layout,
-        });
-
-        let vertex_buffer = device.create_buffer_init(&BufferInitDescriptor {
-            label: Some("Vertex Buffer"),
-            contents: bytemuck::cast_slice(&vertices),
-            usage: BufferUsages::VERTEX,
-        });
-
-        let index_buffer = device.create_buffer_init(&BufferInitDescriptor {
-            label: Some("Index Buffer"),
-            contents: bytemuck::cast_slice(&indices),
-            usage: BufferUsages::INDEX,
-        });
-
-        Self {
-            num_to_draw: vertices.len() as u32,
-            index_buffer: Some(index_buffer),
-            vertex_buffer,
-            uniform_buffer: Some(uniform_buffer),
-            uniform_buffer_bind_group_layout: Some(uniform_buffer_bind_group_layout),
-            uniform_buffer_bind_group: Some(uniform_buffer_bind_group),
-        }
+        Self::new(device, vertices, indices)
     }
 }

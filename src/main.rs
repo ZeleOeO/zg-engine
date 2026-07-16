@@ -4,48 +4,58 @@ use wgpu::{CurrentSurfaceTexture, TextureViewDescriptor};
 use winit::{
     application::ApplicationHandler,
     event::{KeyEvent, WindowEvent},
-    event_loop::EventLoop,
+    event_loop::{ActiveEventLoop, EventLoop},
     keyboard::PhysicalKey,
     window::Window,
 };
 
-use crate::{app_environment::AppEnvironment, app_graphics_engine::AppGraphicsEngine};
+use crate::renderer::{AppGraphicsEngine, context::RendererContext};
 
-pub mod app_environment;
-pub mod app_graphics_engine;
-pub mod shapes;
-pub mod texture;
+pub mod renderer;
 
 pub struct App {
     engine: Option<AppGraphicsEngine>,
-    environment: Option<AppEnvironment>,
+    renderer: Option<RendererContext>,
+    window: Arc<Window>,
 }
 
 impl App {
-    pub fn new() -> Self {
+    pub fn new(window: Arc<Window>) -> Self {
         Self {
             engine: None,
-            environment: None,
+            renderer: None,
+            window: window,
         }
     }
-}
 
-impl ApplicationHandler<AppGraphicsEngine> for App {
-    fn resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
+    fn run() -> anyhow::Result<()> {
+        let event_loop = EventLoop::with_user_event().build()?;
+        event_loop.set_control_flow(winit::event_loop::ControlFlow::Poll);
         let window = Arc::new(
             event_loop
                 .create_window(Window::default_attributes().with_title("Graphics Engine"))
                 .unwrap(),
         );
-        self.environment = Some(pollster::block_on(AppEnvironment::new(window)).unwrap());
+        let mut app = App::new(window);
+        event_loop.run_app(&mut app)?;
+
+        Ok(())
+    }
+}
+
+impl ApplicationHandler<AppGraphicsEngine> for App {
+    fn resumed(&mut self, _event_loop: &winit::event_loop::ActiveEventLoop) {
+        self.renderer =
+            Some(pollster::block_on(RendererContext::new(self.window.clone())).unwrap());
         self.engine = Some(
             AppGraphicsEngine::new(
-                &self.environment.as_ref().unwrap().queue,
-                &self.environment.as_ref().unwrap().device,
-                &self.environment.as_ref().unwrap().config,
+                &self.renderer.as_ref().unwrap().queue,
+                &self.renderer.as_ref().unwrap().device,
+                &self.renderer.as_ref().unwrap().config,
             )
             .unwrap(),
         );
+        self.window.request_redraw();
     }
 
     fn window_event(
@@ -64,9 +74,9 @@ impl ApplicationHandler<AppGraphicsEngine> for App {
                 event_loop.exit();
             }
             WindowEvent::RedrawRequested => {
-                self.environment.as_mut().unwrap().window.request_redraw();
+                self.window.request_redraw();
                 let engine = self.engine.as_mut().unwrap();
-                let app_window = self.environment.as_ref().unwrap();
+                let app_window = self.renderer.as_ref().unwrap();
 
                 let frame = match app_window.surface.get_current_texture() {
                     CurrentSurfaceTexture::Success(texture)
@@ -103,15 +113,6 @@ impl ApplicationHandler<AppGraphicsEngine> for App {
 
 fn main() -> anyhow::Result<()> {
     env_logger::init();
-    run()?;
-    Ok(())
-}
-
-fn run() -> anyhow::Result<()> {
-    let event_loop = EventLoop::with_user_event().build()?;
-    event_loop.set_control_flow(winit::event_loop::ControlFlow::Poll);
-    let mut app = App::new();
-    event_loop.run_app(&mut app)?;
-
+    App::run()?;
     Ok(())
 }
