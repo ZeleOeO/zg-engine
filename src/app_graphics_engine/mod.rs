@@ -1,33 +1,76 @@
+use bytemuck::{Pod, Zeroable};
 use wgpu::{
-    CommandEncoderDescriptor, Device, Face, PipelineCompilationOptions, PipelineLayoutDescriptor,
-    Queue, RenderPassColorAttachment, RenderPassDescriptor, RenderPipeline,
-    RenderPipelineDescriptor, SurfaceConfiguration, VertexState,
+    BufferAddress, CommandEncoderDescriptor, Device, Face, Origin3d, PipelineCompilationOptions,
+    PipelineLayoutDescriptor, Queue, RenderPassColorAttachment, RenderPassDescriptor,
+    RenderPipeline, RenderPipelineDescriptor, SurfaceConfiguration, TexelCopyBufferLayout,
+    TexelCopyTextureInfo, TextureAspect, VertexAttribute, VertexBufferLayout, VertexFormat,
+    VertexState,
 };
 use winit::{event_loop::ActiveEventLoop, keyboard::KeyCode};
 
-pub mod example_object;
-use crate::app_graphics_engine::example_object::ExampleObject;
+use crate::{shapes::Shapes, texture::CustomTexture};
+use std::mem;
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy, Pod, Zeroable)]
+pub struct Vertex {
+    pub position: [f32; 3],
+    pub tex_coords: [f32; 2],
+}
+
+impl Vertex {
+    fn desc() -> VertexBufferLayout<'static> {
+        VertexBufferLayout {
+            array_stride: mem::size_of::<Vertex>() as BufferAddress,
+            step_mode: wgpu::VertexStepMode::Vertex,
+            attributes: &[
+                VertexAttribute {
+                    format: VertexFormat::Float32x3,
+                    shader_location: 0,
+                    offset: 0,
+                },
+                VertexAttribute {
+                    format: VertexFormat::Float32x2,
+                    offset: mem::size_of::<[f32; 3]>() as BufferAddress,
+                    shader_location: 1,
+                },
+            ],
+        }
+    }
+}
 
 #[derive(Debug)]
 pub struct AppGraphicsEngine {
     pub render_pipeline: RenderPipeline,
-    pub example_object: ExampleObject,
+    pub texture: CustomTexture,
+    pub shapes: Shapes,
+    pub frame: f32,
 }
 
 impl AppGraphicsEngine {
     pub fn new(
+        queue: &wgpu::Queue,
         device: &Device,
         config: &SurfaceConfiguration,
     ) -> anyhow::Result<AppGraphicsEngine> {
-        let example_object = ExampleObject::create_indexed_example(device);
+        let custom_texture =
+            CustomTexture::from_bytes(device, include_bytes!("../happy-tree.png"))?;
 
-        let shader =
-            device.create_shader_module(wgpu::include_wgsl!("../shaders/uniform_shader.wgsl"));
+        let shader = device.create_shader_module(wgpu::include_wgsl!("../shaders/shader.wgsl"));
+
+        let shapes = Shapes::display_shapes(device);
+
+        // Which means this layout is only for our texure
         let render_pipeline_layout = device.create_pipeline_layout(&PipelineLayoutDescriptor {
             label: Some("Pipeline layout"),
-            bind_group_layouts: &[Some(&example_object.bind_group_layout)],
+            bind_group_layouts: &[
+                shapes.uniform_buffer_bind_group_layout.as_ref(),
+                Some(&custom_texture.bind_group_layout),
+            ],
             immediate_size: 0,
         });
+
+        // Layout is only for texture render
         let render_pipeline = device.create_render_pipeline(&RenderPipelineDescriptor {
             label: Some("Render Pipeline"),
             layout: Some(&render_pipeline_layout),
@@ -35,7 +78,7 @@ impl AppGraphicsEngine {
                 module: &shader,
                 entry_point: Some("vs_main"),
                 compilation_options: PipelineCompilationOptions::default(),
-                buffers: &example_object.vertex_buffer_layout,
+                buffers: &[Vertex::desc()],
             },
             primitive: wgpu::PrimitiveState {
                 topology: wgpu::PrimitiveTopology::TriangleList,
@@ -66,15 +109,38 @@ impl AppGraphicsEngine {
             cache: None,
         });
 
+        queue.write_texture(
+            TexelCopyTextureInfo {
+                texture: &custom_texture.texture,
+                mip_level: 0,
+                origin: Origin3d::ZERO,
+                aspect: TextureAspect::All,
+            },
+            &custom_texture.image_rba,
+            TexelCopyBufferLayout {
+                offset: 0,
+                bytes_per_row: Some(custom_texture.image_rba.dimensions().0 * 4),
+                rows_per_image: Some(custom_texture.image_rba.dimensions().1),
+            },
+            custom_texture.texture_size,
+        );
+
         let state = Self {
             render_pipeline,
-            example_object,
+            texture: custom_texture,
+            shapes,
+            frame: 0.0,
         };
         Ok(state)
     }
 
     pub fn update(&mut self, queue: &Queue) {
-        self.example_object.update(queue);
+        self.frame += 1.0;
+        queue.write_buffer(
+            &self.shapes.uniform_buffer.as_ref().unwrap(),
+            0,
+            bytemuck::bytes_of(&self.frame),
+        );
     }
 
     pub fn render(&mut self, queue: &wgpu::Queue, device: &wgpu::Device, view: &wgpu::TextureView) {
@@ -104,28 +170,21 @@ impl AppGraphicsEngine {
                 occlusion_query_set: None,
                 multiview_mask: None,
             });
+
             render_pass.set_pipeline(&self.render_pipeline);
-            render_pass.set_bind_group(0, Some(&self.example_object.bind_group), &[]);
-
-            for (i, buffer) in self.example_object.vertex_buffer.iter().enumerate() {
-                render_pass.set_vertex_buffer(i as u32, buffer.slice(..));
+            render_pass.set_vertex_buffer(0, self.shapes.vertex_buffer.slice(..));
+            if let Some(bind_group) = &self.shapes.uniform_buffer_bind_group {
+                render_pass.set_bind_group(0, bind_group, &[]);
             }
-
-            if self.example_object.index_buffer.is_none() {
-                render_pass.draw(
-                    0..self.example_object.num_to_draw,
-                    0..self.example_object.instances,
-                );
-            } else {
+            render_pass.set_bind_group(1, Some(&self.texture.bind_group), &[]);
+            if self.shapes.index_buffer.is_some() {
                 render_pass.set_index_buffer(
-                    self.example_object.index_buffer.clone().unwrap()[0].slice(..),
+                    self.shapes.index_buffer.as_ref().unwrap().slice(..),
                     wgpu::IndexFormat::Uint32,
                 );
-                render_pass.draw_indexed(
-                    0..self.example_object.num_to_draw,
-                    0,
-                    0..self.example_object.instances,
-                );
+                render_pass.draw_indexed(0..self.shapes.num_to_draw, 0, 0..1);
+            } else {
+                render_pass.draw(0..self.shapes.num_to_draw, 0..1);
             }
         }
 

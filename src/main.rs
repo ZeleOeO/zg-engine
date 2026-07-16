@@ -13,6 +13,8 @@ use crate::{app_environment::AppEnvironment, app_graphics_engine::AppGraphicsEng
 
 pub mod app_environment;
 pub mod app_graphics_engine;
+pub mod shapes;
+pub mod texture;
 
 pub struct App {
     engine: Option<AppGraphicsEngine>,
@@ -38,6 +40,7 @@ impl ApplicationHandler<AppGraphicsEngine> for App {
         self.environment = Some(pollster::block_on(AppEnvironment::new(window)).unwrap());
         self.engine = Some(
             AppGraphicsEngine::new(
+                &self.environment.as_ref().unwrap().queue,
                 &self.environment.as_ref().unwrap().device,
                 &self.environment.as_ref().unwrap().config,
             )
