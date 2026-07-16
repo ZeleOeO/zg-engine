@@ -55,6 +55,21 @@ The embedded texture (`happy-tree.png`) is mapped onto all six faces of the cube
 - [ ] MSAA / post-processing effects
 - [ ] ImGui debug overlay
 
+
+### Potential Folder Structure
+``` bash
+app/           -- windowing, input, game loop, ties everything together
+renderer/      -- the actual wgpu engine (device, passes, pipelines)
+  core/        -- Device/Queue/Surface wrapper, resize handling
+  resources/   -- buffers, textures, samplers, bind groups (with pooling/caching)
+  passes/      -- render passes as discrete, composable units
+  pipelines/   -- pipeline layouts, shader modules, pipeline cache
+  scene/       -- render graph / draw list construction
+  shaders/     -- .wgsl files, often with includes/preprocessing
+assets/        -- loaders (gltf, textures, etc.), converted into GPU resources
+ecs/ or scene graph/  -- your actual game/scene data, independent of renderer
+```
+
 ## Tests
 
 I don't have a massive test suite yet, but if I do come back to it, you can run the unit tests with this:
