@@ -7,15 +7,15 @@ use wgpu::{
 };
 use winit::window::Window;
 
-pub struct RendererContext {
+pub struct GPU {
     pub surface: Surface<'static>,
     pub device: Device,
     pub queue: Queue,
     pub config: SurfaceConfiguration,
 }
 
-impl RendererContext {
-    pub async fn new(window: Arc<Window>) -> anyhow::Result<Self> {
+impl GPU {
+    pub async fn new(window: &Arc<Window>) -> anyhow::Result<Self> {
         let size = window.inner_size();
         let instance = Instance::new(wgpu::InstanceDescriptor {
             backends: Backends::PRIMARY,

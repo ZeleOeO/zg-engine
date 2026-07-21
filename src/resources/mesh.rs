@@ -1,55 +1,46 @@
+use bytemuck::{Pod, Zeroable};
 use wgpu::{
-    BindGroup, BindGroupDescriptor, BindGroupEntry, BindGroupLayout, BindGroupLayoutDescriptor,
-    BindGroupLayoutEntry, Buffer, BufferAddress, BufferDescriptor, BufferUsages, Device,
-    ShaderStages,
+    Buffer, BufferAddress, BufferUsages, Device, VertexAttribute, VertexBufferLayout, VertexFormat,
     util::{BufferInitDescriptor, DeviceExt},
 };
 
-use crate::renderer::Vertex;
+#[repr(C)]
+#[derive(Debug, Clone, Copy, Pod, Zeroable)]
+pub struct Vertex {
+    pub position: [f32; 3],
+    pub tex_coords: [f32; 2],
+}
+
+impl Vertex {
+    pub fn desc() -> VertexBufferLayout<'static> {
+        VertexBufferLayout {
+            array_stride: std::mem::size_of::<Vertex>() as BufferAddress,
+            step_mode: wgpu::VertexStepMode::Vertex,
+            attributes: &[
+                VertexAttribute {
+                    format: VertexFormat::Float32x3,
+                    shader_location: 0,
+                    offset: 0,
+                },
+                VertexAttribute {
+                    format: VertexFormat::Float32x2,
+                    offset: std::mem::size_of::<[f32; 3]>() as BufferAddress,
+                    shader_location: 1,
+                },
+            ],
+        }
+    }
+}
 
 #[derive(Debug)]
 pub struct Mesh {
     pub index_buffer: Option<Buffer>,
     pub vertex_buffer: Buffer,
     pub num_to_draw: u32,
-    pub uniform_buffer: Option<Buffer>,
-    pub uniform_buffer_bind_group_layout: Option<BindGroupLayout>,
-    pub uniform_buffer_bind_group: Option<BindGroup>,
 }
 
 impl Mesh {
     pub fn new(device: &Device, vertices: &[Vertex], indices: &[u32]) -> Self {
-        let uniform_buffer = device.create_buffer(&BufferDescriptor {
-            label: Some("Shape Uniform Buffer"),
-            size: std::mem::size_of::<f32>() as BufferAddress,
-            mapped_at_creation: false,
-            usage: BufferUsages::UNIFORM | BufferUsages::COPY_DST,
-        });
-
-        let uniform_buffer_bind_group_layout =
-            device.create_bind_group_layout(&BindGroupLayoutDescriptor {
-                label: Some("Uniform Buffer Bind Group Layout"),
-                entries: &[BindGroupLayoutEntry {
-                    binding: 0,
-                    visibility: ShaderStages::VERTEX,
-                    ty: wgpu::BindingType::Buffer {
-                        ty: wgpu::BufferBindingType::Uniform,
-                        has_dynamic_offset: false,
-                        min_binding_size: None,
-                    },
-                    count: None,
-                }],
-            });
-
-        let uniform_buffer_bind_group = device.create_bind_group(&BindGroupDescriptor {
-            label: Some("Uniform Buffer Bind Group"),
-            entries: &[BindGroupEntry {
-                binding: 0,
-                resource: uniform_buffer.as_entire_binding(),
-            }],
-            layout: &uniform_buffer_bind_group_layout,
-        });
-
         let vertex_buffer = device.create_buffer_init(&BufferInitDescriptor {
             label: Some("Vertex Buffer"),
             contents: bytemuck::cast_slice(&vertices),
@@ -66,13 +57,11 @@ impl Mesh {
             num_to_draw: vertices.len() as u32,
             index_buffer: Some(index_buffer),
             vertex_buffer,
-            uniform_buffer: Some(uniform_buffer),
-            uniform_buffer_bind_group_layout: Some(uniform_buffer_bind_group_layout),
-            uniform_buffer_bind_group: Some(uniform_buffer_bind_group),
         }
     }
 
     pub fn cube(device: &Device) -> Self {
+        // We can do size and position later with math
         let vertices: &[Vertex] = &[
             // Front face (z = 0.5)
             Vertex {
