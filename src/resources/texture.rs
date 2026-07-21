@@ -21,7 +21,8 @@ impl CustomTexture {
         queue: &Queue,
         location: &str,
     ) -> anyhow::Result<Self> {
-        let img = ImageReader::open(location).unwrap().decode().unwrap();
+        let img = ImageReader::open(location)?.decode()?;
+
         Self::from_image(device, queue, &img)
     }
 

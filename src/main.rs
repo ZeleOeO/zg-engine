@@ -40,22 +40,25 @@ pub struct App {
 }
 
 impl App {
-    pub async fn new(window: Arc<Window>) -> Self {
+    pub async fn new(window: Arc<Window>) -> anyhow::Result<Self> {
         let gpu = pollster::block_on(GPU::new(&window)).unwrap();
 
         let layout = create_material_bg_layout(&gpu.device);
-        let texture_location = "./assets/happy-tree.png";
         let shader = &gpu
             .device
             .create_shader_module(wgpu::include_wgsl!("./shaders/shader.wgsl"));
-        print!("stuff");
         let pipeline = Rc::new(opaque_pipeline(&gpu.device, &gpu.config, &layout, shader).unwrap());
 
-        print!("stuff2");
-
         let mesh = Rc::new(Mesh::cube(&gpu.device));
-        let material =
-            Rc::new(Material::new(&gpu.device, &gpu.queue, &layout, texture_location).unwrap());
+        let material = Rc::new(
+            Material::new(
+                &gpu.device,
+                &gpu.queue,
+                &layout,
+                "src/assets/happy-tree.png",
+            )
+            .unwrap(),
+        );
 
         let uniform = Uniform { rotation: 0.0 };
         let scene = Scene {
@@ -66,11 +69,11 @@ impl App {
                 uniform: uniform,
             }],
         };
-        Self {
+        Ok(Self {
             scene,
             gpu: gpu,
             window: window,
-        }
+        })
     }
 
     pub fn render(&self, view: &TextureView) {
@@ -92,7 +95,7 @@ impl ApplicationHandler for AppHandler {
                 .unwrap(),
         );
         let app = pollster::block_on(App::new(window.clone()));
-        self.app = Some(app);
+        self.app = Some(app.unwrap());
         window.request_redraw();
     }
 
@@ -128,6 +131,7 @@ impl ApplicationHandler for AppHandler {
                 app.render(&view);
 
                 frame.present();
+                app.update();
             }
             WindowEvent::KeyboardInput {
                 event:
@@ -145,6 +149,9 @@ impl ApplicationHandler for AppHandler {
 
 fn main() -> anyhow::Result<()> {
     env_logger::init();
+    use std::env;
+
+    println!("Current directory: {:?}", env::current_dir());
     let event_loop = EventLoop::new()?;
     event_loop.set_control_flow(winit::event_loop::ControlFlow::Poll);
     let mut app = AppHandler { app: None };

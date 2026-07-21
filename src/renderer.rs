@@ -6,7 +6,7 @@ use wgpu::{
 use crate::scene::Scene;
 
 pub fn render(device: &Device, queue: &Queue, view: &TextureView, scene: &Scene) {
-    let items = scene.draw_items.clone();
+    let items = &scene.draw_items;
     let mut encoder = device.create_command_encoder(&CommandEncoderDescriptor {
         label: Some("Encoder"),
     });
@@ -33,30 +33,17 @@ pub fn render(device: &Device, queue: &Queue, view: &TextureView, scene: &Scene)
             multiview_mask: None,
         });
 
-        for item in &items {
+        for item in items {
             render_pass.set_pipeline(&item.pipeline);
             render_pass.set_bind_group(0, &item.material.uniform_buffer_bind_group, &[]);
-            if item.mesh.index_buffer.is_some() {
-                render_pass.set_index_buffer(
-                    item.mesh.index_buffer.clone().unwrap().slice(..),
-                    wgpu::IndexFormat::Uint32,
-                );
+            render_pass.set_vertex_buffer(0, item.mesh.vertex_buffer.slice(..));
+            if let Some(index_buffer) = &item.mesh.index_buffer {
+                render_pass.set_index_buffer(index_buffer.slice(..), wgpu::IndexFormat::Uint32);
                 render_pass.draw_indexed(0..item.mesh.num_to_draw, 0, 0..1);
             } else {
-                render_pass.set_vertex_buffer(0, item.mesh.vertex_buffer.slice(..));
                 render_pass.draw(0..item.mesh.num_to_draw, 0..1);
             }
         }
     }
     queue.submit(Some(encoder.finish()));
 }
-
-// pub fn update(&mut , queue: &Queue) {
-//     self. += 1.0;
-//     queue.write_buffer(
-//         &self.shapes.uniform_buffer.as_ref().unwrap(),
-//         0,
-//         bytemuck::bytes_of(&self.frame),
-//     );
-// }
-//

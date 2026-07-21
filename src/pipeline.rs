@@ -12,7 +12,7 @@ pub fn opaque_pipeline(
     shader: &ShaderModule,
 ) -> anyhow::Result<RenderPipeline> {
     let render_pipeline_layout = device.create_pipeline_layout(&PipelineLayoutDescriptor {
-        label: Some("Pipeline layout"),
+        label: Some("Opaque Pipeline Layout"),
         bind_group_layouts: &[Some(&bg_layouts)],
         immediate_size: 0,
     });

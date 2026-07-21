@@ -25,8 +25,11 @@ impl Material {
         layout: &BindGroupLayout,
         texture_location: &str,
     ) -> anyhow::Result<Self> {
-        let texture =
-            Rc::new(CustomTexture::from_location(device, queue, texture_location).unwrap());
+        let texture = Rc::new(CustomTexture::from_location(
+            device,
+            queue,
+            texture_location,
+        )?);
 
         let uniform_buffer = device.create_buffer(&BufferDescriptor {
             label: Some("Shape Uniform Buffer"),
@@ -71,7 +74,7 @@ pub fn create_material_bg_layout(device: &Device) -> BindGroupLayout {
                 count: None,
                 ty: wgpu::BindingType::Texture {
                     sample_type: wgpu::TextureSampleType::Float { filterable: true },
-                    view_dimension: wgpu::TextureViewDimension::D3,
+                    view_dimension: wgpu::TextureViewDimension::D2,
                     multisampled: false,
                 },
                 visibility: ShaderStages::FRAGMENT,
