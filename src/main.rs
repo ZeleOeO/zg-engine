@@ -51,13 +51,7 @@ impl App {
 
         let mesh = Rc::new(Mesh::cube(&gpu.device));
         let material = Rc::new(
-            Material::new(
-                &gpu.device,
-                &gpu.queue,
-                &layout,
-                "src/assets/happy-tree.png",
-            )
-            .unwrap(),
+            Material::new(&gpu.device, &gpu.queue, &layout, "src/assets/brick.jpeg").unwrap(),
         );
 
         let uniform = Uniform { rotation: 0.0 };
