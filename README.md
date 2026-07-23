@@ -2,6 +2,8 @@
 
 A Rust-based 3D Graphics Engine built with WebGPU (wgpu). Renders a textured, rotating cube with a modern graphics pipeline. A learning project for understanding GPU-accelerated rendering, shader authoring (WGSL), and event-loop-driven graphics in Rust.
 
+> Thinking out loud: It's crazy to me how fast this all is. GPU Programming is so insanely cool
+
 ## Technologies
 
 [![Rust](https://img.shields.io/badge/Rust-1.85%2B-orange?logo=rust&logoColor=white)](https://www.rust-lang.org) [![wgpu](https://img.shields.io/badge/wgpu-29.0-brightgreen?logo=webgpu&logoColor=white)](https://wgpu.rs) [![winit](https://img.shields.io/badge/Windowing-winit-blue)](https://github.com/rust-windowing/winit) [![WGSL](https://img.shields.io/badge/Shader-WGSL-purple)](https://www.w3.org/TR/WGSL/)

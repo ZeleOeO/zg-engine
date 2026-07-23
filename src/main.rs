@@ -55,7 +55,7 @@ impl App {
         let shader = &gpu
             .device
             .create_shader_module(wgpu::include_wgsl!("./shaders/shader.wgsl"));
-        let pipeline = Rc::new(opaque_pipeline(&gpu.device, &gpu.config, &layout, shader).unwrap());
+        let pipeline = Rc::new(opaque_pipeline(&gpu.device, &gpu.config, &layout, shader)?);
 
         let cube_mesh = Rc::new(Mesh::cube(&gpu.device));
         let prism_mesh = Rc::new(Mesh::prism(&gpu.device));
@@ -70,11 +70,18 @@ impl App {
         );
 
         let scene = Scene {
-            draw_items: vec![DrawItem {
-                pipeline: pipeline.clone(),
-                mesh: cube_mesh.clone(),
-                material: material.clone(),
-            }],
+            draw_items: vec![
+                DrawItem {
+                    pipeline: pipeline.clone(),
+                    mesh: cube_mesh.clone(),
+                    material: material.clone(),
+                },
+                DrawItem {
+                    pipeline: pipeline.clone(),
+                    mesh: prism_mesh.clone(),
+                    material: material.clone(),
+                },
+            ],
             camera_uniform,
         };
         Ok(Self {
