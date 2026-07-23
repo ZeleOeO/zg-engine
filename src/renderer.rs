@@ -7,6 +7,7 @@ use crate::scene::Scene;
 
 pub fn render(device: &Device, queue: &Queue, view: &TextureView, scene: &Scene) {
     let items = &scene.draw_items;
+    let camera = &scene.camera_uniform;
     let mut encoder = device.create_command_encoder(&CommandEncoderDescriptor {
         label: Some("Encoder"),
     });
@@ -33,6 +34,7 @@ pub fn render(device: &Device, queue: &Queue, view: &TextureView, scene: &Scene)
             multiview_mask: None,
         });
 
+        render_pass.set_bind_group(1, &camera.bind_group, &[]);
         for item in items {
             render_pass.set_pipeline(&item.pipeline);
             render_pass.set_bind_group(0, &item.material.uniform_buffer_bind_group, &[]);

@@ -11,20 +11,13 @@ struct VertexInput {
 @group(0) @binding(0) var texture: texture_2d<f32>;
 @group(0) @binding(1) var t_sampler: sampler;
 
-@group(0) @binding(2) var<uniform> frame: f32;
-
-fn rotate3D(deg: f32) -> mat4x4<f32> {
-    return mat4x4(vec4<f32>(cos(deg), 0.0, sin(deg), 0.0),
-        vec4<f32>(0.0, 1.0, 0.0, 0.0),
-        vec4<f32>(-sin(deg), 0.0, cos(deg), 0.0),
-        vec4<f32>(0.0, 0.0, 0.0, 1.0));
-}
+@group(1) @binding(0) var<uniform> camera: mat4x4<f32>;
 
 @vertex
 fn vs_main(in: VertexInput) -> VertexOutput {
     var out: VertexOutput;
     out.tex_cords = in.tex_cords;
-    out.clip_position = rotate3D(frame * 0.01) * vec4<f32>(in.position, 1.0);
+    out.clip_position = camera * vec4<f32>(in.position, 1.0);
     return out;
 }
 

@@ -178,4 +178,97 @@ impl Mesh {
 
         Self::new(device, vertices, indices)
     }
+
+    pub fn prism(device: &Device) -> Self {
+        // Triangular prism (equilateral-ish cross-section extruded along z)
+        // Apex A = top, B = bottom-left, C = bottom-right
+        let vertices: &[Vertex] = &[
+            // Front face (z = 0.5) — triangle A, B, C
+            Vertex {
+                position: [0.0, 0.5, 0.5],
+                tex_coords: [0.5, 0.0],
+            },
+            Vertex {
+                position: [-0.5, -0.5, 0.5],
+                tex_coords: [0.0, 1.0],
+            },
+            Vertex {
+                position: [0.5, -0.5, 0.5],
+                tex_coords: [1.0, 1.0],
+            },
+            // Back face (z = -0.5) — triangle A, C, B (reversed winding)
+            Vertex {
+                position: [0.0, 0.5, -0.5],
+                tex_coords: [0.5, 0.0],
+            },
+            Vertex {
+                position: [0.5, -0.5, -0.5],
+                tex_coords: [0.0, 1.0],
+            },
+            Vertex {
+                position: [-0.5, -0.5, -0.5],
+                tex_coords: [1.0, 1.0],
+            },
+            // Bottom face (y = -0.5), between B and C
+            Vertex {
+                position: [-0.5, -0.5, 0.5], // B_front
+                tex_coords: [0.0, 1.0],
+            },
+            Vertex {
+                position: [-0.5, -0.5, -0.5], // B_back
+                tex_coords: [1.0, 1.0],
+            },
+            Vertex {
+                position: [0.5, -0.5, -0.5], // C_back
+                tex_coords: [1.0, 0.0],
+            },
+            Vertex {
+                position: [0.5, -0.5, 0.5], // C_front
+                tex_coords: [0.0, 0.0],
+            },
+            // Left face (A-B edge)
+            Vertex {
+                position: [0.0, 0.5, 0.5], // A_front
+                tex_coords: [0.0, 1.0],
+            },
+            Vertex {
+                position: [0.0, 0.5, -0.5], // A_back
+                tex_coords: [1.0, 1.0],
+            },
+            Vertex {
+                position: [-0.5, -0.5, -0.5], // B_back
+                tex_coords: [1.0, 0.0],
+            },
+            Vertex {
+                position: [-0.5, -0.5, 0.5], // B_front
+                tex_coords: [0.0, 0.0],
+            },
+            // Right face (A-C edge)
+            Vertex {
+                position: [0.0, 0.5, 0.5], // A_front
+                tex_coords: [0.0, 1.0],
+            },
+            Vertex {
+                position: [0.5, -0.5, 0.5], // C_front
+                tex_coords: [1.0, 1.0],
+            },
+            Vertex {
+                position: [0.5, -0.5, -0.5], // C_back
+                tex_coords: [1.0, 0.0],
+            },
+            Vertex {
+                position: [0.0, 0.5, -0.5], // A_back
+                tex_coords: [0.0, 0.0],
+            },
+        ];
+        let indices: &[u32] = &[
+            // Front triangle
+            0, 1, 2, // Back triangle
+            3, 4, 5, // Bottom
+            6, 7, 8, 6, 8, 9, // Left
+            10, 11, 12, 10, 12, 13, // Right
+            14, 15, 16, 14, 16, 17,
+        ];
+        Self::new(device, vertices, indices)
+    }
 }

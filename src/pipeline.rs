@@ -8,12 +8,12 @@ use crate::resources::mesh::Vertex;
 pub fn opaque_pipeline(
     device: &Device,
     config: &SurfaceConfiguration,
-    bg_layouts: &BindGroupLayout,
+    bg_layouts: &[Option<&BindGroupLayout>],
     shader: &ShaderModule,
 ) -> anyhow::Result<RenderPipeline> {
     let render_pipeline_layout = device.create_pipeline_layout(&PipelineLayoutDescriptor {
         label: Some("Opaque Pipeline Layout"),
-        bind_group_layouts: &[Some(&bg_layouts)],
+        bind_group_layouts: bg_layouts,
         immediate_size: 0,
     });
 

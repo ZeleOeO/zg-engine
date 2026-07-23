@@ -10,20 +10,23 @@ use winit::{
 };
 
 use crate::{
+    camera::{Camera, CameraUniform, create_camera_layout},
     gpu::GPU,
     pipeline::opaque_pipeline,
     renderer::render,
     resources::{
-        material::{Material, Uniform, create_material_bg_layout},
+        material::{Material, create_material_bg_layout},
         mesh::Mesh,
     },
-    scene::{DrawItem, Scene},
+    scene::{DrawItem, ItemUniform, Scene},
 };
 
 use std::rc::Rc;
 
+pub mod camera;
 pub mod gpu;
 pub mod key_input;
+pub mod math;
 pub mod pipeline;
 pub mod renderer;
 pub mod resources;
@@ -42,26 +45,37 @@ pub struct App {
 impl App {
     pub async fn new(window: Arc<Window>) -> anyhow::Result<Self> {
         let gpu = pollster::block_on(GPU::new(&window)).unwrap();
+        let material_layout = create_material_bg_layout(&gpu.device);
+        let camera_layout = create_camera_layout(&gpu.device);
+        let layout = [Some(&material_layout), Some(&camera_layout)];
+        let window_size = window.inner_size();
 
-        let layout = create_material_bg_layout(&gpu.device);
+        let camera = Camera::new((window_size.width as f32) / window_size.height as f32);
+        let camera_uniform = CameraUniform::new(&gpu.device, &camera, &camera_layout);
         let shader = &gpu
             .device
             .create_shader_module(wgpu::include_wgsl!("./shaders/shader.wgsl"));
         let pipeline = Rc::new(opaque_pipeline(&gpu.device, &gpu.config, &layout, shader).unwrap());
 
-        let mesh = Rc::new(Mesh::cube(&gpu.device));
+        let cube_mesh = Rc::new(Mesh::cube(&gpu.device));
+        let prism_mesh = Rc::new(Mesh::prism(&gpu.device));
         let material = Rc::new(
-            Material::new(&gpu.device, &gpu.queue, &layout, "src/assets/brick.jpeg").unwrap(),
+            Material::new(
+                &gpu.device,
+                &gpu.queue,
+                &material_layout,
+                "src/assets/brick.jpeg",
+            )
+            .unwrap(),
         );
 
-        let uniform = Uniform { rotation: 0.0 };
         let scene = Scene {
             draw_items: vec![DrawItem {
                 pipeline: pipeline.clone(),
-                mesh: mesh.clone(),
+                mesh: cube_mesh.clone(),
                 material: material.clone(),
-                uniform: uniform,
             }],
+            camera_uniform,
         };
         Ok(Self {
             scene,
@@ -74,11 +88,7 @@ impl App {
         render(&self.gpu.device, &self.gpu.queue, view, &self.scene);
     }
 
-    pub fn update(&mut self) {
-        for item in &mut self.scene.draw_items {
-            item.rotate_item(&self.gpu.queue, 1.0);
-        }
-    }
+    pub fn update(&mut self) {}
 }
 
 impl ApplicationHandler for AppHandler {
