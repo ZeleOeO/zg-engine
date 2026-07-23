@@ -10,7 +10,7 @@ use winit::{
 };
 
 use crate::{
-    camera::{Camera, CameraUniform, create_camera_layout},
+    camera::camera::*,
     gpu::GPU,
     pipeline::opaque_pipeline,
     renderer::render,

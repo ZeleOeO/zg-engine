@@ -6,7 +6,7 @@ use wgpu::{
 };
 
 use crate::{
-    camera::CameraUniform,
+    camera::camera::CameraUniform,
     resources::{material::Material, mesh::Mesh},
 };
 
