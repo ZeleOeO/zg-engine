@@ -1,9 +1,9 @@
 use anyhow::Ok;
-use image::{DynamicImage, ImageBuffer, Rgba};
+use image::DynamicImage;
 use image::{GenericImageView, ImageReader};
 use wgpu::{
     Device, Extent3d, Origin3d, Queue, Sampler, TexelCopyBufferLayout, TexelCopyTextureInfo,
-    Texture, TextureAspect, TextureDescriptor, TextureUsages, TextureView, TextureViewDescriptor,
+    TextureAspect, TextureDescriptor, TextureUsages, TextureView, TextureViewDescriptor,
 };
 
 #[derive(Debug)]

@@ -1,8 +1,7 @@
 use std::f32::consts::PI;
 
 use wgpu::{
-    BindGroup, BindGroupEntry, BindGroupLayout, BindGroupLayoutDescriptor, BindGroupLayoutEntry,
-    Buffer, BufferUsages, Device, Queue, ShaderStages,
+    BindGroup, BindGroupEntry, BindGroupLayout, Buffer, BufferUsages, Device, Queue,
     util::{BufferInitDescriptor, DeviceExt},
 };
 
@@ -90,7 +89,7 @@ impl Camera {
         let perspective = perspective_matrix(self.fovy, self.aspect, self.znear, self.zfar);
         let view_proj = mat4_mul(perspective, view);
 
-        transpose(view_proj)
+        mat4_transpose(view_proj)
     }
 }
 
@@ -124,20 +123,4 @@ impl CameraUniform {
 
         queue.write_buffer(&self.buffer, 0, bytemuck::cast_slice(&[self.view_proj]));
     }
-}
-
-pub fn create_camera_layout(device: &Device) -> BindGroupLayout {
-    device.create_bind_group_layout(&BindGroupLayoutDescriptor {
-        label: Some("Camera Bind Group Layout"),
-        entries: &[BindGroupLayoutEntry {
-            binding: 0,
-            count: None,
-            visibility: ShaderStages::VERTEX,
-            ty: wgpu::BindingType::Buffer {
-                ty: wgpu::BufferBindingType::Uniform,
-                has_dynamic_offset: false,
-                min_binding_size: None,
-            },
-        }],
-    })
 }

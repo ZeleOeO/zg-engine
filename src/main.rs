@@ -15,13 +15,11 @@ use winit::{
 use crate::{
     camera::{camera::*, camera_controller::CameraController},
     gpu::GPU,
+    layouts::*,
     pipeline::opaque_pipeline,
     renderer::render,
-    resources::{
-        material::{Material, create_material_bg_layout},
-        mesh::Mesh,
-    },
-    scene::{DrawItem, ItemUniform, Scene},
+    resources::{material::Material, mesh::Mesh},
+    scene::{DrawItem, Scene},
 };
 
 use std::rc::Rc;
@@ -29,6 +27,7 @@ use std::rc::Rc;
 pub mod camera;
 pub mod gpu;
 pub mod key_input;
+pub mod layouts;
 pub mod math;
 pub mod pipeline;
 pub mod renderer;
@@ -51,27 +50,36 @@ pub struct App {
 impl App {
     pub async fn new(window: Arc<Window>) -> anyhow::Result<Self> {
         let gpu = pollster::block_on(GPU::new(&window)).unwrap();
-        let material_layout = create_material_bg_layout(&gpu.device);
-        let camera_layout = create_camera_layout(&gpu.device);
-        let layout = [Some(&material_layout), Some(&camera_layout)];
+
         let window_size = window.inner_size();
+        window.set_cursor_visible(false);
         window
             .set_cursor_grab(winit::window::CursorGrabMode::Confined)
             .or_else(|_e| window.set_cursor_grab(CursorGrabMode::Locked))
             .unwrap();
-        window.set_cursor_visible(false);
+
+        let material_layout = create_material_bg_layout(&gpu.device);
+        let camera_layout = create_camera_layout(&gpu.device);
+        let item_uniform_layout = create_item_uniform_layout(&gpu.device);
+        // Arranged according to bind group
+        let layout = [
+            Some(&camera_layout),
+            Some(&material_layout),
+            Some(&item_uniform_layout),
+        ];
 
         let camera = Camera::new((window_size.width as f32) / window_size.height as f32);
         let camera_controller = CameraController::new(2.0, 0.2);
         let camera_uniform = CameraUniform::new(&gpu.device, &camera, &camera_layout);
+
         let shader = &gpu
             .device
             .create_shader_module(wgpu::include_wgsl!("./shaders/shader.wgsl"));
         let pipeline = Rc::new(opaque_pipeline(&gpu.device, &gpu.config, &layout, shader)?);
 
         let cube_mesh = Rc::new(Mesh::cube(&gpu.device));
-        let weird_prism_mesh = Rc::new(Mesh::weird_prism(&gpu.device));
         let prism_mesh = Rc::new(Mesh::prism(&gpu.device));
+
         let happy_tree_material = Rc::new(Material::new(
             &gpu.device,
             &gpu.queue,
@@ -87,17 +95,24 @@ impl App {
 
         let scene = Scene {
             draw_items: vec![
-                DrawItem {
-                    pipeline: pipeline.clone(),
-                    mesh: prism_mesh.clone(),
-                    material: brick_material.clone(),
-                },
-                // DrawItem {
-                //     pipeline: pipeline.clone(),
-                //     mesh: prism_mesh.clone(),
-                //     material: material.clone(),
-                // },
+                DrawItem::new(
+                    &gpu.device,
+                    &([3.0, 2.0, 1.0] as [f32; 3]),
+                    &item_uniform_layout,
+                    &pipeline,
+                    &brick_material,
+                    &prism_mesh,
+                ),
+                DrawItem::new(
+                    &gpu.device,
+                    &([1.0, 1.0, 1.0] as [f32; 3]),
+                    &item_uniform_layout,
+                    &pipeline,
+                    &happy_tree_material,
+                    &cube_mesh,
+                ),
             ],
+
             camera_uniform,
         };
         Ok(Self {
@@ -115,11 +130,13 @@ impl App {
     }
 
     pub fn update(&mut self, dt: f32) {
+        let dt_min = dt.min(0.1);
         self.scene
             .camera_uniform
             .update_view_proj(&self.camera, &self.gpu.queue);
 
-        self.camera_controller.camera_update(&mut self.camera, dt);
+        self.camera_controller
+            .camera_update(&mut self.camera, dt_min);
         println!("=== ANGLE DEBUG ===");
         println!(
             "fovy: {:.3} rad ({:.1}°)",

@@ -34,10 +34,11 @@ pub fn render(device: &Device, queue: &Queue, view: &TextureView, scene: &Scene)
             multiview_mask: None,
         });
 
-        render_pass.set_bind_group(1, &camera.bind_group, &[]);
+        render_pass.set_bind_group(0, &camera.bind_group, &[]);
         for item in items {
             render_pass.set_pipeline(&item.pipeline);
-            render_pass.set_bind_group(0, &item.material.uniform_buffer_bind_group, &[]);
+            render_pass.set_bind_group(1, &item.material.uniform_buffer_bind_group, &[]);
+            render_pass.set_bind_group(2, &item.bind_group, &[]);
             render_pass.set_vertex_buffer(0, item.mesh.vertex_buffer.slice(..));
             if let Some(index_buffer) = &item.mesh.index_buffer {
                 render_pass.set_index_buffer(index_buffer.slice(..), wgpu::IndexFormat::Uint32);

@@ -1,7 +1,6 @@
 use std::rc::Rc;
 use wgpu::{
-    BindGroup, BindGroupDescriptor, BindGroupEntry, BindGroupLayout, BindGroupLayoutDescriptor,
-    BindGroupLayoutEntry, BindingResource, Device, Queue, ShaderStages,
+    BindGroup, BindGroupDescriptor, BindGroupEntry, BindGroupLayout, BindingResource, Device, Queue,
 };
 
 use crate::resources::texture::CustomTexture;
@@ -44,29 +43,4 @@ impl Material {
             uniform_buffer_bind_group,
         })
     }
-}
-
-pub fn create_material_bg_layout(device: &Device) -> BindGroupLayout {
-    let bg_layouts = device.create_bind_group_layout(&BindGroupLayoutDescriptor {
-        label: Some("Bind Group Layout"),
-        entries: &[
-            BindGroupLayoutEntry {
-                binding: 0,
-                count: None,
-                ty: wgpu::BindingType::Texture {
-                    sample_type: wgpu::TextureSampleType::Float { filterable: true },
-                    view_dimension: wgpu::TextureViewDimension::D2,
-                    multisampled: false,
-                },
-                visibility: ShaderStages::FRAGMENT,
-            },
-            BindGroupLayoutEntry {
-                binding: 1,
-                count: None,
-                ty: wgpu::BindingType::Sampler(wgpu::SamplerBindingType::Filtering),
-                visibility: ShaderStages::FRAGMENT,
-            },
-        ],
-    });
-    bg_layouts
 }

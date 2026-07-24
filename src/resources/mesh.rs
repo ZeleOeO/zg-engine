@@ -273,25 +273,4 @@ impl Mesh {
         ];
         Self::new(device, vertices, indices)
     }
-
-    pub fn weird_prism(device: &Device) -> Self {
-        let vertices: &[Vertex] = &[
-            Vertex {
-                position: [-0.5, -0.5, 0.0],
-                tex_coords: [0.0, 1.0],
-            },
-            Vertex {
-                position: [0.5, -0.5, 0.0],
-                tex_coords: [1.0, 1.0],
-            },
-            Vertex {
-                position: [0.0, 0.5, 0.0],
-                tex_coords: [0.5, 0.0],
-            },
-        ];
-
-        let indices: &[u32] = &[0, 1, 2]; // CCW
-
-        Self::new(device, vertices, indices)
-    }
 }

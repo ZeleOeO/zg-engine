@@ -8,16 +8,21 @@ struct VertexInput {
     @location(1) tex_cords: vec2<f32>,
 }
 
-@group(0) @binding(0) var texture: texture_2d<f32>;
-@group(0) @binding(1) var t_sampler: sampler;
+struct ItemUniform {
+    transform: mat4x4<f32>}
 
-@group(1) @binding(0) var<uniform> camera: mat4x4<f32>;
+@group(0) @binding(0) var<uniform> camera: mat4x4<f32>;
+
+@group(1) @binding(0) var texture: texture_2d<f32>;
+@group(1) @binding(1) var t_sampler: sampler;
+
+@group(2) @binding(0) var<uniform> model_transform: ItemUniform;
 
 @vertex
 fn vs_main(in: VertexInput) -> VertexOutput {
     var out: VertexOutput;
     out.tex_cords = in.tex_cords;
-    out.clip_position = camera * vec4<f32>(in.position, 1.0);
+    out.clip_position = camera * model_transform.transform * vec4<f32>(in.position, 1.0);
     return out;
 }
 
