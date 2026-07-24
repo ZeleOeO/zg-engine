@@ -2,7 +2,7 @@ use std::f32::consts::PI;
 
 use wgpu::{
     BindGroup, BindGroupEntry, BindGroupLayout, BindGroupLayoutDescriptor, BindGroupLayoutEntry,
-    BufferUsages, Device, ShaderStages,
+    Buffer, BufferUsages, Device, ShaderStages,
     util::{BufferInitDescriptor, DeviceExt},
 };
 
@@ -69,12 +69,13 @@ pub struct Camera {
 pub struct CameraUniform {
     pub view_proj: Mat4,
     pub bind_group: BindGroup,
+    pub buffer: Buffer,
 }
 
 impl Camera {
     pub fn new(aspect: f32) -> Self {
         Self {
-            eye: [0.0, 0.0, 5.0], // Moved back and to the side
+            eye: [0.0, 0.0, 3.0],
             target: [0.0, 0.0, 0.0],
             up: [0.0, 1.0, 0.0],
             fovy: PI / 4.0,
@@ -115,7 +116,12 @@ impl CameraUniform {
         Self {
             view_proj,
             bind_group,
+            buffer,
         }
+    }
+
+    pub fn update_view_proj(&mut self, camera: &Camera) {
+        self.view_proj = camera.build_projection_matrix()
     }
 }
 

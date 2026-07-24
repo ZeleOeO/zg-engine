@@ -3,14 +3,17 @@ use std::sync::Arc;
 use wgpu::{CurrentSurfaceTexture, TextureView, TextureViewDescriptor};
 use winit::{
     application::ApplicationHandler,
-    event::{KeyEvent, WindowEvent},
+    event::{
+        DeviceEvent::{self, MouseMotion},
+        KeyEvent, WindowEvent,
+    },
     event_loop::EventLoop,
     keyboard::PhysicalKey,
-    window::Window,
+    window::{CursorGrabMode, Window},
 };
 
 use crate::{
-    camera::camera::*,
+    camera::{camera::*, camera_controller::CameraController},
     gpu::GPU,
     pipeline::opaque_pipeline,
     renderer::render,
@@ -40,6 +43,8 @@ pub struct App {
     scene: Scene,
     gpu: GPU,
     window: Arc<Window>,
+    camera: Camera,
+    camera_controller: CameraController,
 }
 
 impl App {
@@ -49,8 +54,14 @@ impl App {
         let camera_layout = create_camera_layout(&gpu.device);
         let layout = [Some(&material_layout), Some(&camera_layout)];
         let window_size = window.inner_size();
+        window
+            .set_cursor_grab(winit::window::CursorGrabMode::Confined)
+            .or_else(|_e| window.set_cursor_grab(CursorGrabMode::Locked))
+            .unwrap();
+        window.set_cursor_visible(false);
 
         let camera = Camera::new((window_size.width as f32) / window_size.height as f32);
+        let camera_controller = CameraController::new(2.0, 0.2);
         let camera_uniform = CameraUniform::new(&gpu.device, &camera, &camera_layout);
         let shader = &gpu
             .device
@@ -70,24 +81,19 @@ impl App {
         );
 
         let scene = Scene {
-            draw_items: vec![
-                DrawItem {
-                    pipeline: pipeline.clone(),
-                    mesh: cube_mesh.clone(),
-                    material: material.clone(),
-                },
-                DrawItem {
-                    pipeline: pipeline.clone(),
-                    mesh: prism_mesh.clone(),
-                    material: material.clone(),
-                },
-            ],
+            draw_items: vec![DrawItem {
+                pipeline: pipeline.clone(),
+                mesh: cube_mesh.clone(),
+                material: material.clone(),
+            }],
             camera_uniform,
         };
         Ok(Self {
             scene,
             gpu: gpu,
+            camera,
             window: window,
+            camera_controller,
         })
     }
 
@@ -95,7 +101,32 @@ impl App {
         render(&self.gpu.device, &self.gpu.queue, view, &self.scene);
     }
 
-    pub fn update(&mut self) {}
+    pub fn update(&mut self) {
+        self.camera_controller.camera_update(&mut self.camera);
+        self.scene.camera_uniform.update_view_proj(&self.camera);
+        println!("=== ANGLE DEBUG ===");
+        println!(
+            "fovy: {:.3} rad ({:.1}°)",
+            self.camera.fovy,
+            self.camera.fovy.to_degrees()
+        );
+        println!(
+            "yaw: {:.3} rad ({:.1}°)",
+            self.camera_controller.yaw,
+            self.camera_controller.yaw.to_degrees()
+        );
+        println!(
+            "pitch: {:.3} rad ({:.1}°)",
+            self.camera_controller.pitch,
+            self.camera_controller.pitch.to_degrees()
+        );
+        println!("{:?}", self.scene.camera_uniform.view_proj);
+        self.gpu.queue.write_buffer(
+            &self.scene.camera_uniform.buffer,
+            0,
+            bytemuck::cast_slice(&[self.scene.camera_uniform.view_proj]),
+        );
+    }
 }
 
 impl ApplicationHandler for AppHandler {
@@ -109,7 +140,29 @@ impl ApplicationHandler for AppHandler {
         self.app = Some(app.unwrap());
         window.request_redraw();
     }
+    fn device_event(
+        &mut self,
+        _event_loop: &winit::event_loop::ActiveEventLoop,
+        _device_id: winit::event::DeviceId,
+        event: DeviceEvent,
+    ) {
+        let Some(app) = &mut self.app else {
+            return;
+        };
 
+        match event {
+            MouseMotion { delta } => {
+                app.camera_controller
+                    .handle_mouse(delta.0 as f32, delta.1 as f32);
+            }
+            _ => {}
+        }
+    }
+
+    // fn about_to_wait(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
+    //     kkk
+    // }
+    //
     fn window_event(
         &mut self,
         event_loop: &winit::event_loop::ActiveEventLoop,
@@ -152,7 +205,12 @@ impl ApplicationHandler for AppHandler {
                         ..
                     },
                 ..
-            } => key_input::handle_key(code, key_state.is_pressed(), event_loop),
+            } => key_input::handle_key(
+                code,
+                key_state.is_pressed(),
+                event_loop,
+                &mut app.camera_controller,
+            ),
             _ => {}
         }
     }
