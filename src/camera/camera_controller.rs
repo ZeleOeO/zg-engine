@@ -31,12 +31,12 @@ impl CameraController {
     }
 
     pub fn handle_mouse(&mut self, delta_x: f32, delta_y: f32) {
-        self.yaw += delta_x.to_radians() * self.sensitivity;
+        self.yaw -= delta_x.to_radians() * self.sensitivity;
         self.pitch += delta_y.to_radians() * self.sensitivity;
         self.pitch = self.pitch.clamp(-1.5, 1.5);
     }
 
-    pub fn camera_update(&self, camera: &mut Camera) {
+    pub fn camera_update(&self, camera: &mut Camera, dt: f32) {
         let sin_yaw = self.yaw.sin();
         let cos_yaw = self.yaw.cos();
         let sin_pitch = self.pitch.sin();
@@ -44,7 +44,7 @@ impl CameraController {
 
         let forward = vec3_normalize([cos_pitch * sin_yaw, sin_pitch, cos_pitch * cos_yaw]);
         let right = vec3_normalize(vec3_cross_product(forward, camera.up));
-        let speed = self.speed;
+        let speed = self.speed as f32 * dt;
 
         let mut movement = [0.0, 0.0, 0.0];
 

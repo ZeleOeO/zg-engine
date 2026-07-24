@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{sync::Arc, time::Instant};
 
 use wgpu::{CurrentSurfaceTexture, TextureView, TextureViewDescriptor};
 use winit::{
@@ -45,6 +45,7 @@ pub struct App {
     window: Arc<Window>,
     camera: Camera,
     camera_controller: CameraController,
+    last_frame: Instant,
 }
 
 impl App {
@@ -81,11 +82,18 @@ impl App {
         );
 
         let scene = Scene {
-            draw_items: vec![DrawItem {
-                pipeline: pipeline.clone(),
-                mesh: cube_mesh.clone(),
-                material: material.clone(),
-            }],
+            draw_items: vec![
+                DrawItem {
+                    pipeline: pipeline.clone(),
+                    mesh: cube_mesh.clone(),
+                    material: material.clone(),
+                },
+                // DrawItem {
+                //     pipeline: pipeline.clone(),
+                //     mesh: prism_mesh.clone(),
+                //     material: material.clone(),
+                // },
+            ],
             camera_uniform,
         };
         Ok(Self {
@@ -94,6 +102,7 @@ impl App {
             camera,
             window: window,
             camera_controller,
+            last_frame: Instant::now(),
         })
     }
 
@@ -101,9 +110,12 @@ impl App {
         render(&self.gpu.device, &self.gpu.queue, view, &self.scene);
     }
 
-    pub fn update(&mut self) {
-        self.camera_controller.camera_update(&mut self.camera);
-        self.scene.camera_uniform.update_view_proj(&self.camera);
+    pub fn update(&mut self, dt: f32) {
+        self.scene
+            .camera_uniform
+            .update_view_proj(&self.camera, &self.gpu.queue);
+
+        self.camera_controller.camera_update(&mut self.camera, dt);
         println!("=== ANGLE DEBUG ===");
         println!(
             "fovy: {:.3} rad ({:.1}°)",
@@ -121,11 +133,6 @@ impl App {
             self.camera_controller.pitch.to_degrees()
         );
         println!("{:?}", self.scene.camera_uniform.view_proj);
-        self.gpu.queue.write_buffer(
-            &self.scene.camera_uniform.buffer,
-            0,
-            bytemuck::cast_slice(&[self.scene.camera_uniform.view_proj]),
-        );
     }
 }
 
@@ -159,10 +166,17 @@ impl ApplicationHandler for AppHandler {
         }
     }
 
-    // fn about_to_wait(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
-    //     kkk
-    // }
-    //
+    fn about_to_wait(&mut self, _event_loop: &winit::event_loop::ActiveEventLoop) {
+        let now = Instant::now();
+        let Some(app) = &mut self.app else {
+            return;
+        };
+        let dt = now.duration_since(app.last_frame).as_secs_f32();
+        app.last_frame = Instant::now();
+        app.update(dt);
+        app.window.request_redraw();
+    }
+
     fn window_event(
         &mut self,
         event_loop: &winit::event_loop::ActiveEventLoop,
@@ -195,7 +209,6 @@ impl ApplicationHandler for AppHandler {
                 app.render(&view);
 
                 frame.present();
-                app.update();
             }
             WindowEvent::KeyboardInput {
                 event:

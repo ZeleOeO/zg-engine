@@ -2,7 +2,7 @@ use std::f32::consts::PI;
 
 use wgpu::{
     BindGroup, BindGroupEntry, BindGroupLayout, BindGroupLayoutDescriptor, BindGroupLayoutEntry,
-    Buffer, BufferUsages, Device, ShaderStages,
+    Buffer, BufferUsages, Device, Queue, ShaderStages,
     util::{BufferInitDescriptor, DeviceExt},
 };
 
@@ -119,8 +119,10 @@ impl CameraUniform {
         }
     }
 
-    pub fn update_view_proj(&mut self, camera: &Camera) {
-        self.view_proj = camera.build_projection_matrix()
+    pub fn update_view_proj(&mut self, camera: &Camera, queue: &Queue) {
+        self.view_proj = camera.build_projection_matrix();
+
+        queue.write_buffer(&self.buffer, 0, bytemuck::cast_slice(&[self.view_proj]));
     }
 }
 
