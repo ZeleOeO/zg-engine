@@ -45,7 +45,7 @@ fn perspective_matrix(fovy: f32, aspect: f32, znear: f32, zfar: f32) -> Mat4 {
 
     [
         [focal / aspect, 0.0, 0.0, 0.0],
-        [0.0, focal, 0.0, 0.0],
+        [0.0, -focal, 0.0, 0.0],
         [
             0.0,
             0.0,
@@ -90,18 +90,17 @@ impl Camera {
         let perspective = perspective_matrix(self.fovy, self.aspect, self.znear, self.zfar);
         let view_proj = mat4_mul(perspective, view);
 
-        view_proj
+        transpose(view_proj)
     }
 }
 
 impl CameraUniform {
     pub fn new(device: &Device, camera: &Camera, camera_layout: &BindGroupLayout) -> Self {
         let view_proj = Camera::build_projection_matrix(&camera);
-        let transpose_view_proj = transpose(view_proj);
 
         let buffer = device.create_buffer_init(&BufferInitDescriptor {
             label: Some("Camera Uniform Buffer"),
-            contents: bytemuck::cast_slice(&[transpose_view_proj]),
+            contents: bytemuck::cast_slice(&[view_proj]),
             usage: BufferUsages::UNIFORM | BufferUsages::COPY_DST,
         });
 

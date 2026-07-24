@@ -63,7 +63,6 @@ impl CameraController {
 
         camera.eye = vec3_add(camera.eye, movement);
         camera.target = vec3_add(camera.eye, forward);
-        // println!("Camera Eye")
     }
 }
 
@@ -73,11 +72,11 @@ pub fn handle_key_controller(controller: &mut CameraController, code: KeyCode, i
             controller.is_forward_key_pressed = is_pressed;
         }
 
-        KeyCode::ArrowDown | KeyCode::KeyA => {
-            controller.is_forward_key_pressed = is_pressed;
+        KeyCode::ArrowDown | KeyCode::KeyS => {
+            controller.is_backward_key_pressed = is_pressed;
         }
 
-        KeyCode::ArrowLeft | KeyCode::KeyS => {
+        KeyCode::ArrowLeft | KeyCode::KeyA => {
             controller.is_left_key_pressed = is_pressed;
         }
 
