@@ -76,7 +76,7 @@ impl Camera {
     pub fn new(aspect: f32) -> Self {
         Self {
             eye: [0.0, 0.0, 3.0],
-            target: [0.0, 0.0, 0.0],
+            target: [-1.0, 0.0, 1.0],
             up: [0.0, 1.0, 0.0],
             fovy: PI / 4.0,
             znear: 0.1,

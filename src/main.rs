@@ -70,23 +70,26 @@ impl App {
         let pipeline = Rc::new(opaque_pipeline(&gpu.device, &gpu.config, &layout, shader)?);
 
         let cube_mesh = Rc::new(Mesh::cube(&gpu.device));
-        let prism_mesh = Rc::new(Mesh::prism(&gpu.device));
-        let material = Rc::new(
-            Material::new(
-                &gpu.device,
-                &gpu.queue,
-                &material_layout,
-                "src/assets/brick.jpeg",
-            )
-            .unwrap(),
-        );
+        // let prism_mesh = Rc::new(Mesh::prism(&gpu.device));
+        // let happy_tree_material = Rc::new(Material::new(
+        //     &gpu.device,
+        //     &gpu.queue,
+        //     &material_layout,
+        //     "src/assets/happy-tree.png",
+        // )?);
+        let brick_material = Rc::new(Material::new(
+            &gpu.device,
+            &gpu.queue,
+            &material_layout,
+            "src/assets/brick.jpeg",
+        )?);
 
         let scene = Scene {
             draw_items: vec![
                 DrawItem {
                     pipeline: pipeline.clone(),
                     mesh: cube_mesh.clone(),
-                    material: material.clone(),
+                    material: brick_material.clone(),
                 },
                 // DrawItem {
                 //     pipeline: pipeline.clone(),
