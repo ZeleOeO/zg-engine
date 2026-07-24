@@ -29,8 +29,8 @@ pub fn opaque_pipeline(
         primitive: wgpu::PrimitiveState {
             topology: wgpu::PrimitiveTopology::TriangleList,
             strip_index_format: None,
-            front_face: FrontFace::Ccw,
-            cull_mode: Some(Face::Front),
+            front_face: FrontFace::Cw,
+            cull_mode: Some(Face::Back),
             ..Default::default()
         },
         depth_stencil: None,
