@@ -8,11 +8,8 @@ use wgpu::{
 
 #[derive(Debug)]
 pub struct CustomTexture {
-    pub texture: Texture,
     pub view: TextureView,
     pub sampler: Sampler,
-    pub texture_size: Extent3d,
-    pub image_rba: ImageBuffer<Rgba<u8>, Vec<u8>>,
 }
 
 impl CustomTexture {
@@ -80,11 +77,8 @@ impl CustomTexture {
         );
 
         Ok(Self {
-            texture,
             view: texture_view,
             sampler: texture_sampler,
-            texture_size,
-            image_rba: img_rgba,
         })
     }
 }

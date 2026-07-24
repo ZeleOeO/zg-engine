@@ -41,7 +41,7 @@ pub fn render(device: &Device, queue: &Queue, view: &TextureView, scene: &Scene)
             render_pass.set_vertex_buffer(0, item.mesh.vertex_buffer.slice(..));
             if let Some(index_buffer) = &item.mesh.index_buffer {
                 render_pass.set_index_buffer(index_buffer.slice(..), wgpu::IndexFormat::Uint32);
-                render_pass.draw_indexed(0..item.mesh.num_to_draw, 0, 0..1);
+                render_pass.draw_indexed(0..item.mesh.index_num_to_draw, 0, 0..1);
             } else {
                 render_pass.draw(0..item.mesh.num_to_draw, 0..1);
             }

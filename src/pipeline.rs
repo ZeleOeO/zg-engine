@@ -1,5 +1,5 @@
 use wgpu::{
-    BindGroupLayout, Device, Face, PipelineCompilationOptions, PipelineLayoutDescriptor,
+    BindGroupLayout, Device, Face, FrontFace, PipelineCompilationOptions, PipelineLayoutDescriptor,
     RenderPipeline, RenderPipelineDescriptor, ShaderModule, SurfaceConfiguration, VertexState,
 };
 
@@ -29,6 +29,8 @@ pub fn opaque_pipeline(
         primitive: wgpu::PrimitiveState {
             topology: wgpu::PrimitiveTopology::TriangleList,
             strip_index_format: None,
+            front_face: FrontFace::Ccw,
+            cull_mode: Some(Face::Front),
             ..Default::default()
         },
         depth_stencil: None,

@@ -37,6 +37,7 @@ pub struct Mesh {
     pub index_buffer: Option<Buffer>,
     pub vertex_buffer: Buffer,
     pub num_to_draw: u32,
+    pub index_num_to_draw: u32,
 }
 
 impl Mesh {
@@ -55,6 +56,7 @@ impl Mesh {
 
         Self {
             num_to_draw: vertices.len() as u32,
+            index_num_to_draw: indices.len() as u32,
             index_buffer: Some(index_buffer),
             vertex_buffer,
         }
@@ -269,6 +271,27 @@ impl Mesh {
             10, 11, 12, 10, 12, 13, // Right
             14, 15, 16, 14, 16, 17,
         ];
+        Self::new(device, vertices, indices)
+    }
+
+    pub fn weird_prism(device: &Device) -> Self {
+        let vertices: &[Vertex] = &[
+            Vertex {
+                position: [-0.5, -0.5, 0.0],
+                tex_coords: [0.0, 1.0],
+            },
+            Vertex {
+                position: [0.5, -0.5, 0.0],
+                tex_coords: [1.0, 1.0],
+            },
+            Vertex {
+                position: [0.0, 0.5, 0.0],
+                tex_coords: [0.5, 0.0],
+            },
+        ];
+
+        let indices: &[u32] = &[0, 1, 2]; // CCW
+
         Self::new(device, vertices, indices)
     }
 }
