@@ -85,3 +85,5 @@ pub fn vec3_translation_matrix(translate: Vec3) -> Mat4 {
         [0.0, 0.0, 0.0, 1.0],
     ]
 }
+
+pub fn vec3_scaling_matrix(scale: Vec3) {}

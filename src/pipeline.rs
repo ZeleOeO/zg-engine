@@ -1,6 +1,7 @@
 use wgpu::{
-    BindGroupLayout, Device, Face, FrontFace, PipelineCompilationOptions, PipelineLayoutDescriptor,
-    RenderPipeline, RenderPipelineDescriptor, ShaderModule, SurfaceConfiguration, VertexState,
+    BindGroupLayout, CompareFunction, DepthBiasState, DepthStencilState, Device, Face, FrontFace,
+    PipelineCompilationOptions, PipelineLayoutDescriptor, RenderPipeline, RenderPipelineDescriptor,
+    ShaderModule, StencilState, SurfaceConfiguration, TextureFormat, VertexState,
 };
 
 use crate::resources::mesh::Vertex;
@@ -33,7 +34,13 @@ pub fn opaque_pipeline(
             cull_mode: Some(Face::Back),
             ..Default::default()
         },
-        depth_stencil: None,
+        depth_stencil: Some(DepthStencilState {
+            format: TextureFormat::Depth32Float,
+            depth_write_enabled: Some(true),
+            depth_compare: Some(CompareFunction::Less),
+            stencil: StencilState::default(),
+            bias: DepthBiasState::default(),
+        }),
         multisample: wgpu::MultisampleState {
             count: 1,
             mask: !0,

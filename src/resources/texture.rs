@@ -2,8 +2,9 @@ use anyhow::Ok;
 use image::DynamicImage;
 use image::{GenericImageView, ImageReader};
 use wgpu::{
-    Device, Extent3d, Origin3d, Queue, Sampler, TexelCopyBufferLayout, TexelCopyTextureInfo,
-    TextureAspect, TextureDescriptor, TextureUsages, TextureView, TextureViewDescriptor,
+    CompareFunction, Device, Extent3d, Origin3d, Queue, Sampler, SurfaceConfiguration,
+    TexelCopyBufferLayout, TexelCopyTextureInfo, TextureAspect, TextureDescriptor, TextureUsages,
+    TextureView, TextureViewDescriptor,
 };
 
 #[derive(Debug)]
@@ -80,5 +81,41 @@ impl CustomTexture {
             view: texture_view,
             sampler: texture_sampler,
         })
+    }
+
+    pub fn create_depth_texture(device: &Device, config: &SurfaceConfiguration) -> Self {
+        let size = Extent3d {
+            width: config.width.max(1),
+            height: config.height.max(1),
+            depth_or_array_layers: 1,
+        };
+
+        let texture = device.create_texture(&TextureDescriptor {
+            label: Some("Depth Texture"),
+            format: wgpu::TextureFormat::Depth32Float,
+            mip_level_count: 1,
+            size: size,
+            dimension: wgpu::TextureDimension::D2,
+            sample_count: 1,
+            usage: TextureUsages::RENDER_ATTACHMENT | TextureUsages::TEXTURE_BINDING,
+            view_formats: &[],
+        });
+
+        let texture_view = texture.create_view(&TextureViewDescriptor::default());
+        let texture_sampler = device.create_sampler(&wgpu::SamplerDescriptor {
+            address_mode_u: wgpu::AddressMode::ClampToEdge,
+            address_mode_v: wgpu::AddressMode::ClampToEdge,
+            address_mode_w: wgpu::AddressMode::ClampToEdge,
+            mag_filter: wgpu::FilterMode::Linear,
+            min_filter: wgpu::FilterMode::Linear,
+            mipmap_filter: wgpu::MipmapFilterMode::Nearest,
+            compare: Some(CompareFunction::LessEqual),
+            ..Default::default()
+        });
+
+        Self {
+            view: texture_view,
+            sampler: texture_sampler,
+        }
     }
 }

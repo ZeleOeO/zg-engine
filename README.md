@@ -49,8 +49,8 @@ The embedded texture (`happy-tree.png`) is mapped onto all six faces of the cube
 
 ### TODO
 
-- [ ] Make the code cleaner - ongoing
-- [ ] Camera controls (orbit / zoom)
+- [X] Make the code cleaner - ongoing
+- [X] Camera controls (orbit)
 - [ ] Multiple objects / scene graph
 - [ ] Lighting (Phong / PBR)
 - [ ] OBJ / GLTF model loading

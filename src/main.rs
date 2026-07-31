@@ -18,7 +18,7 @@ use crate::{
     layouts::*,
     pipeline::opaque_pipeline,
     renderer::render,
-    resources::{material::Material, mesh::Mesh},
+    resources::{material::Material, mesh::Mesh, texture::CustomTexture},
     scene::{DrawItem, Scene},
 };
 
@@ -93,6 +93,8 @@ impl App {
             "src/assets/brick.jpeg",
         )?);
 
+        let depth_texture = CustomTexture::create_depth_texture(&gpu.device, &gpu.config);
+
         let scene = Scene {
             draw_items: vec![
                 DrawItem::new(
@@ -112,8 +114,8 @@ impl App {
                     &cube_mesh,
                 ),
             ],
-
             camera_uniform,
+            depth_texture,
         };
         Ok(Self {
             scene,
@@ -137,23 +139,6 @@ impl App {
 
         self.camera_controller
             .camera_update(&mut self.camera, dt_min);
-        println!("=== ANGLE DEBUG ===");
-        println!(
-            "fovy: {:.3} rad ({:.1}°)",
-            self.camera.fovy,
-            self.camera.fovy.to_degrees()
-        );
-        println!(
-            "yaw: {:.3} rad ({:.1}°)",
-            self.camera_controller.yaw,
-            self.camera_controller.yaw.to_degrees()
-        );
-        println!(
-            "pitch: {:.3} rad ({:.1}°)",
-            self.camera_controller.pitch,
-            self.camera_controller.pitch.to_degrees()
-        );
-        println!("{:?}", self.scene.camera_uniform.view_proj);
     }
 }
 
@@ -208,6 +193,14 @@ impl ApplicationHandler for AppHandler {
             return;
         };
         match event {
+            WindowEvent::Resized(size) => {
+                let Some(app) = &mut self.app else {
+                    return;
+                };
+                app.camera.aspect = size.width as f32 / size.height as f32;
+                app.scene.depth_texture =
+                    CustomTexture::create_depth_texture(&app.gpu.device, &app.gpu.config);
+            }
             WindowEvent::CloseRequested => {
                 event_loop.exit();
             }

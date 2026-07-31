@@ -1,6 +1,6 @@
 use wgpu::{
-    Device, Queue, RenderPassColorAttachment, RenderPassDescriptor, TextureView,
-    wgt::CommandEncoderDescriptor,
+    Device, LoadOp, Operations, Queue, RenderPassColorAttachment, RenderPassDepthStencilAttachment,
+    RenderPassDescriptor, StoreOp, TextureView, wgt::CommandEncoderDescriptor,
 };
 
 use crate::scene::Scene;
@@ -8,6 +8,7 @@ use crate::scene::Scene;
 pub fn render(device: &Device, queue: &Queue, view: &TextureView, scene: &Scene) {
     let items = &scene.draw_items;
     let camera = &scene.camera_uniform;
+    let depth_texture = &scene.depth_texture;
     let mut encoder = device.create_command_encoder(&CommandEncoderDescriptor {
         label: Some("Encoder"),
     });
@@ -28,7 +29,14 @@ pub fn render(device: &Device, queue: &Queue, view: &TextureView, scene: &Scene)
                     store: wgpu::StoreOp::Store,
                 },
             })],
-            depth_stencil_attachment: None,
+            depth_stencil_attachment: Some(RenderPassDepthStencilAttachment {
+                view: &depth_texture.view,
+                depth_ops: Some(Operations {
+                    load: LoadOp::Clear(1.0),
+                    store: StoreOp::Store,
+                }),
+                stencil_ops: None,
+            }),
             timestamp_writes: None,
             occlusion_query_set: None,
             multiview_mask: None,

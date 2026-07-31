@@ -10,7 +10,7 @@ use wgpu::{
 use crate::{
     camera::camera::CameraUniform,
     math::{Mat4, Vec3, mat4_transpose, vec3_translation_matrix},
-    resources::{material::Material, mesh::Mesh},
+    resources::{material::Material, mesh::Mesh, texture::CustomTexture},
 };
 
 #[derive(Clone, Pod, Copy, Zeroable)]
@@ -31,6 +31,7 @@ pub struct DrawItem {
 pub struct Scene {
     pub draw_items: Vec<DrawItem>,
     pub camera_uniform: CameraUniform,
+    pub depth_texture: CustomTexture,
 }
 
 impl DrawItem {
