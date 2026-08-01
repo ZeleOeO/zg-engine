@@ -28,5 +28,7 @@ fn vs_main(in: VertexInput) -> VertexOutput {
 
 @fragment
 fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
-    return textureSample(texture, t_sampler, in.tex_cords);
+    let ambientLightIntensity = 0.2;
+    let lightFinal = ambientLightIntensity;
+    return textureSample(texture, t_sampler, in.tex_cords) * lightFinal;
 }

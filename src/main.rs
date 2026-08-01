@@ -14,10 +14,10 @@ use winit::{
 
 use crate::{
     camera::{camera::*, camera_controller::CameraController},
-    gpu::GPU,
+    core::gpu::GPU,
     layouts::*,
-    pipeline::opaque_pipeline,
-    renderer::render,
+    passes::render_pass::render,
+    pipeline::pipeline::opaque_pipeline,
     resources::{material::Material, mesh::Mesh, texture::CustomTexture},
     scene::{DrawItem, Scene},
 };
@@ -25,12 +25,12 @@ use crate::{
 use std::rc::Rc;
 
 pub mod camera;
-pub mod gpu;
+pub mod core;
 pub mod key_input;
 pub mod layouts;
 pub mod math;
+pub mod passes;
 pub mod pipeline;
-pub mod renderer;
 pub mod resources;
 pub mod scene;
 
