@@ -61,21 +61,25 @@ impl App {
         let material_layout = create_material_bg_layout(&gpu.device);
         let camera_layout = create_camera_layout(&gpu.device);
         let item_uniform_layout = create_item_uniform_layout(&gpu.device);
+        let light_uniform_layout = create_light_uniform_layout(&gpu.device);
         // Arranged according to bind group
         let layout = [
             Some(&camera_layout),
             Some(&material_layout),
             Some(&item_uniform_layout),
+            Some(&light_uniform_layout),
         ];
 
         let camera = Camera::new((window_size.width as f32) / window_size.height as f32);
         let camera_controller = CameraController::new(2.0, 0.2);
         let camera_uniform = CameraUniform::new(&gpu.device, &camera, &camera_layout);
 
-        let shader = &gpu
-            .device
-            .create_shader_module(wgpu::include_wgsl!("./shaders/shader.wgsl"));
-        let pipeline = Rc::new(opaque_pipeline(&gpu.device, &gpu.config, &layout, shader)?);
+        let pipeline = {
+            let shader = &gpu
+                .device
+                .create_shader_module(wgpu::include_wgsl!("./shaders/shader.wgsl"));
+            Rc::new(opaque_pipeline(&gpu.device, &gpu.config, &layout, shader)?)
+        };
 
         let cube_mesh = Rc::new(Mesh::cube(&gpu.device));
         let prism_mesh = Rc::new(Mesh::prism(&gpu.device));
