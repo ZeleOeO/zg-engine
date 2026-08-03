@@ -9,7 +9,7 @@ use wgpu::{
 
 use crate::{
     camera::camera::CameraUniform,
-    math::{Mat4, Vec3, mat4_transpose, vec3_translation_matrix},
+    math::{Mat4, Vec3, mat4_identity, mat4_transpose, vec3_translation_matrix},
     resources::{material::Material, mesh::Mesh, texture::CustomTexture},
 };
 
@@ -26,6 +26,7 @@ pub struct DrawItem {
     pub material: Rc<Material>,
     pub item_uniform: ItemUniform,
     pub bind_group: BindGroup,
+    pub is_light: bool,
 }
 
 pub struct Scene {
@@ -37,14 +38,14 @@ pub struct Scene {
 impl DrawItem {
     pub fn new(
         device: &Device,
-        translation: &Vec3,
         layout: &BindGroupLayout,
         pipeline: &Rc<RenderPipeline>,
         material: &Rc<Material>,
         mesh: &Rc<Mesh>,
+        is_light: bool,
     ) -> Self {
         let item_uniform = ItemUniform {
-            translation: mat4_transpose(vec3_translation_matrix(*translation)),
+            translation: mat4_identity(),
         };
         let uniform = device.create_buffer_init(&BufferInitDescriptor {
             label: Some("Draw Item Buffer Transform"),
@@ -67,6 +68,14 @@ impl DrawItem {
             material: Rc::clone(&material),
             item_uniform,
             bind_group,
+            is_light,
         }
+    }
+
+    pub fn translate(mut self, translation: &Vec3) -> Self {
+        self.item_uniform = ItemUniform {
+            translation: mat4_transpose(vec3_translation_matrix(*translation)),
+        };
+        self
     }
 }
