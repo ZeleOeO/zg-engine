@@ -1,10 +1,11 @@
 use anyhow::Ok;
 use image::DynamicImage;
 use image::{GenericImageView, ImageReader};
+use wgpu::wgt::TextureDescriptor;
 use wgpu::{
-    CompareFunction, Device, Extent3d, Origin3d, Queue, Sampler, SurfaceConfiguration,
-    TexelCopyBufferLayout, TexelCopyTextureInfo, TextureAspect, TextureDescriptor, TextureUsages,
-    TextureView, TextureViewDescriptor,
+    CompareFunction, Device, Extent3d, Origin3d, Queue, Sampler, SamplerDescriptor,
+    SurfaceConfiguration, TexelCopyBufferLayout, TexelCopyTextureInfo, TextureAspect,
+    TextureFormat, TextureUsages, TextureView, TextureViewDescriptor,
 };
 
 #[derive(Debug)]
@@ -116,6 +117,35 @@ impl CustomTexture {
         Self {
             view: texture_view,
             sampler: texture_sampler,
+        }
+    }
+
+    pub fn create_dummy_texture(device: &Device) -> Self {
+        let texture = device.create_texture(&TextureDescriptor {
+            label: Some("Dummy Texture"),
+            size: Extent3d {
+                width: 1,
+                height: 1,
+                depth_or_array_layers: 1,
+            },
+            mip_level_count: 1,
+            sample_count: 1,
+            dimension: wgpu::TextureDimension::D2,
+            format: TextureFormat::Rgba8UnormSrgb,
+            usage: TextureUsages::TEXTURE_BINDING | TextureUsages::COPY_DST,
+            view_formats: &[],
+        });
+
+        let texture_view = texture.create_view(&TextureViewDescriptor::default());
+
+        let sampler = device.create_sampler(&SamplerDescriptor {
+            label: Some("Dummy Sampler"),
+            ..Default::default()
+        });
+
+        Self {
+            view: texture_view,
+            sampler,
         }
     }
 }

@@ -7,13 +7,6 @@ use wgpu::{
 
 use crate::math::*;
 
-// Following, albeit loosely, a tutorial
-// Definition: eye is camera in world space
-// Target is what I'm looking at
-// Up is the hinted direction of where "up" is in world space
-//
-// Might change variable names later
-
 fn look_at_matrix(eye: Vec3, target: Vec3, up: Vec3) -> Mat4 {
     let forward = vec3_normalize(vec3_sub(target, eye));
     let right = vec3_normalize(vec3_cross_product(forward, up));

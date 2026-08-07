@@ -1,3 +1,5 @@
+use std::f32::consts::PI;
+
 pub type Vec3 = [f32; 3];
 pub type Mat4 = [[f32; 4]; 4];
 
@@ -86,4 +88,12 @@ pub fn vec3_translation_matrix(translate: Vec3) -> Mat4 {
     ]
 }
 
-pub fn vec3_scaling_matrix(scale: Vec3) {}
+pub fn vec3_rotate_by_y(vector: Vec3, degree: f32) -> Vec3 {
+    let radians: f32 = degree * PI / 180.0;
+
+    [
+        vector[0] * radians.cos() - vector[2] * radians.sin(),
+        vector[1],
+        vector[0] * radians.sin() + vector[2] * radians.sin(),
+    ]
+}

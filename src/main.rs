@@ -16,8 +16,8 @@ use crate::{
     camera::{camera::*, camera_controller::CameraController},
     core::gpu::GPU,
     layouts::*,
-    passes::render_pass::render,
-    pipeline::pipeline::opaque_pipeline,
+    passes::render,
+    pipeline::opaque_pipeline,
     resources::{material::Material, mesh::Mesh, texture::CustomTexture},
     scene::{DrawItem, Scene},
 };
@@ -58,23 +58,22 @@ impl App {
             .or_else(|_e| window.set_cursor_grab(CursorGrabMode::Locked))
             .unwrap();
 
-        let material_layout = create_material_bg_layout(&gpu.device);
         let camera_layout = create_camera_layout(&gpu.device);
+        let material_layout = create_material_bg_layout(&gpu.device);
         let item_uniform_layout = create_item_uniform_layout(&gpu.device);
-        let light_uniform_layout = create_light_uniform_layout(&gpu.device);
-        // Arranged according to bind group
+
+        //Arranged according to bind group
         let layout = [
             Some(&camera_layout),
             Some(&material_layout),
             Some(&item_uniform_layout),
-            Some(&light_uniform_layout),
         ];
 
         let camera = Camera::new((window_size.width as f32) / window_size.height as f32);
         let camera_controller = CameraController::new(2.0, 0.2);
         let camera_uniform = CameraUniform::new(&gpu.device, &camera, &camera_layout);
 
-        let pipeline = {
+        let mesh_pipeline = {
             let shader = &gpu
                 .device
                 .create_shader_module(wgpu::include_wgsl!("./shaders/shader.wgsl"));
@@ -84,42 +83,48 @@ impl App {
         let cube_mesh = Rc::new(Mesh::cube(&gpu.device));
         let prism_mesh = Rc::new(Mesh::prism(&gpu.device));
 
-        let happy_tree_material = Rc::new(Material::new(
-            &gpu.device,
-            &gpu.queue,
-            &material_layout,
-            "src/assets/happy-tree.png",
-        )?);
-        let brick_material = Rc::new(Material::new(
+        // let happy_tree_material = Rc::new(Material::new_texture(
+        //     &gpu.device,
+        //     &gpu.queue,
+        //     &material_layout,
+        //     "src/assets/happy-tree.png",
+        // )?);
+        let brick_material = Rc::new(Material::new_texture(
             &gpu.device,
             &gpu.queue,
             &material_layout,
             "src/assets/brick.jpeg",
         )?);
 
-        let depth_texture = CustomTexture::create_depth_texture(&gpu.device, &gpu.config);
-
         let scene = Scene {
             draw_items: vec![
-                DrawItem::new(
+                DrawItem::new_with_texture(
                     &gpu.device,
-                    &([3.0, 2.0, 1.0] as [f32; 3]),
                     &item_uniform_layout,
-                    &pipeline,
+                    &mesh_pipeline,
                     &brick_material,
                     &prism_mesh,
-                ),
-                DrawItem::new(
+                )
+                .translate(&([3.0, 2.0, 1.0] as [f32; 3]), &gpu.queue),
+                DrawItem::new_with_color(
                     &gpu.device,
-                    &([1.0, 1.0, 1.0] as [f32; 3]),
                     &item_uniform_layout,
-                    &pipeline,
-                    &happy_tree_material,
+                    &mesh_pipeline,
+                    Material::new_color(&gpu.device, &material_layout, [1.0, 1.0, 1.0], 1.0)?,
+                    &prism_mesh,
+                )
+                .translate(&([5.0, 6.0, 5.0] as [f32; 3]), &gpu.queue),
+                DrawItem::new_with_color(
+                    &gpu.device,
+                    &item_uniform_layout,
+                    &mesh_pipeline,
+                    Material::new_color(&gpu.device, &material_layout, [0.0, 0.0, 0.0], 1.0)?,
                     &cube_mesh,
-                ),
+                )
+                .translate(&([6.0, 3.0, 2.0] as [f32; 3]), &gpu.queue),
             ],
             camera_uniform,
-            depth_texture,
+            depth_texture: CustomTexture::create_depth_texture(&gpu.device, &gpu.config),
         };
         Ok(Self {
             scene,

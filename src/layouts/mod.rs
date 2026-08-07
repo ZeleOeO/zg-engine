@@ -35,7 +35,7 @@ pub fn create_item_uniform_layout(device: &Device) -> BindGroupLayout {
 }
 
 pub fn create_material_bg_layout(device: &Device) -> BindGroupLayout {
-    let bg_layouts = device.create_bind_group_layout(&BindGroupLayoutDescriptor {
+    device.create_bind_group_layout(&BindGroupLayoutDescriptor {
         label: Some("Bind Group Layout"),
         entries: &[
             BindGroupLayoutEntry {
@@ -54,7 +54,16 @@ pub fn create_material_bg_layout(device: &Device) -> BindGroupLayout {
                 ty: wgpu::BindingType::Sampler(wgpu::SamplerBindingType::Filtering),
                 visibility: ShaderStages::FRAGMENT,
             },
+            BindGroupLayoutEntry {
+                binding: 2,
+                count: None,
+                visibility: ShaderStages::VERTEX_FRAGMENT,
+                ty: wgpu::BindingType::Buffer {
+                    ty: wgpu::BufferBindingType::Uniform,
+                    has_dynamic_offset: false,
+                    min_binding_size: None,
+                },
+            },
         ],
-    });
-    bg_layouts
+    })
 }
