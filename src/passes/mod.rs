@@ -60,6 +60,7 @@ pub fn render(device: &Device, queue: &Queue, view: &TextureView, scene: &Scene)
             }
 
             render_pass.set_bind_group(2, &item.transform_bind_group, &[]);
+            render_pass.set_bind_group(3, &item.light_uniform_bind_group, &[]);
 
             if let Some(index_buffer) = &item.mesh.index_buffer {
                 render_pass.set_index_buffer(index_buffer.slice(..), wgpu::IndexFormat::Uint32);

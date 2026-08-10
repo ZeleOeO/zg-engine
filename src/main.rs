@@ -61,12 +61,14 @@ impl App {
         let camera_layout = create_camera_layout(&gpu.device);
         let material_layout = create_material_bg_layout(&gpu.device);
         let item_uniform_layout = create_item_uniform_layout(&gpu.device);
+        let light_uniform_layout = create_light_uniform_layout(&gpu.device);
 
         //Arranged according to bind group
         let layout = [
             Some(&camera_layout),
             Some(&material_layout),
             Some(&item_uniform_layout),
+            Some(&light_uniform_layout),
         ];
 
         let camera = Camera::new((window_size.width as f32) / window_size.height as f32);
@@ -99,29 +101,30 @@ impl App {
         let scene = Scene {
             draw_items: vec![
                 DrawItem::new_with_texture(
-                    &gpu.device,
+                    &gpu,
                     &item_uniform_layout,
                     &mesh_pipeline,
                     &brick_material,
                     &prism_mesh,
                 )
-                .translate(&([3.0, 2.0, 1.0] as [f32; 3]), &gpu.queue),
+                .translate(&([1.0, 3.0, 1.0] as [f32; 3]), &gpu),
                 DrawItem::new_with_color(
-                    &gpu.device,
+                    &gpu,
                     &item_uniform_layout,
                     &mesh_pipeline,
-                    Material::new_color(&gpu.device, &material_layout, [1.0, 1.0, 1.0], 1.0)?,
+                    Material::new_color(&gpu.device, &material_layout, [1.0, 1.0, 1.0])?,
                     &prism_mesh,
                 )
-                .translate(&([5.0, 6.0, 5.0] as [f32; 3]), &gpu.queue),
+                .translate(&([1.0, 1.0, 2.0] as [f32; 3]), &gpu)
+                .is_light(&gpu),
                 DrawItem::new_with_color(
-                    &gpu.device,
+                    &gpu,
                     &item_uniform_layout,
                     &mesh_pipeline,
-                    Material::new_color(&gpu.device, &material_layout, [0.0, 0.0, 0.0], 1.0)?,
+                    Material::new_color(&gpu.device, &material_layout, [0.0, 0.0, 0.0])?,
                     &cube_mesh,
                 )
-                .translate(&([6.0, 3.0, 2.0] as [f32; 3]), &gpu.queue),
+                .translate(&([2.0, 2.0, 2.0] as [f32; 3]), &gpu),
             ],
             camera_uniform,
             depth_texture: CustomTexture::create_depth_texture(&gpu.device, &gpu.config),

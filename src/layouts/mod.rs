@@ -67,3 +67,19 @@ pub fn create_material_bg_layout(device: &Device) -> BindGroupLayout {
         ],
     })
 }
+
+pub fn create_light_uniform_layout(device: &Device) -> BindGroupLayout {
+    device.create_bind_group_layout(&BindGroupLayoutDescriptor {
+        label: Some("Light Uniform Layout"),
+        entries: &[BindGroupLayoutEntry {
+            binding: 0,
+            count: None,
+            visibility: ShaderStages::VERTEX_FRAGMENT,
+            ty: wgpu::BindingType::Buffer {
+                ty: wgpu::BufferBindingType::Uniform,
+                has_dynamic_offset: false,
+                min_binding_size: None,
+            },
+        }],
+    })
+}

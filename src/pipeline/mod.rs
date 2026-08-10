@@ -20,7 +20,7 @@ pub fn opaque_pipeline(
     });
 
     let render_pipeline = device.create_render_pipeline(&RenderPipelineDescriptor {
-        label: Some("Render Pipeline"),
+        label: Some("General Render Pipeline"),
         layout: Some(&render_pipeline_layout),
         vertex: VertexState {
             module: &shader,

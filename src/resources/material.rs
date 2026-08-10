@@ -25,8 +25,6 @@ pub enum MaterialType {
 struct MaterialUniform {
     color: Vec3,
     has_texture: f32,
-    emmisive: f32,
-    _padding: Vec3,
 }
 
 #[derive(Clone)]
@@ -54,8 +52,6 @@ impl Material {
             contents: bytemuck::cast_slice(&[MaterialUniform {
                 color: [0.0, 0.0, 0.0],
                 has_texture: 1.0,
-                emmisive: 0.0,
-                _padding: [0.0, 0.0, 0.0],
             }]),
             usage: BufferUsages::UNIFORM | BufferUsages::COPY_DST,
         });
@@ -90,15 +86,12 @@ impl Material {
         device: &Device,
         layout: &BindGroupLayout,
         color: Vec3,
-        emmisive: f32,
     ) -> anyhow::Result<Self> {
         let buffer = device.create_buffer_init(&BufferInitDescriptor {
             label: Some("Buffer Init Descriptor Matieral Color"),
             contents: bytemuck::cast_slice(&[MaterialUniform {
                 color,
                 has_texture: 0.0,
-                emmisive,
-                _padding: [0.0, 0.0, 0.0],
             }]),
             usage: BufferUsages::UNIFORM | BufferUsages::COPY_DST,
         });
