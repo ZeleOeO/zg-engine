@@ -14,6 +14,7 @@ struct VertexInput {
 struct MaterialUniform {
     color: vec3<f32>,
     has_texture: f32,
+    emmisive: f32,
 }
 
 struct ItemUniform {
@@ -54,9 +55,9 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
         material_uniform.has_texture == 1.0
     );
 
-    //    if material_uniform.emmisive > 0.0 {
-    //        return vec4<f32>(base_color * material_uniform.emmisive, 1.0);
-    //   }
+    if material_uniform.emmisive > 0.0 {
+        return vec4<f32>(base_color * material_uniform.emmisive, 1.0);
+    }
 
     let ambientLightIntensity = 0.2;
 

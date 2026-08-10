@@ -29,7 +29,7 @@ pub struct ItemUniform {
 #[repr(C)]
 pub struct LightUniform {
     position: Vec3,
-    emmisive: f32,
+    _padding: f32,
     color: Vec3,
     _padding2: f32,
 }
@@ -38,7 +38,7 @@ fn default_light_uniform(gpu: &GPU) -> BindGroup {
     let light_uniform = LightUniform {
         position: [0.0, 0.0, 0.0],
         color: [0.0, 0.0, 0.0],
-        emmisive: 0.0,
+        _padding: 0.0,
         _padding2: 0.0,
     };
 
@@ -180,7 +180,7 @@ impl DrawItem {
                 let light_uniform = LightUniform {
                     position: self.position,
                     color,
-                    emmisive: 1.0,
+                    _padding: 0.0,
                     _padding2: 0.0,
                 };
 

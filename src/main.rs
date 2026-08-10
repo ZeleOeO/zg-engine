@@ -112,7 +112,7 @@ impl App {
                     &gpu,
                     &item_uniform_layout,
                     &mesh_pipeline,
-                    Material::new_color(&gpu.device, &material_layout, [1.0, 1.0, 1.0])?,
+                    Material::new_color(&gpu.device, &material_layout, [1.0, 1.0, 1.0], 1.0)?,
                     &prism_mesh,
                 )
                 .translate(&([1.0, 1.0, 2.0] as [f32; 3]), &gpu)
@@ -121,7 +121,7 @@ impl App {
                     &gpu,
                     &item_uniform_layout,
                     &mesh_pipeline,
-                    Material::new_color(&gpu.device, &material_layout, [0.0, 0.0, 0.0])?,
+                    Material::new_color(&gpu.device, &material_layout, [0.0, 0.0, 0.0], 0.0)?,
                     &cube_mesh,
                 )
                 .translate(&([2.0, 2.0, 2.0] as [f32; 3]), &gpu),
