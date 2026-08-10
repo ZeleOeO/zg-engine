@@ -2,8 +2,8 @@ use std::rc::Rc;
 
 use bytemuck::{Pod, Zeroable};
 use wgpu::{
-    BindGroup, BindGroupDescriptor, BindGroupEntry, BindGroupLayout, Buffer, BufferUsages, Device,
-    Queue, RenderPipeline,
+    BindGroup, BindGroupDescriptor, BindGroupEntry, BindGroupLayout, Buffer, BufferUsages,
+    RenderPipeline,
     util::{BufferInitDescriptor, DeviceExt},
 };
 
