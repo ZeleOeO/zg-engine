@@ -2,6 +2,18 @@ use std::f32::consts::PI;
 
 pub type Vec3 = [f32; 3];
 pub type Mat4 = [[f32; 4]; 4];
+pub type Mat3 = [[f32; 3]; 3];
+
+#[repr(C)]
+#[derive(Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]
+pub struct UniformMat3 {
+    col0: [f32; 3],
+    _pad0: f32,
+    col1: [f32; 3],
+    _pad1: f32,
+    col2: [f32; 3],
+    _pad2: f32,
+}
 
 pub fn vec3_add(vec_one: Vec3, vec_two: Vec3) -> Vec3 {
     [
@@ -50,6 +62,25 @@ pub fn vec3_normalize(vec: Vec3) -> Vec3 {
     [vec[0] / length, vec[1] / length, vec[2] / length]
 }
 
+pub fn vec3_translation_matrix(translate: Vec3) -> Mat4 {
+    [
+        [1.0, 0.0, 0.0, translate[0]],
+        [0.0, 1.0, 0.0, translate[1]],
+        [0.0, 0.0, 1.0, translate[2]],
+        [0.0, 0.0, 0.0, 1.0],
+    ]
+}
+
+pub fn vec3_rotate_by_y(vector: Vec3, degree: f32) -> Vec3 {
+    let radians: f32 = degree * PI / 180.0;
+
+    [
+        vector[0] * radians.cos() - vector[2] * radians.sin(),
+        vector[1],
+        vector[0] * radians.sin() + vector[2] * radians.sin(),
+    ]
+}
+
 pub fn mat4_identity() -> Mat4 {
     [
         [1.0, 0.0, 0.0, 0.0],
@@ -79,21 +110,66 @@ pub fn mat4_transpose(matrix: Mat4) -> Mat4 {
     ]
 }
 
-pub fn vec3_translation_matrix(translate: Vec3) -> Mat4 {
+// Everything below is AI-generated, I just want to get this thing done mehn
+fn invert_mat3(m: Mat3) -> Option<Mat3> {
+    let a = m[0][0];
+    let b = m[0][1];
+    let c = m[0][2];
+    let d = m[1][0];
+    let e = m[1][1];
+    let f = m[1][2];
+    let g = m[2][0];
+    let h = m[2][1];
+    let i = m[2][2];
+
+    let det = a * (e * i - f * h) - b * (d * i - f * g) + c * (d * h - e * g);
+
+    if det.abs() < 1e-8 {
+        return None;
+    }
+
+    let inv_det = 1.0 / det;
+
+    Some([
+        [
+            (e * i - f * h) * inv_det,
+            (c * h - b * i) * inv_det,
+            (b * f - c * e) * inv_det,
+        ],
+        [
+            (f * g - d * i) * inv_det,
+            (a * i - c * g) * inv_det,
+            (c * d - a * f) * inv_det,
+        ],
+        [
+            (d * h - e * g) * inv_det,
+            (b * g - a * h) * inv_det,
+            (a * e - b * d) * inv_det,
+        ],
+    ])
+}
+
+fn mat3_transpose(m: Mat3) -> Mat3 {
     [
-        [1.0, 0.0, 0.0, translate[0]],
-        [0.0, 1.0, 0.0, translate[1]],
-        [0.0, 0.0, 1.0, translate[2]],
-        [0.0, 0.0, 0.0, 1.0],
+        [m[0][0], m[1][0], m[2][0]],
+        [m[0][1], m[1][1], m[2][1]],
+        [m[0][2], m[1][2], m[2][2]],
     ]
 }
 
-pub fn vec3_rotate_by_y(vector: Vec3, degree: f32) -> Vec3 {
-    let radians: f32 = degree * PI / 180.0;
-
+fn mat4_to_mat3(m: Mat4) -> Mat3 {
     [
-        vector[0] * radians.cos() - vector[2] * radians.sin(),
-        vector[1],
-        vector[0] * radians.sin() + vector[2] * radians.sin(),
+        [m[0][0], m[0][1], m[0][2]],
+        [m[1][0], m[1][1], m[1][2]],
+        [m[2][0], m[2][1], m[2][2]],
     ]
+}
+
+fn compute_normal_matrix(model: Mat4) -> Mat3 {
+    let m3 = mat4_to_mat3(model);
+
+    match invert_mat3(m3) {
+        Some(inv) => mat3_transpose(inv),
+        None => [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
+    }
 }
