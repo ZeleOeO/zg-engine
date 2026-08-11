@@ -4,17 +4,6 @@ pub type Vec3 = [f32; 3];
 pub type Mat4 = [[f32; 4]; 4];
 pub type Mat3 = [[f32; 3]; 3];
 
-#[repr(C)]
-#[derive(Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]
-pub struct UniformMat3 {
-    col0: [f32; 3],
-    _pad0: f32,
-    col1: [f32; 3],
-    _pad1: f32,
-    col2: [f32; 3],
-    _pad2: f32,
-}
-
 pub fn vec3_add(vec_one: Vec3, vec_two: Vec3) -> Vec3 {
     [
         vec_one[0] + vec_two[0],
@@ -111,7 +100,7 @@ pub fn mat4_transpose(matrix: Mat4) -> Mat4 {
 }
 
 // Everything below is AI-generated, I just want to get this thing done mehn
-fn invert_mat3(m: Mat3) -> Option<Mat3> {
+pub fn invert_mat3(m: Mat3) -> Option<Mat3> {
     let a = m[0][0];
     let b = m[0][1];
     let c = m[0][2];
@@ -149,7 +138,7 @@ fn invert_mat3(m: Mat3) -> Option<Mat3> {
     ])
 }
 
-fn mat3_transpose(m: Mat3) -> Mat3 {
+pub fn mat3_transpose(m: Mat3) -> Mat3 {
     [
         [m[0][0], m[1][0], m[2][0]],
         [m[0][1], m[1][1], m[2][1]],
@@ -157,7 +146,7 @@ fn mat3_transpose(m: Mat3) -> Mat3 {
     ]
 }
 
-fn mat4_to_mat3(m: Mat4) -> Mat3 {
+pub fn mat4_to_mat3(m: Mat4) -> Mat3 {
     [
         [m[0][0], m[0][1], m[0][2]],
         [m[1][0], m[1][1], m[1][2]],
@@ -165,7 +154,7 @@ fn mat4_to_mat3(m: Mat4) -> Mat3 {
     ]
 }
 
-fn compute_normal_matrix(model: Mat4) -> Mat3 {
+pub fn compute_normal_matrix(model: Mat4) -> Mat3 {
     let m3 = mat4_to_mat3(model);
 
     match invert_mat3(m3) {

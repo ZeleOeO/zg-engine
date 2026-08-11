@@ -9,6 +9,7 @@ pub fn render(device: &Device, queue: &Queue, view: &TextureView, scene: &Scene)
     let items = &scene.draw_items;
     let camera = &scene.camera_uniform;
     let depth_texture = &scene.depth_texture;
+
     let mut encoder = device.create_command_encoder(&CommandEncoderDescriptor {
         label: Some("Encoder"),
     });
@@ -60,7 +61,7 @@ pub fn render(device: &Device, queue: &Queue, view: &TextureView, scene: &Scene)
             }
 
             render_pass.set_bind_group(2, &item.transform_bind_group, &[]);
-            render_pass.set_bind_group(3, &item.light_uniform_bind_group, &[]);
+            render_pass.set_bind_group(3, &scene.light_bind_group, &[]);
 
             if let Some(index_buffer) = &item.mesh.index_buffer {
                 render_pass.set_index_buffer(index_buffer.slice(..), wgpu::IndexFormat::Uint32);

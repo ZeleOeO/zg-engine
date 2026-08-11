@@ -16,8 +16,9 @@ use crate::{
     camera::{camera::*, camera_controller::CameraController},
     core::gpu::GPU,
     layouts::*,
+    math::Vec3,
     passes::render,
-    pipeline::opaque_pipeline,
+    pipeline::{light_pipeline, opaque_pipeline},
     resources::{material::Material, mesh::Mesh, texture::CustomTexture},
     scene::{DrawItem, Scene},
 };
@@ -78,9 +79,10 @@ impl App {
         let mesh_pipeline = {
             let shader = &gpu
                 .device
-                .create_shader_module(wgpu::include_wgsl!("./shaders/shader.wgsl"));
+                .create_shader_module(wgpu::include_wgsl!("./shaders/mesh.wgsl"));
             Rc::new(opaque_pipeline(&gpu.device, &gpu.config, &layout, shader)?)
         };
+        let light_pipeline = Rc::new(light_pipeline(&gpu, &layout)?);
 
         let cube_mesh = Rc::new(Mesh::cube(&gpu.device));
         let prism_mesh = Rc::new(Mesh::prism(&gpu.device));
@@ -98,37 +100,41 @@ impl App {
             "src/assets/brick.jpeg",
         )?);
 
-        let scene = Scene {
-            draw_items: vec![
-                DrawItem::new_with_texture(
-                    &gpu,
-                    &item_uniform_layout,
-                    &mesh_pipeline,
-                    &brick_material,
-                    &prism_mesh,
-                )
-                .translate(&([1.0, 3.0, 1.0] as [f32; 3]), &gpu),
-                DrawItem::new_with_color(
-                    &gpu,
-                    &item_uniform_layout,
-                    &mesh_pipeline,
-                    Material::new_color(&gpu.device, &material_layout, [1.0, 1.0, 1.0], 1.0)?,
-                    &prism_mesh,
-                )
-                .translate(&([1.0, 1.0, 2.0] as [f32; 3]), &gpu)
-                .is_light(&gpu),
-                DrawItem::new_with_color(
-                    &gpu,
-                    &item_uniform_layout,
-                    &mesh_pipeline,
-                    Material::new_color(&gpu.device, &material_layout, [0.0, 0.0, 0.0], 0.0)?,
-                    &cube_mesh,
-                )
-                .translate(&([2.0, 2.0, 2.0] as [f32; 3]), &gpu),
-            ],
+        let draw_items = vec![
+            DrawItem::new_with_texture(
+                &gpu,
+                &item_uniform_layout,
+                &mesh_pipeline,
+                &brick_material,
+                &prism_mesh,
+            )
+            .translate(&([1.0, 3.0, 1.0] as Vec3), &gpu),
+            DrawItem::new_with_color(
+                &gpu,
+                &item_uniform_layout,
+                &mesh_pipeline,
+                Material::new_color(&gpu.device, &material_layout, [1.0, 1.0, 1.0], 1.0)?,
+                &prism_mesh,
+            )
+            .translate(&([1.0, 1.0, 2.0] as Vec3), &gpu)
+            .is_light(&light_pipeline),
+            DrawItem::new_with_color(
+                &gpu,
+                &item_uniform_layout,
+                &mesh_pipeline,
+                Material::new_color(&gpu.device, &material_layout, [1.0, 0.0, 1.0], 0.0)?,
+                &cube_mesh,
+            )
+            .translate(&([2.0, 2.0, 2.0] as Vec3), &gpu),
+        ];
+        let scene = Scene::new(
             camera_uniform,
-            depth_texture: CustomTexture::create_depth_texture(&gpu.device, &gpu.config),
-        };
+            CustomTexture::create_depth_texture(&gpu.device, &gpu.config),
+            draw_items,
+            &gpu,
+            &light_uniform_layout,
+        );
+
         Ok(Self {
             scene,
             gpu: gpu,
@@ -140,6 +146,7 @@ impl App {
     }
 
     pub fn render(&self, view: &TextureView) {
+        self.scene.render_light(&self.gpu);
         render(&self.gpu.device, &self.gpu.queue, view, &self.scene);
     }
 

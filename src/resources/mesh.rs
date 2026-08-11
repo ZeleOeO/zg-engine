@@ -4,7 +4,7 @@ use wgpu::{
     util::{BufferInitDescriptor, DeviceExt},
 };
 
-use crate::math::Vec3;
+use crate::math::{Vec3, vec3_add, vec3_cross_product, vec3_normalize};
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, Pod, Zeroable)]
@@ -31,8 +31,8 @@ impl Vertex {
                     shader_location: 1,
                 },
                 VertexAttribute {
-                    format: VertexFormat::Float32x2,
-                    offset: std::mem::size_of::<[f32; 3]>() as BufferAddress,
+                    format: VertexFormat::Float32x3,
+                    offset: std::mem::size_of::<[f32; 2]>() as BufferAddress,
                     shader_location: 2,
                 },
             ],
@@ -49,7 +49,8 @@ pub struct Mesh {
 }
 
 impl Mesh {
-    pub fn new(device: &Device, vertices: &[Vertex], indices: &[u32]) -> Self {
+    pub fn new(device: &Device, vertices: &mut [Vertex], indices: &[u32]) -> Self {
+        Self::calculate_normals(vertices, indices);
         let vertex_buffer = device.create_buffer_init(&BufferInitDescriptor {
             label: Some("Vertex Buffer"),
             contents: bytemuck::cast_slice(&vertices),
@@ -73,7 +74,7 @@ impl Mesh {
     // AI generated this cause I was too lazy to create the normal creation logic, especially
     // because I want to add model loading and most .obj files already have normals
     pub fn cube(device: &Device) -> Self {
-        let vertices: &[Vertex] = &[
+        let vertices: &mut [Vertex] = &mut [
             // Front face (z = 0.5) — normal: [0, 0, 1]
             Vertex {
                 position: [-0.5, -0.5, 0.5],
@@ -215,7 +216,7 @@ impl Mesh {
     }
 
     pub fn prism(device: &Device) -> Self {
-        let vertices: &[Vertex] = &[
+        let vertices: &mut [Vertex] = &mut [
             // Front face (z = 0.5) — normal: [0, 0, 1]
             Vertex {
                 position: [0.0, 0.5, 0.5],
@@ -323,5 +324,32 @@ impl Mesh {
         ];
 
         Self::new(device, vertices, indices)
+    }
+
+    pub fn calculate_normals(vertices: &mut [Vertex], indices: &[u32]) {
+        let mut normals: Vec<Vec3> = vec![[0.0, 0.0, 0.0]; vertices.len()];
+
+        for i in (0..indices.len()).step_by(3) {
+            let i0 = indices[i] as usize;
+            let i1 = indices[i + 1] as usize;
+            let i2 = indices[i + 2] as usize;
+
+            let v0 = vertices[i0].position;
+            let v1 = vertices[i1].position;
+            let v2 = vertices[i2].position;
+
+            let edge1 = [v1[0] - v0[0], v1[1] - v0[1], v1[2] - v0[2]];
+            let edge2 = [v2[0] - v0[0], v2[1] - v0[1], v2[2] - v0[2]];
+            let normal = vec3_cross_product(edge1, edge2);
+
+            normals[i0] = vec3_add(normals[i0], normal);
+            normals[i1] = vec3_add(normals[i1], normal);
+            normals[i2] = vec3_add(normals[i2], normal);
+        }
+
+        for (i, normal) in normals.iter_mut().enumerate() {
+            vertices[i].normal = vec3_normalize(*normal);
+            println!("Normal: {:?}", vertices[i].normal);
+        }
     }
 }
