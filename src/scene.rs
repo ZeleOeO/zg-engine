@@ -11,8 +11,7 @@ use crate::{
     camera::camera::CameraUniform,
     core::gpu::GPU,
     math::{
-        Mat4, Vec3, compute_normal_matrix, mat3_transpose, mat4_identity, mat4_transpose,
-        vec3_translation_matrix,
+        Mat4, Vec3, compute_normal_matrix, mat4_identity, mat4_transpose, vec3_translation_matrix,
     },
     resources::{
         material::{Material, MaterialType},
@@ -59,7 +58,7 @@ pub struct LightUniform {
 }
 
 #[derive(Clone)]
-pub struct DrawItem {
+pub struct Object {
     pub pipeline: Rc<RenderPipeline>,
     pub mesh: Rc<Mesh>,
     pub material_type: MaterialType,
@@ -71,7 +70,7 @@ pub struct DrawItem {
 }
 
 pub struct Scene {
-    pub draw_items: Vec<DrawItem>,
+    pub draw_items: Vec<Object>,
     pub camera_uniform: CameraUniform,
     pub depth_texture: CustomTexture,
     pub light_buffer: Buffer,
@@ -82,7 +81,7 @@ impl Scene {
     pub fn new(
         camera_uniform: CameraUniform,
         depth_texture: CustomTexture,
-        draw_items: Vec<DrawItem>,
+        draw_items: Vec<Object>,
         gpu: &GPU,
         light_uniform_layout: &BindGroupLayout,
     ) -> Self {
@@ -135,7 +134,7 @@ impl Scene {
     }
 }
 
-impl DrawItem {
+impl Object {
     pub fn new_with_texture(
         gpu: &GPU,
         layout: &BindGroupLayout,

@@ -20,7 +20,7 @@ use crate::{
     passes::render,
     pipeline::{light_pipeline, opaque_pipeline},
     resources::{material::Material, mesh::Mesh, texture::CustomTexture},
-    scene::{DrawItem, Scene},
+    scene::{Object, Scene},
 };
 
 use std::rc::Rc;
@@ -101,7 +101,7 @@ impl App {
         )?);
 
         let draw_items = vec![
-            DrawItem::new_with_texture(
+            Object::new_with_texture(
                 &gpu,
                 &item_uniform_layout,
                 &mesh_pipeline,
@@ -109,7 +109,7 @@ impl App {
                 &prism_mesh,
             )
             .translate(&([1.0, 3.0, 1.0] as Vec3), &gpu),
-            DrawItem::new_with_color(
+            Object::new_with_color(
                 &gpu,
                 &item_uniform_layout,
                 &mesh_pipeline,
@@ -118,7 +118,7 @@ impl App {
             )
             .translate(&([1.0, 1.0, 2.0] as Vec3), &gpu)
             .is_light(&light_pipeline),
-            DrawItem::new_with_color(
+            Object::new_with_color(
                 &gpu,
                 &item_uniform_layout,
                 &mesh_pipeline,
