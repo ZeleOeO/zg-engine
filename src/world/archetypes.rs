@@ -1,80 +1,93 @@
-use std::any::{Any, TypeId, type_name};
+use std::any::{Any, TypeId};
 
-use crate::{
-    managers::{material::MaterialComponent, mesh::MeshComponent, transform::Transform},
-    resources::mesh::Mesh,
-};
+use crate::world::components::ComponentColumn;
 
 #[derive(Clone, Copy)]
-pub struct ArchetypeID(u32);
+pub struct ArchetypeID(pub u32);
+
+#[derive(Clone, Copy)]
+pub struct Entity(pub u32);
 
 pub struct Archetype {
     pub archetype_id: ArchetypeID,
-    pub row: Vec<u32>,
+    pub entities: Vec<Entity>,
     pub components: Vec<TypeId>,
-    pub column: Vec<Column>,
+    pub columns: Vec<Column>,
+    pub len: usize,
 }
 
-pub enum Column {
-    Transform(Vec<Transform>),
-    Mesh(Vec<MeshComponent>),
-    Material(Vec<MaterialComponent>),
-    // Light(Vec<LightComponent>),
+pub struct Column {
+    column_type_id: TypeId,
+    data: Box<dyn ComponentColumn>,
 }
 
-
-pub trait Components {
-    type Output;
-    fn get_column(column: &Column) -> Option<&Self::Output>;
-}
-
-impl Components for Transform {
-    type Output = Vec<Transform>;
-    fn get_column(column: &Column) -> Option<&Vec<Transform>> {
-        match column {
-            Column::Transform(item) => Some(item),
-            _ => None,
-        }
+impl Column {
+    fn get_column<T: 'static>(&self) -> &Vec<T> {
+        self.data.as_any().downcast_ref::<Vec<T>>().unwrap()
     }
-}
 
-impl Components for Mesh {
-    type Output = Vec<MeshComponent>;
-    fn get_column(column: &Column) -> Option<&Self::Output> {
-        match column {
-            Column::Mesh(mesh) => Some(mesh),
-            _ => None,
-        }
-    }
-}
-
-impl Components for MaterialComponent {
-    type Output = Vec<MaterialComponent>;
-    fn get_column(column: &Column) -> Option<&Self::Output> {
-        match column {
-            Column::Material(material) => Some(material),
-            _ => None,
-        }
+    fn get_column_mut<T: 'static>(&mut self) -> &mut Vec<T> {
+        self.data.as_any_mut().downcast_mut::<Vec<T>>().unwrap()
     }
 }
 
 impl Archetype {
-    pub fn new<T: Components>(&self, components: Vec<T>, archetype_id: ArchetypeID) -> Self {
+    pub fn new<T: 'static>(components: &Vec<T>, archetype_id: ArchetypeID) -> Self {
         let type_ids = components
             .iter()
             .map(|component| (component).type_id())
             .collect();
         Self {
             archetype_id: archetype_id,
-            row: Vec::new(),
+            entities: Vec::new(),
             components: type_ids,
-            column: ,
+            columns: Vec::new(),
+            len: 0,
         }
     }
 
-    pub fn get_column<T: Components>(&self) -> &T::Output {
-        // I have a vector
-        // I want to get the actual column
-        T::get_column(&self.column).unwrap()
+    pub fn get_column_with_type<T: 'static>(&self) -> &Vec<T> {
+        let column = self
+            .columns
+            .iter()
+            .find(|col| col.column_type_id == TypeId::of::<T>())
+            .unwrap();
+        column.get_column::<T>()
+    }
+
+    pub fn get_column_mut_with_type<T: 'static>(&mut self) -> &mut Vec<T> {
+        let column = self
+            .columns
+            .iter_mut()
+            .find(|col| col.column_type_id == TypeId::of::<T>())
+            .unwrap();
+        column.get_column_mut::<T>()
+    }
+
+    pub fn get_column<T: 'static>(&self, value: &T) -> &Vec<T> {
+        let column = self
+            .columns
+            .iter()
+            .find(|col| col.column_type_id == value.type_id())
+            .unwrap();
+        column.get_column::<T>()
+    }
+
+    pub fn get_column_mut<T: 'static>(&mut self, value: &T) -> &mut Vec<T> {
+        let column = self
+            .columns
+            .iter_mut()
+            .find(|col| col.column_type_id == value.type_id())
+            .unwrap();
+        column.get_column_mut::<T>()
+    }
+
+    pub fn get_column_by_type_id<T: 'static>(&self, value: TypeId) -> &Vec<T> {
+        let column = self
+            .columns
+            .iter()
+            .find(|col| col.column_type_id == value)
+            .unwrap();
+        column.get_column::<T>()
     }
 }
