@@ -5,7 +5,7 @@ use wgpu::{
     VertexState,
 };
 
-use crate::{core::gpu::GPU, resources::mesh::Vertex};
+use crate::{core::gpu::InternalGraphics, resources::mesh::Vertex};
 
 pub fn opaque_pipeline(
     device: &Device,
@@ -65,7 +65,7 @@ pub fn opaque_pipeline(
 }
 
 pub fn light_pipeline(
-    gpu: &GPU,
+    gpu: &InternalGraphics,
     bg_layouts: &[Option<&BindGroupLayout>],
 ) -> anyhow::Result<RenderPipeline> {
     let shader = gpu

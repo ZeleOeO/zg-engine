@@ -1,5 +1,7 @@
 use std::any::Any;
 
+use crate::managers::{material::MaterialHandle, mesh::MeshHandle, transform::Transform};
+
 pub trait ComponentColumn: Any {
     fn len(&self) -> usize;
     fn as_any(&self) -> &dyn Any;
@@ -18,3 +20,12 @@ impl<T: 'static> ComponentColumn for Vec<T> {
         self
     }
 }
+
+#[derive(Clone, Copy)]
+pub struct MeshComponent(pub MeshHandle);
+
+#[derive(Clone, Copy)]
+pub struct TransformComponent(pub Transform);
+
+#[derive(Clone, Copy)]
+pub struct MaterialComponent(pub MaterialHandle);

@@ -1,18 +1,28 @@
 use std::{
     any::{Any, TypeId},
+    cell::{Ref, RefCell, RefMut},
     ops::Deref,
+    sync::Arc,
 };
 
+use winit::window::Window;
+
 use crate::{
-    schedule::schedule::Schedule,
-    world::archetypes::{Archetype, ArchetypeID, Entity},
+    camera::{camera::Camera, camera_controller::CameraController},
+    core::gpu::InternalGraphics,
+    managers::Manager,
+    utils::storage_util::TypeIdMap,
+    world::{
+        archetypes::{Archetype, ArchetypeID, Entity},
+        resources::{Resource, ResourceMut, ResourceRef},
+    },
 };
 
 pub struct World {
     pub archetypes: Vec<Archetype>,
     pub object_locations: Vec<ObjectLocation>,
     pub entities: Vec<Entity>,
-    pub schedule: Schedule,
+    pub resources: TypeIdMap<RefCell<Box<dyn Resource>>>,
 }
 
 pub struct ObjectLocation {
@@ -25,8 +35,8 @@ impl World {
         Self {
             archetypes: Vec::new(),
             object_locations: Vec::new(),
-            schedule: Schedule::new(),
             entities: Vec::new(),
+            resources: TypeIdMap::default(),
         }
     }
 
@@ -57,6 +67,46 @@ impl World {
         self
     }
 
+    pub fn get<R: Resource + 'static>(&self) -> ResourceRef<R> {
+        let item = self.resources.get(&TypeId::of::<R>()).unwrap();
+        let borrowed = item.try_borrow().unwrap();
+        let resource = Ref::map(borrowed, |resource| {
+            resource.as_ref().as_any().downcast_ref::<R>().unwrap()
+        });
+        ResourceRef(resource)
+    }
+
+    pub fn get_mut<R: Resource + 'static>(&self) -> ResourceMut<R> {
+        let item = self.resources.get(&TypeId::of::<R>()).unwrap();
+        let borrow_mut = item.try_borrow_mut().unwrap();
+        let resource = RefMut::map(borrow_mut, |resource| {
+            resource.as_mut().as_any_mut().downcast_mut::<R>().unwrap()
+        });
+        ResourceMut(resource)
+    }
+
+    pub fn insert<R: Resource + 'static>(&mut self, resource: R) {
+        self.resources
+            .insert(TypeId::of::<R>(), RefCell::new(Box::new(resource)));
+    }
+
+    pub fn insert_default_resources(&mut self, window: Arc<Window>) {
+        let window_size = window.inner_size();
+        let internal_graphics = pollster::block_on(InternalGraphics::new(&window)).unwrap();
+
+        let manager = Manager::new(&internal_graphics);
+
+        let camera_controller = CameraController::new(0.1, 2.0);
+
+        let camera = Camera::new((window_size.width as f32) / window_size.height as f32);
+
+        self.insert(window);
+        self.insert(internal_graphics);
+        self.insert(manager);
+        self.insert(camera_controller);
+        self.insert(camera);
+    }
+
     pub fn get_or_create_archetype_by_items<T: 'static>(&mut self, items: Vec<T>) -> &Archetype {
         let archetype_id = self.get_or_create_archetype_id_by_items(&items);
         let archetype = Self::get_archetype_by_id(self, &archetype_id);
@@ -80,10 +130,7 @@ impl World {
         arch_id
     }
 
-    pub fn get_or_create_archetype_id_by_type_id<T: 'static>(
-        &mut self,
-        type_ids: Vec<TypeId>,
-    ) -> ArchetypeID {
+    pub fn get_or_create_archetype_id_by_type_ids(&mut self, type_ids: Vec<TypeId>) -> ArchetypeID {
         for archetype in self.archetypes.iter() {
             if archetype.components.iter().eq(&type_ids) {
                 return archetype.archetype_id;
@@ -100,11 +147,14 @@ impl World {
         &self.archetypes[archetype_id.0 as usize]
     }
 
-    // pub fn run(mut self) -> Self {
-    //     let schedule = &self.schedule;
-    //
-    //     self
-    // }
+    pub fn get_archetype_by_type_ids(&self, type_ids: Vec<TypeId>) -> Option<&Archetype> {
+        for archetype in self.archetypes.iter() {
+            if archetype.components.iter().eq(&type_ids) {
+                return Some(self.get_archetype_by_id(&archetype.archetype_id));
+            }
+        }
+        None
+    }
 }
 
 // Need to do systems

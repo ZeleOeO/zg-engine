@@ -46,24 +46,6 @@ impl Archetype {
         }
     }
 
-    pub fn get_column_with_type<T: 'static>(&self) -> &Vec<T> {
-        let column = self
-            .columns
-            .iter()
-            .find(|col| col.column_type_id == TypeId::of::<T>())
-            .unwrap();
-        column.get_column::<T>()
-    }
-
-    pub fn get_column_mut_with_type<T: 'static>(&mut self) -> &mut Vec<T> {
-        let column = self
-            .columns
-            .iter_mut()
-            .find(|col| col.column_type_id == TypeId::of::<T>())
-            .unwrap();
-        column.get_column_mut::<T>()
-    }
-
     pub fn get_column<T: 'static>(&self, value: &T) -> &Vec<T> {
         let column = self
             .columns
@@ -89,5 +71,9 @@ impl Archetype {
             .find(|col| col.column_type_id == value)
             .unwrap();
         column.get_column::<T>()
+    }
+
+    pub fn has_component<T: 'static>(&self) -> bool {
+        self.components.contains(&TypeId::of::<T>())
     }
 }
