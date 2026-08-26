@@ -9,7 +9,7 @@ use winit::window::Window;
 
 use crate::{
     camera::{camera::Camera, camera_controller::CameraController},
-    core::gpu::InternalGraphics,
+    graphics::gpu::InternalGraphics,
     managers::Manager,
     utils::storage_util::TypeIdMap,
     world::{
@@ -94,7 +94,7 @@ impl World {
         let window_size = window.inner_size();
         let internal_graphics = pollster::block_on(InternalGraphics::new(&window)).unwrap();
 
-        let manager = Manager::new(&internal_graphics);
+        let manager = Manager::new();
 
         let camera_controller = CameraController::new(0.1, 2.0);
 

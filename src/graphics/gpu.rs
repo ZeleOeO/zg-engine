@@ -1,15 +1,15 @@
 use std::collections::hash_map;
 use std::sync::Arc;
 
-use slotmap::secondary::Entry::Occupied;
 use wgpu::{
-    Backends, BindingResource, Device, DeviceDescriptor, ExperimentalFeatures, Features, Instance,
-    Limits, RequestAdapterOptions, Surface, SurfaceConfiguration,
+    Backends, BindGroup, BindingResource, Device, DeviceDescriptor, ExperimentalFeatures, Features,
+    Instance, Limits, RenderPipeline, RequestAdapterOptions, Surface, SurfaceConfiguration,
 };
 use wgpu::{Queue, TextureView};
 use winit::window::Window;
 
-use crate::core::cache::Cache;
+use crate::graphics::cache::{BindGroupCacheHandle, Cache};
+use crate::pipeline::pipeline_id::PipelineID;
 use crate::render::buffer::{BindGroupCacheKey, BindGroupResourceType};
 
 pub struct InternalGraphics {
@@ -96,10 +96,10 @@ impl InternalGraphics {
         //     ..Default::default()
         // });
 
-        let cache = Cache::new(&device);
+        let cache = Cache::new(&device, &config);
 
         surface.configure(&device, &config);
-        let state = Self {
+        let graphics = Self {
             surface,
             device,
             queue,
@@ -107,12 +107,12 @@ impl InternalGraphics {
             depth_texture_view,
             cache,
         };
-        Ok(state)
+        Ok(graphics)
     }
 
-    pub fn get_or_create_bind_group(&mut self, key: BindGroupCacheKey) -> Arc<wgpu::BindGroup> {
-        let bind_group = match self.cache.bind_groups.entry(key) {
-            hash_map::Entry::Occupied(occupied) => occupied.get().clone(),
+    pub fn get_or_create_bind_group(&mut self, key: BindGroupCacheKey) -> BindGroupCacheHandle {
+        let bind_group = match self.cache.bind_groups_cache_map.entry(key) {
+            hash_map::Entry::Occupied(occupied) => *occupied.get(),
             hash_map::Entry::Vacant(vacant) => {
                 let key_ref = vacant.key();
                 let layout = &self.cache.layouts[key_ref.layout_num as usize];
@@ -142,13 +142,23 @@ impl InternalGraphics {
                     layout,
                     entries: &entries,
                 });
-                let saved_bind_group = Arc::new(raw_bind_group);
-                vacant.insert(saved_bind_group.clone());
-                saved_bind_group
+
+                let index = self.cache.cached_bind_groups.len() as u32;
+                self.cache.cached_bind_groups.push(raw_bind_group);
+                let handle = BindGroupCacheHandle(index, key_ref.layout_num);
+                vacant.insert(handle);
+
+                handle
             }
         };
         bind_group
     }
 
-    pub fn stuff() {}
+    pub fn get_bind_group_by_handle(&self, handle: BindGroupCacheHandle) -> &BindGroup {
+        &self.cache.cached_bind_groups[handle.0 as usize]
+    }
+
+    pub fn get_pipeline_cache(&self, pipeline_id: PipelineID) -> &RenderPipeline {
+        &self.cache.pipelines[pipeline_id as usize]
+    }
 }

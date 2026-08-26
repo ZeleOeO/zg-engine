@@ -6,7 +6,7 @@ use wgpu::{
 };
 
 use crate::{
-    core::gpu::InternalGraphics,
+    graphics::gpu::InternalGraphics,
     math::{Vec3, vec3_add, vec3_cross_product, vec3_normalize},
 };
 
@@ -54,6 +54,7 @@ pub struct MeshManager {
 pub struct MeshHandle(pub u32);
 
 // This is for draw
+#[derive(Debug, Clone, Copy)]
 pub struct MeshMetaData {
     pub vertex_count: u32,
     pub index_count: u32,
@@ -131,11 +132,15 @@ impl MeshManager {
         }
     }
 
-    pub fn get_buffers_as_slice(&self, mesh_handle: u32) -> (BufferSlice, BufferSlice) {
-        let vertex_slice = self.vertex_buffers[mesh_handle as usize].slice(..);
-        let index_slice = self.index_buffers[mesh_handle as usize].slice(..);
+    pub fn get_vertex_buffers(&self, mesh_handle: u32) -> &Buffer {
+        &self.vertex_buffers[mesh_handle as usize]
+    }
 
-        (vertex_slice, index_slice)
-        // render_pass.draw_indexed(0..self.meshes[mesh_handle as usize].index_count, 0, 0..1);
+    pub fn get_index_buffers(&self, mesh_handle: u32) -> &Buffer {
+        &self.index_buffers[mesh_handle as usize]
+    }
+
+    pub fn get_mesh_data(&self, mesh_handle: u32) -> MeshMetaData {
+        self.meshes[mesh_handle as usize]
     }
 }

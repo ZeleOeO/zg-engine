@@ -1,7 +1,4 @@
-use crate::{
-    core::gpu::InternalGraphics,
-    managers::{material::MaterialManager, mesh::MeshManager},
-};
+use crate::managers::{material::MaterialManager, mesh::MeshManager};
 
 pub mod light;
 pub mod material;
@@ -14,10 +11,10 @@ pub struct Manager {
 }
 
 impl Manager {
-    pub fn new(gpu: &InternalGraphics) -> Manager {
+    pub fn new() -> Manager {
         Self {
             mesh_manager: MeshManager::new(),
-            material_manager: MaterialManager::new(gpu),
+            material_manager: MaterialManager::new(),
         }
     }
 }

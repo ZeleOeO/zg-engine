@@ -1,11 +1,15 @@
 use bytemuck::{Pod, Zeroable};
 use image::{DynamicImage, GenericImageView, ImageReader};
 use wgpu::{
-    BindGroup, BindGroupDescriptor, BindGroupEntry, BindGroupLayout, BindingResource, BufferUsages,
+    BufferUsages,
     util::{BufferInitDescriptor, DeviceExt},
 };
 
-use crate::{core::gpu::InternalGraphics, layouts::create_material_bg_layout, math::Vec3};
+use crate::{
+    graphics::{cache::BindGroupCacheHandle, gpu::InternalGraphics},
+    math::Vec3,
+    render::buffer::{BindGroupCacheKey, BindGroupResourceType},
+};
 
 #[repr(C)]
 #[derive(Pod, Zeroable, Clone, Copy)]
@@ -32,27 +36,26 @@ pub struct TextureData {
 pub struct MaterialHandle(pub u32);
 
 pub struct MaterialManager {
-    material_bind_group: Vec<BindGroup>,
-    layout: BindGroupLayout,
+    material_bind_group: Vec<BindGroupCacheHandle>,
+    layout: u32,
 }
 
 impl MaterialManager {
-    pub fn new(gpu: &InternalGraphics) -> MaterialManager {
-        let layout = create_material_bg_layout(&gpu.device);
+    pub fn new() -> MaterialManager {
         Self {
             material_bind_group: Vec::new(),
-            layout: layout,
+            layout: 1,
         }
     }
 
-    pub fn get_material(&self, material_handle: MaterialHandle) -> &BindGroup {
-        &self.material_bind_group[material_handle.0 as usize]
+    pub fn get_material(&self, material_handle: MaterialHandle) -> BindGroupCacheHandle {
+        self.material_bind_group[material_handle.0 as usize]
     }
 
     pub fn add_new_material(
         &mut self,
         material_type: MaterialType,
-        gpu: &InternalGraphics,
+        gpu: &mut InternalGraphics,
     ) -> MaterialHandle {
         let bind_group = match material_type {
             MaterialType::Textured { location } => {
@@ -67,24 +70,27 @@ impl MaterialManager {
                     }]),
                     usage: BufferUsages::UNIFORM | BufferUsages::COPY_DST,
                 });
-                gpu.device.create_bind_group(&BindGroupDescriptor {
-                    label: Some("Texture Bind Group"),
-                    entries: &[
-                        BindGroupEntry {
-                            binding: 0,
-                            resource: BindingResource::TextureView(&texture.view),
-                        },
-                        BindGroupEntry {
-                            binding: 1,
-                            resource: BindingResource::Sampler(&texture.sampler),
-                        },
-                        BindGroupEntry {
-                            binding: 2,
-                            resource: BindingResource::Buffer(buffer.as_entire_buffer_binding()),
-                        },
+
+                let cache_key = BindGroupCacheKey {
+                    layout_num: 1,
+                    entries: vec![
+                        (2, BindGroupResourceType::Buffer { buffer }),
+                        (
+                            1,
+                            BindGroupResourceType::Sampler {
+                                sampler: texture.sampler,
+                            },
+                        ),
+                        (
+                            0,
+                            BindGroupResourceType::Texture {
+                                texture_view: texture.view,
+                            },
+                        ),
                     ],
-                    layout: &self.layout,
-                })
+                };
+
+                gpu.get_or_create_bind_group(cache_key)
             }
             MaterialType::NonTexture { color } => {
                 let buffer = gpu.device.create_buffer_init(&BufferInitDescriptor {
@@ -98,26 +104,28 @@ impl MaterialManager {
                     usage: BufferUsages::UNIFORM | BufferUsages::COPY_DST,
                 });
 
-                let dummy_texture = &Self::create_dummy_texture(gpu);
+                let dummy_texture = Self::create_dummy_texture(gpu);
 
-                gpu.device.create_bind_group(&BindGroupDescriptor {
-                    label: Some("Uniform Buffer Bind Group Texture Material"),
-                    entries: &[
-                        BindGroupEntry {
-                            binding: 0,
-                            resource: BindingResource::TextureView(&dummy_texture.view),
-                        },
-                        BindGroupEntry {
-                            binding: 1,
-                            resource: BindingResource::Sampler(&dummy_texture.sampler),
-                        },
-                        BindGroupEntry {
-                            binding: 2,
-                            resource: BindingResource::Buffer(buffer.as_entire_buffer_binding()),
-                        },
+                let cache_key = BindGroupCacheKey {
+                    layout_num: 1,
+                    entries: vec![
+                        (2, BindGroupResourceType::Buffer { buffer }),
+                        (
+                            1,
+                            BindGroupResourceType::Sampler {
+                                sampler: dummy_texture.sampler,
+                            },
+                        ),
+                        (
+                            0,
+                            BindGroupResourceType::Texture {
+                                texture_view: dummy_texture.view,
+                            },
+                        ),
                     ],
-                    layout: &self.layout,
-                })
+                };
+
+                gpu.get_or_create_bind_group(cache_key)
             }
         };
         self.material_bind_group.push(bind_group);

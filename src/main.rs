@@ -16,7 +16,7 @@ use winit::{
 use crate::world::world::World;
 
 pub mod camera;
-pub mod core;
+pub mod graphics;
 pub mod key_input;
 pub mod layouts;
 pub mod managers;

@@ -1,20 +1,40 @@
-use wgpu::Buffer;
+use bytemuck::{Pod, Zeroable};
+use wgpu::util::{BufferInitDescriptor, DeviceExt};
 
-use crate::math::Vec3;
+use crate::{
+    graphics::{cache::BindGroupCacheHandle, gpu::InternalGraphics},
+    math::{Mat4, Vec3, mat4_transpose, vec3_translation_matrix},
+    render::buffer::{BindGroupCacheKey, BindGroupResourceType},
+};
 
-#[derive(Debug)]
-pub struct TransformBuffer {
-    buffer: Buffer,
-    capacity: u32,
+#[derive(Clone, Pod, Copy, Zeroable)]
+#[repr(C)]
+pub struct ItemUniform {
+    transform: Mat4,
 }
 
 #[derive(Clone, Copy)]
 pub struct Transform {
-    position: Vec3,
+    pub position: Vec3,
     // rotation: Quat,
-    scale: Vec3,
+    pub scale: Vec3,
 }
 
-impl TransformBuffer {
-    pub fn create_bind_group(transform: Transform) {}
+impl Transform {
+    pub fn get_or_create_bind_group(&self, gpu: &mut InternalGraphics) -> BindGroupCacheHandle {
+        let item_uniform = ItemUniform {
+            transform: mat4_transpose(vec3_translation_matrix(self.position)),
+        };
+        let buffer = gpu.device.create_buffer_init(&BufferInitDescriptor {
+            label: None,
+            contents: bytemuck::cast_slice(&[item_uniform]),
+            usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
+        });
+
+        let cache_key = BindGroupCacheKey {
+            layout_num: 2,
+            entries: vec![(0, BindGroupResourceType::Buffer { buffer })],
+        };
+        gpu.get_or_create_bind_group(cache_key)
+    }
 }
