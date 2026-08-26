@@ -11,6 +11,7 @@ use crate::{
     camera::{camera::Camera, camera_controller::CameraController},
     graphics::gpu::InternalGraphics,
     managers::Manager,
+    render::render_queue::RenderQueue,
     utils::storage_util::TypeIdMap,
     world::{
         archetypes::{Archetype, ArchetypeID, Entity},
@@ -99,12 +100,14 @@ impl World {
         let camera_controller = CameraController::new(0.1, 2.0);
 
         let camera = Camera::new((window_size.width as f32) / window_size.height as f32);
+        let render_queue = RenderQueue::default();
 
         self.insert(window);
         self.insert(internal_graphics);
         self.insert(manager);
         self.insert(camera_controller);
         self.insert(camera);
+        self.insert(render_queue);
     }
 
     pub fn get_or_create_archetype_by_items<T: 'static>(&mut self, items: Vec<T>) -> &Archetype {
