@@ -1,11 +1,16 @@
+use std::collections::hash_map;
 use std::sync::Arc;
 
+use slotmap::secondary::Entry::Occupied;
 use wgpu::{
-    Backends, Device, DeviceDescriptor, ExperimentalFeatures, Features, Instance, Limits,
-    RequestAdapterOptions, Surface, SurfaceConfiguration,
+    Backends, BindingResource, Device, DeviceDescriptor, ExperimentalFeatures, Features, Instance,
+    Limits, RequestAdapterOptions, Surface, SurfaceConfiguration,
 };
 use wgpu::{Queue, TextureView};
 use winit::window::Window;
+
+use crate::core::cache::Cache;
+use crate::render::buffer::{BindGroupCacheKey, BindGroupResourceType};
 
 pub struct InternalGraphics {
     pub surface: Surface<'static>,
@@ -13,6 +18,7 @@ pub struct InternalGraphics {
     pub queue: Queue,
     pub config: SurfaceConfiguration,
     pub depth_texture_view: TextureView,
+    pub cache: Cache,
 }
 
 impl InternalGraphics {
@@ -90,6 +96,8 @@ impl InternalGraphics {
         //     ..Default::default()
         // });
 
+        let cache = Cache::new(&device);
+
         surface.configure(&device, &config);
         let state = Self {
             surface,
@@ -97,7 +105,50 @@ impl InternalGraphics {
             queue,
             config,
             depth_texture_view,
+            cache,
         };
         Ok(state)
     }
+
+    pub fn get_or_create_bind_group(&mut self, key: BindGroupCacheKey) -> Arc<wgpu::BindGroup> {
+        let bind_group = match self.cache.bind_groups.entry(key) {
+            hash_map::Entry::Occupied(occupied) => occupied.get().clone(),
+            hash_map::Entry::Vacant(vacant) => {
+                let key_ref = vacant.key();
+                let layout = &self.cache.layouts[key_ref.layout_num as usize];
+                let entries = key_ref
+                    .entries
+                    .iter()
+                    .map(|(binding, resource_type)| {
+                        let resource = match resource_type {
+                            BindGroupResourceType::Buffer { buffer } => {
+                                BindingResource::Buffer(buffer.as_entire_buffer_binding())
+                            }
+                            BindGroupResourceType::Texture { texture_view } => {
+                                BindingResource::TextureView(&texture_view)
+                            }
+                            BindGroupResourceType::Sampler { sampler } => {
+                                BindingResource::Sampler(&sampler)
+                            }
+                        };
+                        wgpu::BindGroupEntry {
+                            binding: *binding,
+                            resource,
+                        }
+                    })
+                    .collect::<Vec<_>>();
+                let raw_bind_group = self.device.create_bind_group(&wgpu::BindGroupDescriptor {
+                    label: None,
+                    layout,
+                    entries: &entries,
+                });
+                let saved_bind_group = Arc::new(raw_bind_group);
+                vacant.insert(saved_bind_group.clone());
+                saved_bind_group
+            }
+        };
+        bind_group
+    }
+
+    pub fn stuff() {}
 }
