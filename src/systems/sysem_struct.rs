@@ -1,14 +1,13 @@
-use winit::event::WindowEvent;
+use winit::event::{DeviceEvent, WindowEvent};
 
 use crate::world::world::World;
 
-type SetupFn = fn();
-type UpdateFn = fn();
-
-pub struct System {
-    pub setups: Vec<Box<dyn FnMut(&mut World)>>,
-    pub updates: Vec<Box<dyn FnMut(&mut World)>>,
-    pub window_events: Vec<Box<dyn FnMut(&mut World, WindowEvent)>>,
+#[derive(Default)]
+pub struct Systems {
+    pub setups: SystemsStorage<WorldOnly>,
+    pub updates: SystemsStorage<WorldOnly>,
+    pub window_events: SystemsStorage<WindowSystemEvent>,
+    pub device_events: SystemsStorage<DeviceSystemEvent>,
 }
 
 pub enum SystemSchedule {
@@ -17,33 +16,93 @@ pub enum SystemSchedule {
     WindowEvent,
 }
 
-impl System {
-    pub fn new() -> Self {
-        Self {
-            setups: Vec::new(),
-            updates: Vec::new(),
-            window_events: Vec::new(),
-        }
-    }
-
+impl Systems {
     pub fn add_setup_system<F: FnMut(&mut World) + 'static>(&mut self, callback: F) -> &mut Self {
-        self.setups.push(Box::new(callback));
+        self.setups.systems.push(Box::new(callback));
         self
     }
 
     pub fn add_update_system<F: FnMut(&mut World) + 'static>(&mut self, callback: F) -> &mut Self {
-        self.updates.push(Box::new(callback));
+        self.updates.insert(Box::new(callback));
         self
     }
 
-    pub fn add_window_event_sytem<F: FnMut(&mut World, WindowEvent) + 'static>(
+    pub fn add_window_event_sytem<F: FnMut(&mut World, &WindowEvent) + 'static>(
         &mut self,
         callback: F,
     ) -> &mut Self {
-        self.window_events.push(Box::new(callback));
+        self.window_events.insert(Box::new(callback));
         self
     }
 
-    // pub fn add_system(schedule_time: SystemSchedule ) {
-    // }
+    pub fn add_device_event_sytem<F: FnMut(&mut World, &DeviceEvent) + 'static>(
+        &mut self,
+        callback: F,
+    ) -> &mut Self {
+        self.device_events.insert(Box::new(callback));
+        self
+    }
+}
+
+// Made this so I can have a .execute()
+pub struct SystemsStorage<A: SystemFunction> {
+    pub systems: Vec<Box<A::Fntype>>,
+}
+
+impl<A: SystemFunction> SystemsStorage<A> {
+    pub fn insert(&mut self, item: Box<A::Fntype>) {
+        self.systems.push(item);
+    }
+
+    pub fn execute(&mut self, mut args: A::Args<'_, '_>) {
+        for system in &mut self.systems {
+            A::execute(system, &mut args);
+        }
+    }
+}
+
+impl<A: SystemFunction> Default for SystemsStorage<A> {
+    fn default() -> Self {
+        Self {
+            systems: Vec::default(),
+        }
+    }
+}
+
+pub trait SystemFunction {
+    type Fntype: ?Sized;
+    type Args<'a, 'b>;
+
+    // changed the lifetimes cause I need to know it's differnt lol
+    fn execute<'e, 'f>(function: &mut Box<Self::Fntype>, args: &mut Self::Args<'e, 'f>);
+}
+
+pub struct WorldOnly {}
+pub struct WindowSystemEvent {}
+pub struct DeviceSystemEvent {}
+
+impl SystemFunction for WorldOnly {
+    type Fntype = dyn FnMut(&mut World);
+    type Args<'a, 'b> = &'a mut World;
+
+    fn execute<'e, 'f>(function: &mut Box<Self::Fntype>, args: &mut Self::Args<'e, 'f>) {
+        function(args)
+    }
+}
+
+impl SystemFunction for WindowSystemEvent {
+    type Fntype = dyn FnMut(&mut World, &WindowEvent);
+    type Args<'a, 'b> = (&'a mut World, &'b WindowEvent);
+
+    fn execute<'e, 'f>(function: &mut Box<Self::Fntype>, args: &mut Self::Args<'e, 'f>) {
+        function(args.0, args.1)
+    }
+}
+impl SystemFunction for DeviceSystemEvent {
+    type Fntype = dyn FnMut(&mut World, &DeviceEvent);
+    type Args<'a, 'b> = (&'a mut World, &'b DeviceEvent);
+
+    fn execute<'e, 'f>(function: &mut Box<Self::Fntype>, args: &mut Self::Args<'e, 'f>) {
+        function(args.0, args.1)
+    }
 }

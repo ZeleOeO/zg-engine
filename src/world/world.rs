@@ -158,6 +158,6 @@ impl World {
         }
         None
     }
-}
 
-// Need to do systems
+    pub fn add_system(&mut self) {}
+}
