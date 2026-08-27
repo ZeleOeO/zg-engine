@@ -3,14 +3,7 @@ use std::{sync::Arc, time::Instant};
 use anyhow::Ok;
 use wgpu::{CurrentSurfaceTexture, TextureViewDescriptor};
 use winit::{
-    application::ApplicationHandler,
-    event::{
-        DeviceEvent::{self, MouseMotion},
-        KeyEvent, WindowEvent,
-    },
-    event_loop::EventLoop,
-    keyboard::PhysicalKey,
-    window::Window,
+    application::ApplicationHandler, event::WindowEvent, event_loop::EventLoop, window::Window,
 };
 
 use crate::{app::engine_app::EngineApp, world::world::World};

@@ -68,6 +68,12 @@ impl World {
         self
     }
 
+    pub fn get_entity(&self, entity: &Entity) {
+        let location = &self.object_locations[entity.0 as usize];
+        let archetype = self.get_archetype_by_id(&location.archetype_id);
+        let stuff = &archetype.columns[location.row as usize];
+    }
+
     pub fn get<R: Resource + 'static>(&self) -> ResourceRef<R> {
         let item = self.resources.get(&TypeId::of::<R>()).unwrap();
         let borrowed = item.try_borrow().unwrap();
@@ -92,21 +98,19 @@ impl World {
     }
 
     pub fn insert_default_resources(&mut self, window: Arc<Window>) {
-        let window_size = window.inner_size();
+        // let window_size = window.inner_size();
         let internal_graphics = pollster::block_on(InternalGraphics::new(&window)).unwrap();
 
         let manager = Manager::new();
 
         let camera_controller = CameraController::new(0.1, 2.0);
 
-        let camera = Camera::new((window_size.width as f32) / window_size.height as f32);
         let render_queue = RenderQueue::default();
 
         self.insert(window);
         self.insert(internal_graphics);
         self.insert(manager);
         self.insert(camera_controller);
-        self.insert(camera);
         self.insert(render_queue);
     }
 
@@ -158,6 +162,4 @@ impl World {
         }
         None
     }
-
-    pub fn add_system(&mut self) {}
 }

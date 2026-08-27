@@ -1,5 +1,6 @@
 use crate::managers::{material::MaterialManager, mesh::MeshManager};
 
+pub mod camera;
 pub mod light;
 pub mod material;
 pub mod mesh;

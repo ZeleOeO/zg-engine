@@ -45,6 +45,7 @@ impl Archetype {
             len: 0,
         }
     }
+    pub fn get_entity(&self, entity: &Entity) {}
 
     pub fn get_column<T: 'static>(&self, value: &T) -> &Vec<T> {
         let column = self
