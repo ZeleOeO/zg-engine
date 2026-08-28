@@ -17,6 +17,7 @@ pub struct Archetype {
 }
 
 pub struct Column {
+    // Can't even remember why I wanted to use this
     column_type_id: TypeId,
     data: Box<dyn ComponentColumn>,
 }
@@ -45,7 +46,12 @@ impl Archetype {
             len: 0,
         }
     }
-    pub fn get_entity(&self, entity: &Entity) {}
+    pub fn get_entity(&self, row: u32) -> Vec<&dyn Any> {
+        self.columns
+            .iter()
+            .map(|col| col.data.get_entity(row))
+            .collect()
+    }
 
     pub fn get_column<T: 'static>(&self, value: &T) -> &Vec<T> {
         let column = self

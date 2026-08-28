@@ -2,14 +2,14 @@ use std::any::Any;
 
 use crate::{
     managers::{material::MaterialHandle, mesh::MeshHandle, transform::Transform},
-    world::archetypes::Entity,
+    world::resources::Resource,
 };
 
 pub trait ComponentColumn: Any {
     fn len(&self) -> usize;
     fn as_any(&self) -> &dyn Any;
     fn as_any_mut(&mut self) -> &mut dyn Any;
-    fn get_entity(&self, entity: &Entity) -> &dyn Any;
+    fn get_entity(&self, row: u32) -> &dyn Any;
 }
 
 impl<T: 'static> ComponentColumn for Vec<T> {
@@ -24,8 +24,9 @@ impl<T: 'static> ComponentColumn for Vec<T> {
         self
     }
 
-    fn get_entity(&self, entity: &Entity) -> &dyn Any {
-        &self[entity.0 as usize]
+    fn get_entity(&self, row: u32) -> &dyn Any {
+        let ans = &self[row as usize];
+        ans.as_any()
     }
 }
 

@@ -68,10 +68,10 @@ impl World {
         self
     }
 
-    pub fn get_entity(&self, entity: &Entity) {
+    pub fn get_entity(&self, entity: &Entity) -> Vec<&dyn Any> {
         let location = &self.object_locations[entity.0 as usize];
         let archetype = self.get_archetype_by_id(&location.archetype_id);
-        let stuff = &archetype.columns[location.row as usize];
+        archetype.get_entity(location.row)
     }
 
     pub fn get<R: Resource + 'static>(&self) -> ResourceRef<R> {
