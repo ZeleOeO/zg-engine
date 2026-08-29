@@ -13,7 +13,6 @@ pub struct Archetype {
     pub entities: Vec<Entity>,
     pub components: Vec<TypeId>,
     pub columns: Vec<Column>,
-    pub len: usize,
 }
 
 pub struct Column {
@@ -43,8 +42,10 @@ impl Archetype {
             entities: Vec::new(),
             components: type_ids,
             columns: Vec::new(),
-            len: 0,
         }
+    }
+    pub fn len(&self) -> usize {
+        self.entities.len()
     }
     pub fn get_entity(&self, row: u32) -> Vec<&dyn Any> {
         self.columns
@@ -69,6 +70,15 @@ impl Archetype {
             .find(|col| col.column_type_id == value.type_id())
             .unwrap();
         column.get_column_mut::<T>()
+    }
+
+    pub fn get_column_by_type<T: 'static>(&self) -> &Vec<T> {
+        let column = self
+            .columns
+            .iter()
+            .find(|col| col.column_type_id == TypeId::of::<T>())
+            .unwrap();
+        column.get_column::<T>()
     }
 
     pub fn get_column_by_type_id<T: 'static>(&self, value: TypeId) -> &Vec<T> {

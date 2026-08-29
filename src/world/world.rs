@@ -1,6 +1,7 @@
 use std::{
     any::{Any, TypeId},
     cell::{Ref, RefCell, RefMut},
+    marker::PhantomData,
     ops::Deref,
     sync::Arc,
 };
@@ -15,6 +16,7 @@ use crate::{
     utils::storage_util::TypeIdMap,
     world::{
         archetypes::{Archetype, ArchetypeID, Entity},
+        query::{Query, QueryData},
         resources::{Resource, ResourceMut, ResourceRef},
     },
 };
@@ -24,6 +26,7 @@ pub struct World {
     pub object_locations: Vec<ObjectLocation>,
     pub entities: Vec<Entity>,
     pub resources: TypeIdMap<RefCell<Box<dyn Resource>>>,
+    pub default_camera: Option<Entity>,
 }
 
 pub struct ObjectLocation {
@@ -38,10 +41,11 @@ impl World {
             object_locations: Vec::new(),
             entities: Vec::new(),
             resources: TypeIdMap::default(),
+            default_camera: None,
         }
     }
 
-    pub fn spawn<T: 'static>(mut self, items: Vec<T>) -> Self {
+    pub fn spawn<T: 'static>(&mut self, items: Vec<T>) -> Entity {
         let archetype_id = self.get_or_create_archetype_id_by_items(&items);
         let archetype = &mut self.archetypes[archetype_id.0 as usize];
 
@@ -53,25 +57,19 @@ impl World {
 
         // We store the entity data in archetype
         let entity = Entity(self.entities.len() as u32);
+        // Get the row it's in in the archetype
+        let row = (archetype.entities.len()) as u32;
         archetype.entities.push(entity.clone());
-        archetype.len += 1;
 
         // We get the location
         // Store what archetype the entity is and in what location in the entity list
-        let row = (archetype.entities.len()) as u32;
         self.object_locations.push(ObjectLocation {
             archetype_id: archetype.archetype_id,
             row,
         });
         self.entities.push(entity);
 
-        self
-    }
-
-    pub fn get_entity(&self, entity: &Entity) -> Vec<&dyn Any> {
-        let location = &self.object_locations[entity.0 as usize];
-        let archetype = self.get_archetype_by_id(&location.archetype_id);
-        archetype.get_entity(location.row)
+        entity
     }
 
     pub fn get<R: Resource + 'static>(&self) -> ResourceRef<R> {
@@ -98,10 +96,14 @@ impl World {
     }
 
     pub fn insert_default_resources(&mut self, window: Arc<Window>) {
-        // let window_size = window.inner_size();
+        let window_size = window.inner_size();
         let internal_graphics = pollster::block_on(InternalGraphics::new(&window)).unwrap();
 
         let manager = Manager::new();
+        let camera_entity = self.spawn(vec![Camera::new(
+            (window_size.width as f32) / window_size.height as f32,
+        )]);
+        self.default_camera = Some(camera_entity);
 
         let camera_controller = CameraController::new(0.1, 2.0);
 
@@ -161,5 +163,25 @@ impl World {
             }
         }
         None
+    }
+
+    fn query<'w, D: QueryData<'w>>(&'w self) -> Query<'w, D> {
+        Query {
+            world: self,
+            _marker: PhantomData,
+        }
+    }
+
+    pub fn get_entity<'w, D: QueryData<'w>>(&'w self, entity: Entity) -> D::Output {
+        let location = &self.object_locations[entity.0 as usize];
+        self.query::<D>().get(location.row)
+    }
+
+    pub fn get_all_entities_in_archetype<'w, D: QueryData<'w> + 'w>(
+        &'w self,
+        archetype: &Archetype,
+    ) -> Vec<D::Output> {
+        let query = self.query::<D>();
+        query.iter(archetype).collect::<Vec<_>>()
     }
 }
