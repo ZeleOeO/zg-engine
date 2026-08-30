@@ -83,34 +83,16 @@ impl Camera {
     }
 }
 
-// impl CameraUniform {
-//     pub fn new(device: &Device, camera: &Camera, camera_layout: &BindGroupLayout) -> Self {
-//         let view_proj = Camera::build_projection_matrix(&camera);
-//
-//         let buffer = device.create_buffer_init(&BufferInitDescriptor {
-//             label: Some("Camera Uniform Buffer"),
-//             contents: bytemuck::cast_slice(&[view_proj]),
-//             usage: BufferUsages::UNIFORM | BufferUsages::COPY_DST,
-//         });
-//
-//         let bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
-//             label: Some("Camera Bind Group"),
-//             layout: camera_layout,
-//             entries: &[BindGroupEntry {
-//                 binding: 0,
-//                 resource: buffer.as_entire_binding(),
-//             }],
-//         });
-//         Self {
-//             view_proj,
-//             bind_group,
-//             buffer,
-//         }
-//     }
-//
-//     // pub fn update_view_proj(&mut self, camera: &Camera, queue: &Queue) {
-//     //     self.view_proj = camera.build_projection_matrix();
-//     //
-//     //     queue.write_buffer(&self.buffer, 0, bytemuck::cast_slice(&[self.view_proj]));
-//     // }
-// }
+impl Default for Camera {
+    fn default() -> Self {
+        Self {
+            eye: [0.0, 0.0, -3.0],
+            target: [0.0, 0.0, 0.0],
+            up: [0.0, 1.0, 0.0],
+            fovy: PI / 4.0,
+            znear: 0.1,
+            zfar: 100.0,
+            aspect: 16.0 / 9.0,
+        }
+    }
+}

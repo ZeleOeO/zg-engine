@@ -1,4 +1,7 @@
-use winit::event::{DeviceEvent, WindowEvent};
+use winit::{
+    event::{DeviceEvent, WindowEvent},
+    event_loop::ActiveEventLoop,
+};
 
 use crate::world::world::World;
 
@@ -27,7 +30,9 @@ impl Systems {
         self
     }
 
-    pub fn add_window_event_sytem<F: FnMut(&mut World, &WindowEvent) + 'static>(
+    pub fn add_window_event_sytem<
+        F: FnMut(&mut World, &WindowEvent, &ActiveEventLoop) + 'static,
+    >(
         &mut self,
         callback: F,
     ) -> &mut Self {
@@ -91,11 +96,11 @@ impl SystemFunction for WorldOnly {
 }
 
 impl SystemFunction for WindowSystemEvent {
-    type Fntype = dyn FnMut(&mut World, &WindowEvent);
-    type Args<'a, 'b> = (&'a mut World, &'b WindowEvent);
+    type Fntype = dyn FnMut(&mut World, &WindowEvent, &ActiveEventLoop);
+    type Args<'a, 'b> = (&'a mut World, &'b WindowEvent, &'b ActiveEventLoop);
 
     fn execute<'e, 'f>(function: &mut Box<Self::Fntype>, args: &mut Self::Args<'e, 'f>) {
-        function(args.0, args.1)
+        function(args.0, args.1, args.2)
     }
 }
 impl SystemFunction for DeviceSystemEvent {

@@ -170,7 +170,7 @@ impl InternalGraphics {
             .create_command_encoder(&wgpu::CommandEncoderDescriptor {
                 label: Some("Encoder"),
             });
-        let render_queue = &mut world.get_mut::<RenderQueue>();
+        let mut render_queue = world.get_mut::<RenderQueue>();
         {
             let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: Some("Render Pass"),

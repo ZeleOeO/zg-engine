@@ -3,7 +3,6 @@ use crate::app::app::App;
 pub mod app;
 pub mod camera;
 pub mod graphics;
-pub mod key_input;
 pub mod layouts;
 pub mod managers;
 pub mod math;

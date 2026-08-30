@@ -18,9 +18,9 @@ pub fn draw_items(world: &mut World) {
         TypeId::of::<TransformComponent>(),
     ];
 
-    let render_queue = &mut world.get_mut::<RenderQueue>();
+    let mut render_queue = world.get_mut::<RenderQueue>();
     let manager = &world.get::<Manager>();
-    let gpu = &mut world.get_mut::<InternalGraphics>();
+    let mut gpu = world.get_mut::<InternalGraphics>();
 
     let archetype_id = &world.get_archetype_by_type_ids(components).unwrap();
     let archetype = &world.archetypes[archetype_id.archetype_id.0 as usize];
@@ -32,6 +32,8 @@ pub fn draw_items(world: &mut World) {
 
     let transform_column: &Vec<TransformComponent> =
         archetype.get_column_by_type_id(TypeId::of::<TransformComponent>());
+
+    // TODO change this to use new querying system
 
     let item_iter = mesh_column
         .iter()

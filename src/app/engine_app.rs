@@ -12,7 +12,7 @@ use crate::{
 pub struct EngineApp {
     pub world: World,
     pub systems: Systems,
-    window: Arc<Window>,
+    pub window: Arc<Window>,
 }
 
 impl EngineApp {
@@ -29,4 +29,3 @@ impl EngineApp {
         }
     }
 }
-// add_system(ScheduleTime, )

@@ -3,7 +3,10 @@ use std::{sync::Arc, time::Instant};
 use anyhow::Ok;
 use wgpu::{CurrentSurfaceTexture, TextureViewDescriptor};
 use winit::{
-    application::ApplicationHandler, event::WindowEvent, event_loop::EventLoop, window::Window,
+    application::ApplicationHandler,
+    event::{DeviceEvent, WindowEvent},
+    event_loop::{ActiveEventLoop, EventLoop},
+    window::Window,
 };
 
 use crate::{app::engine_app::EngineApp, world::world::World};
@@ -41,7 +44,9 @@ impl App {
         self
     }
 
-    pub fn add_window_event_sytem<F: FnMut(&mut World, &WindowEvent) + 'static>(
+    pub fn add_window_event_sytem<
+        F: FnMut(&mut World, &WindowEvent, &ActiveEventLoop) + 'static,
+    >(
         &mut self,
         callback: F,
     ) -> &mut Self {
@@ -93,14 +98,12 @@ impl ApplicationHandler for App {
     }
 
     fn about_to_wait(&mut self, _event_loop: &winit::event_loop::ActiveEventLoop) {
-        let now = Instant::now();
         let Some(app) = &mut self.engine_app else {
             return;
         };
-        // // let dt = now.duration_since(app.last_frame).as_secs_f32();
-        // // app.last_frame = Instant::now();
-        // app.update(dt);
-        // app.window.request_redraw();
+        let world = &mut app.world;
+        app.systems.updates.execute(world);
+        app.window.request_redraw();
     }
 
     fn window_event(
@@ -112,39 +115,44 @@ impl ApplicationHandler for App {
         let Some(app) = &mut self.engine_app else {
             return;
         };
-        match event {
-            WindowEvent::Resized(size) => {
-                let Some(app) = &mut self.engine_app else {
-                    return;
-                };
-                // app.camera.aspect = size.width as f32 / size.height as f32;
-                // app.scene.depth_texture =
-                // CustomTexture::create_depth_texture(&app.gpu.device, &app.gpu.config);
-            }
-            WindowEvent::CloseRequested => {
-                event_loop.exit();
-            }
-            WindowEvent::RedrawRequested => {
-                app.window.request_redraw();
 
-                let frame = match app.gpu.surface.get_current_texture() {
-                    CurrentSurfaceTexture::Success(texture)
-                    | CurrentSurfaceTexture::Suboptimal(texture) => texture,
-                    CurrentSurfaceTexture::Timeout | CurrentSurfaceTexture::Occluded => return,
-                    CurrentSurfaceTexture::Outdated | CurrentSurfaceTexture::Lost => {
-                        app.gpu.surface.configure(&app.gpu.device, &app.gpu.config);
-                        return;
-                    }
-                    CurrentSurfaceTexture::Validation => return,
-                };
-
-                let view = frame.texture.create_view(&TextureViewDescriptor::default());
-
-                app.render(&view);
-
-                frame.present();
-            }
-            _ => {}
-        }
+        let world = &mut app.world;
+        app.systems
+            .window_events
+            .execute((world, &event, event_loop));
+        // match event {
+        //     WindowEvent::Resized(size) => {
+        //         let Some(app) = &mut self.engine_app else {
+        //             return;
+        //         };
+        //         // app.camera.aspect = size.width as f32 / size.height as f32;
+        //         // app.scene.depth_texture =
+        // CustomTexture::create_depth_texture(&app.gpu.device, &app.gpu.config);
+        //     }
+        //     WindowEvent::CloseRequested => {
+        //         event_loop.exit();
+        //     }
+        //     WindowEvent::RedrawRequested => {
+        //         app.window.request_redraw();
+        //
+        //         let frame = match app.gpu.surface.get_current_texture() {
+        //             CurrentSurfaceTexture::Success(texture)
+        //             | CurrentSurfaceTexture::Suboptimal(texture) => texture,
+        //             CurrentSurfaceTexture::Timeout | CurrentSurfaceTexture::Occluded => return,
+        //             CurrentSurfaceTexture::Outdated | CurrentSurfaceTexture::Lost => {
+        //                 app.gpu.surface.configure(&app.gpu.device, &app.gpu.config);
+        //                 return;
+        //             }
+        //             CurrentSurfaceTexture::Validation => return,
+        //         };
+        //
+        //         let view = frame.texture.create_view(&TextureViewDescriptor::default());
+        //
+        //         app.render(&view);
+        //
+        //         frame.present();
+        //     }
+        //     _ => {}
+        // }
     }
 }

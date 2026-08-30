@@ -47,12 +47,6 @@ impl Archetype {
     pub fn len(&self) -> usize {
         self.entities.len()
     }
-    pub fn get_entity(&self, row: u32) -> Vec<&dyn Any> {
-        self.columns
-            .iter()
-            .map(|col| col.data.get_entity(row))
-            .collect()
-    }
 
     pub fn get_column<T: 'static>(&self, value: &T) -> &Vec<T> {
         let column = self
@@ -81,6 +75,15 @@ impl Archetype {
         column.get_column::<T>()
     }
 
+    pub fn get_mut_column_by_type<T: 'static>(&mut self) -> &Vec<T> {
+        let column = self
+            .columns
+            .iter_mut()
+            .find(|col| col.column_type_id == TypeId::of::<T>())
+            .unwrap();
+        column.get_column_mut::<T>()
+    }
+
     pub fn get_column_by_type_id<T: 'static>(&self, value: TypeId) -> &Vec<T> {
         let column = self
             .columns
@@ -88,6 +91,11 @@ impl Archetype {
             .find(|col| col.column_type_id == value)
             .unwrap();
         column.get_column::<T>()
+    }
+
+    pub fn get_column_ptr_by_type<T: 'static>(&self) -> *mut Vec<T> {
+        let column = self.get_column_by_type::<T>();
+        column as *const Vec<T> as *mut Vec<T>
     }
 
     pub fn has_component<T: 'static>(&self) -> bool {

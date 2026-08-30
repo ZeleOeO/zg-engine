@@ -5,6 +5,8 @@ use crate::world::{archetypes::Archetype, world::World};
 // We'll then have a vec of columns
 // if we iterate through them line by line
 // Then we can get the components line by line
+//
+// I also need to make it mut
 
 pub trait QueryData<'w> {
     type Output;
@@ -16,14 +18,15 @@ macro_rules! impl_query_for_tuples {
         where
         $($T: 'static),*
         {
-            type Output = ($(&'w $T,)*);
-            fn get(world: &'w $crate::world::world::World, row: usize) -> Self::Output {
+            type Output = ($(&'w mut $T,)*);
+            fn get(world: &'w  $crate::world::world::World, row: usize) -> Self::Output {
                 let location = &world.object_locations[row];
-                let archetype = world.get_archetype_by_id(&location.archetype_id);
-        // get the archetype
-        // get the column from the archetype
-        // get the iterator
-                ($(&archetype.get_column_by_type::<$T>()[row],)*)
+                let archetype = world.get_archetype_by_id(location.archetype_id);
+
+                // Takes pointer so I can mutate without worrying about multiple mutation borrows
+                unsafe {
+                    ($( (&mut *archetype.get_column_ptr_by_type::<$T>()).get_mut(row).unwrap(),)*)
+                }
             }
 
         }
