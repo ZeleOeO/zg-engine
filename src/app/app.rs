@@ -1,7 +1,6 @@
-use std::{sync::Arc, time::Instant};
+use std::sync::Arc;
 
 use anyhow::Ok;
-use wgpu::{CurrentSurfaceTexture, TextureViewDescriptor};
 use winit::{
     application::ApplicationHandler,
     event::{DeviceEvent, WindowEvent},
@@ -79,7 +78,9 @@ impl ApplicationHandler for App {
                 .unwrap(),
         );
         let mut app = pollster::block_on(EngineApp::new(window.clone()));
-        app.world.insert_default_resources(window.clone());
+        let world = &mut app.world;
+        world.insert_default_resources(window.clone());
+        app.systems.setups.execute(world);
         self.engine_app = Some(app);
         window.request_redraw();
     }
@@ -120,39 +121,5 @@ impl ApplicationHandler for App {
         app.systems
             .window_events
             .execute((world, &event, event_loop));
-        // match event {
-        //     WindowEvent::Resized(size) => {
-        //         let Some(app) = &mut self.engine_app else {
-        //             return;
-        //         };
-        //         // app.camera.aspect = size.width as f32 / size.height as f32;
-        //         // app.scene.depth_texture =
-        // CustomTexture::create_depth_texture(&app.gpu.device, &app.gpu.config);
-        //     }
-        //     WindowEvent::CloseRequested => {
-        //         event_loop.exit();
-        //     }
-        //     WindowEvent::RedrawRequested => {
-        //         app.window.request_redraw();
-        //
-        //         let frame = match app.gpu.surface.get_current_texture() {
-        //             CurrentSurfaceTexture::Success(texture)
-        //             | CurrentSurfaceTexture::Suboptimal(texture) => texture,
-        //             CurrentSurfaceTexture::Timeout | CurrentSurfaceTexture::Occluded => return,
-        //             CurrentSurfaceTexture::Outdated | CurrentSurfaceTexture::Lost => {
-        //                 app.gpu.surface.configure(&app.gpu.device, &app.gpu.config);
-        //                 return;
-        //             }
-        //             CurrentSurfaceTexture::Validation => return,
-        //         };
-        //
-        //         let view = frame.texture.create_view(&TextureViewDescriptor::default());
-        //
-        //         app.render(&view);
-        //
-        //         frame.present();
-        //     }
-        //     _ => {}
-        // }
     }
 }

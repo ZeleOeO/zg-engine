@@ -2,7 +2,7 @@ use std::any::TypeId;
 
 use crate::{
     graphics::gpu::InternalGraphics,
-    managers::Manager,
+    managers::Assets,
     pipeline::pipeline_id::PipelineID,
     render::{command::RenderCommand, render_queue::RenderQueue},
     world::{
@@ -19,7 +19,7 @@ pub fn draw_items(world: &mut World) {
     ];
 
     let mut render_queue = world.get_mut::<RenderQueue>();
-    let manager = &world.get::<Manager>();
+    let assets = &world.get::<Assets>();
     let mut gpu = world.get_mut::<InternalGraphics>();
 
     let archetype_id = &world.get_archetype_by_type_ids(components).unwrap();
@@ -40,9 +40,9 @@ pub fn draw_items(world: &mut World) {
         .zip(material_column.iter().zip(transform_column.iter()));
 
     for (mesh, (material, transform)) in item_iter {
-        let material_bind_group_handle = manager.material_manager.get_material(material.0);
+        let material_bind_group_handle = assets.material_manager.get_material(material.0);
         let transform_bind_group_handle = transform.0.get_or_create_bind_group(gpu.as_mut());
-        let mesh_meta_data = manager.mesh_manager.get_mesh_data(mesh.0.0);
+        let mesh_meta_data = assets.mesh_manager.get_mesh_data(mesh.0.0);
 
         render_queue.commands.push(RenderCommand::SetPipeline {
             pipeline_id: PipelineID::MAIN,

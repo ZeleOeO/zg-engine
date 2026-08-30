@@ -11,7 +11,7 @@ use winit::window::Window;
 use crate::{
     camera::{camera::Camera, camera_controller::CameraController},
     graphics::gpu::InternalGraphics,
-    managers::Manager,
+    managers::Assets,
     render::{render_queue::RenderQueue, renderer::WorldRenderer},
     utils::{storage_util::TypeIdMap, time::Time},
     world::{
@@ -111,7 +111,7 @@ impl World {
 
     pub fn insert_default_resources(&mut self, window: Arc<Window>) {
         let internal_graphics = pollster::block_on(InternalGraphics::new(&window)).unwrap();
-        let manager = Manager::new();
+        let assets = Assets::new();
         let camera_controller = CameraController::new(0.1, 2.0);
         let render_queue = RenderQueue::default();
         let renderer = WorldRenderer::new(&internal_graphics);
@@ -119,7 +119,7 @@ impl World {
 
         self.insert(window);
         self.insert(internal_graphics);
-        self.insert(manager);
+        self.insert(assets);
         self.insert(camera_controller);
         self.insert(render_queue);
         self.insert(renderer);

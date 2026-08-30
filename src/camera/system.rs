@@ -1,6 +1,5 @@
 use std::sync::Arc;
 
-use wgpu::util::{BufferInitDescriptor, DeviceExt};
 use winit::event::DeviceEvent;
 
 use winit::event_loop::ActiveEventLoop;
@@ -12,7 +11,6 @@ use winit::{
 
 use crate::camera::camera::Camera;
 use crate::camera::camera_controller::handle_key_controller;
-use crate::graphics::cache::BindGroupCacheHandle;
 use crate::graphics::gpu::InternalGraphics;
 use crate::render::buffer::{BindGroupCacheKey, BindGroupResourceType};
 use crate::render::command::RenderCommand;

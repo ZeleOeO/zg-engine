@@ -1,5 +1,5 @@
 use crate::{
-    graphics::gpu::InternalGraphics, managers::Manager, render::command::RenderCommand,
+    graphics::gpu::InternalGraphics, managers::Assets, render::command::RenderCommand,
     world::world::World,
 };
 
@@ -11,15 +11,15 @@ pub struct RenderQueue {
 impl RenderQueue {
     pub fn flush(&mut self, render_pass: &mut wgpu::RenderPass, world: &World) {
         let graphics = world.get::<InternalGraphics>();
-        let manager = world.get::<Manager>();
+        let assets = world.get::<Assets>();
         for command in self.commands.drain(..) {
             match command {
                 RenderCommand::SetVertexBuffer { mesh_handle } => {
-                    let buffer = manager.mesh_manager.get_vertex_buffers(mesh_handle.0);
+                    let buffer = assets.mesh_manager.get_vertex_buffers(mesh_handle.0);
                     render_pass.set_vertex_buffer(0, buffer.slice(..));
                 }
                 RenderCommand::SetIndexBuffer { index_handle } => {
-                    let buffer = manager.mesh_manager.get_index_buffers(index_handle.0);
+                    let buffer = assets.mesh_manager.get_index_buffers(index_handle.0);
                     render_pass.set_index_buffer(buffer.slice(..), wgpu::IndexFormat::Uint32);
                 }
                 RenderCommand::SetPipeline { pipeline_id } => {
