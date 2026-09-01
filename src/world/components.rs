@@ -30,8 +30,6 @@ impl<T: 'static> ComponentColumn for Vec<T> {
     }
 }
 
-pub trait Component {}
-
 #[derive(Clone, Copy)]
 pub struct MeshComponent(pub MeshHandle);
 
@@ -40,7 +38,3 @@ pub struct TransformComponent(pub Transform);
 
 #[derive(Clone, Copy)]
 pub struct MaterialComponent(pub MaterialHandle);
-
-impl Component for MeshComponent {}
-impl Component for TransformComponent {}
-impl Component for MaterialComponent {}
