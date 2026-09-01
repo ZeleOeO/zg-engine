@@ -1,6 +1,6 @@
 use std::any::{Any, TypeId};
 
-use crate::world::components::ComponentColumn;
+use crate::world::{bundle::Bundle, components::ComponentColumn};
 
 #[derive(Clone, Copy)]
 pub struct ArchetypeID(pub u32);
@@ -48,6 +48,11 @@ impl Archetype {
         self.entities.len()
     }
 
+    pub fn insert_component<T: 'static>(&mut self, component: T) {
+        let col = self.get_column_mut(&component);
+        col.push(component);
+    }
+
     pub fn get_column<T: 'static>(&self, value: &T) -> &Vec<T> {
         let column = self
             .columns
@@ -91,6 +96,15 @@ impl Archetype {
             .find(|col| col.column_type_id == value)
             .unwrap();
         column.get_column::<T>()
+    }
+
+    pub fn get_column_mut_by_type_id<T: 'static>(&mut self, value: TypeId) -> &mut Vec<T> {
+        let column = self
+            .columns
+            .iter_mut()
+            .find(|col| col.column_type_id == value)
+            .unwrap();
+        column.get_column_mut::<T>()
     }
 
     pub fn get_column_ptr_by_type<T: 'static>(&self) -> *mut Vec<T> {

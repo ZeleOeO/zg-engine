@@ -36,6 +36,8 @@ macro_rules! impl_query_for_tuples {
 impl_query_for_tuples!(A);
 impl_query_for_tuples!(A, B);
 impl_query_for_tuples!(A, B, C);
+impl_query_for_tuples!(A, B, C, D);
+impl_query_for_tuples!(A, B, C, D, E);
 
 pub struct Query<'w, D: QueryData<'w>> {
     pub world: &'w World,

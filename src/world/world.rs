@@ -9,13 +9,14 @@ use std::{
 use winit::window::Window;
 
 use crate::{
-    camera::{camera::Camera, camera_controller::CameraController},
+    camera::camera_controller::CameraController,
     graphics::gpu::InternalGraphics,
     managers::Assets,
     render::{render_queue::RenderQueue, renderer::WorldRenderer},
     utils::{storage_util::TypeIdMap, time::Time},
     world::{
         archetypes::{Archetype, ArchetypeID, Entity},
+        bundle::Bundle,
         query::{Query, QueryData},
         resources::{Resource, ResourceMut, ResourceRef},
     },
@@ -44,15 +45,12 @@ impl World {
         }
     }
 
-    pub fn spawn<T: 'static>(&mut self, items: Vec<T>) -> Entity {
-        let archetype_id = self.get_or_create_archetype_id_by_items(&items);
+    // Replacing the T with a trait Bundle
+    pub fn spawn<T: Bundle>(&mut self, bundle: T) -> Entity {
+        let items = T::get_archetype();
+        let archetype_id = self.get_or_create_archetype_id_by_type_ids(&items);
         let archetype = &mut self.archetypes[archetype_id.0 as usize];
-
-        // This is one entity
-        for item in items {
-            let col = archetype.get_column_mut(&item);
-            col.push(item);
-        }
+        bundle.insert_into(archetype);
 
         // We store the entity data in archetype
         let entity = Entity(self.entities.len() as u32);
@@ -126,8 +124,8 @@ impl World {
         self.insert(time);
     }
 
-    pub fn get_or_create_archetype_by_items<T: 'static>(&mut self, items: Vec<T>) -> &Archetype {
-        let archetype_id = self.get_or_create_archetype_id_by_items(&items);
+    pub fn get_or_create_archetype_by_items<T: 'static>(&mut self, items: &Vec<T>) -> &Archetype {
+        let archetype_id = self.get_or_create_archetype_id_by_items(items);
         let archetype = Self::get_archetype_by_id(self, archetype_id);
         archetype
     }
@@ -149,9 +147,12 @@ impl World {
         arch_id
     }
 
-    pub fn get_or_create_archetype_id_by_type_ids(&mut self, type_ids: Vec<TypeId>) -> ArchetypeID {
+    pub fn get_or_create_archetype_id_by_type_ids(
+        &mut self,
+        type_ids: &Vec<TypeId>,
+    ) -> ArchetypeID {
         for archetype in self.archetypes.iter() {
-            if archetype.components.iter().eq(&type_ids) {
+            if archetype.components.iter().eq(type_ids) {
                 return archetype.archetype_id;
             }
         }
