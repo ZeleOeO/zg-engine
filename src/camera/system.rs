@@ -39,7 +39,7 @@ pub fn camera_controller_device_sytem(world: &mut World, event: &DeviceEvent) {
 // set's the bind group via the handle
 pub fn camera_init_system(world: &mut World) {
     let camera = Camera::default();
-    let entity = world.spawn(vec![camera]);
+    let entity = world.spawn((camera,));
     let mut renderer = world.get_mut::<WorldRenderer>();
     let mut graphics = world.get_mut::<InternalGraphics>();
     let mut render_queue = world.get_mut::<RenderQueue>();

@@ -28,6 +28,8 @@ macro_rules! impl_tuple_for_bundle {
 
 impl_tuple_for_bundle!(A);
 impl_tuple_for_bundle!(A, B);
+impl_tuple_for_bundle!(A, B, C);
+impl_tuple_for_bundle!(A, B, C, D);
 
 // fn stuff() {
 //     Archetype
