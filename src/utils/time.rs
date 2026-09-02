@@ -17,9 +17,10 @@ impl Time {
     }
 
     // This checks between the last time and now
-    pub fn calculate_time_delta(&mut self) {
+    pub fn calculate_time_delta(&mut self) -> f32 {
         let now = Instant::now();
         self.time_delta = now.duration_since(self.last_frame).as_secs_f32();
+        self.time_delta
     }
 }
 
@@ -27,9 +28,9 @@ impl Time {
 // I believe we would possibly face an issue with a 0 delta time if we run this before the camera update
 // if we do, I'll either change it to run at the beginning of each frame orrrr, I update the
 // intital time_delta to 0.1
-pub fn update_time_system(world: &mut World) {
-    let mut time = world.get_mut::<Time>();
-    // Every update, this checks the current time
-    // gets how much it is from the previous time
-    time.calculate_time_delta();
-}
+// pub fn update_time_system(world: &mut World) {
+//     let mut time = world.get_mut::<Time>();
+//     // Every update, this checks the current time
+//     // gets how much it is from the previous time
+//     time.calculate_time_delta();
+// }

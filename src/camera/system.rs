@@ -1,4 +1,3 @@
-use std::any::TypeId;
 use std::sync::Arc;
 
 use winit::event::DeviceEvent;
@@ -57,10 +56,11 @@ pub fn camera_update_system(world: &mut World) {
 
     let window = world.get::<Arc<Window>>();
     if let Some(camera_entity) = renderer.default_camera {
+        // This changes the aspect ratio for the camera
         let window_size = window.inner_size();
         let camera = world.get_entity::<(Camera,)>(camera_entity).0;
-        // println!("Camera: {:#?}", TypeId::of::<Camera>());
         camera.aspect = (window_size.width as f32) / window_size.height as f32;
+
         let view_proj = camera.build_projection_matrix();
         graphics.queue.write_buffer(
             &renderer.camera_buffer,
@@ -94,8 +94,9 @@ pub fn camera_controller_update_system(world: &mut World) {
     let camera_entity = renderer.default_camera.unwrap();
     let camera = world.get_entity::<(Camera,)>(camera_entity).0;
     let camera_controller = world.get::<CameraController>();
-    let time = world.get::<Time>();
-    camera_controller.camera_update(camera, time.time_delta);
+    let mut time = world.get_mut::<Time>();
+    let delta = time.calculate_time_delta().min(0.1);
+    camera_controller.camera_update(camera, delta);
 }
 
 pub fn camera_window_event(
@@ -117,7 +118,6 @@ pub fn camera_window_event(
             if *code == KeyCode::Escape && key_state.is_pressed() {
                 event_loop.exit();
             } else {
-                println!("{:#?}", key_state);
                 handle_key_controller(controller, *code, key_state.is_pressed());
             }
         }
