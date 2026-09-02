@@ -1,5 +1,3 @@
-use std::any::TypeId;
-
 use wgpu::CurrentSurfaceTexture;
 use winit::{event::WindowEvent, event_loop::ActiveEventLoop};
 

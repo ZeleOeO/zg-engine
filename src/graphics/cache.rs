@@ -2,11 +2,7 @@ use std::collections::HashMap;
 
 use wgpu::{BindGroup, BindGroupLayout};
 
-use crate::{
-    layouts::*,
-    pipeline::pipeline::{light_pipeline, main_pipeline},
-    render::buffer::BindGroupCacheKey,
-};
+use crate::{layouts::*, pipeline::pipeline::main_pipeline, render::buffer::BindGroupCacheKey};
 
 #[derive(Clone, Copy, Hash, Debug)]
 // position, bind_group_slot
