@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use winit::window::{CursorGrabMode, Window};
 
-use crate::{systems::sysem_struct::Systems, world::world::World};
+use crate::{systems::system_struct::Systems, world::world::World};
 
 pub struct EngineApp {
     pub world: World,
