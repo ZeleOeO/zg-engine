@@ -49,8 +49,6 @@ impl World {
     // Replacing the T with a trait Bundle
     pub fn spawn<T: Bundle + Debug + 'static>(&mut self, bundle: T) -> Entity {
         let archetype_id = self.get_or_create_archetype_id_by_bundle::<T>();
-        // println!("{:#?}", bundle);
-        // println!("{:#?}", archetype_id);
         let archetype = &mut self.archetypes[archetype_id.0 as usize];
         bundle.insert_into(archetype);
 
@@ -72,8 +70,7 @@ impl World {
     }
 
     pub fn get<R: Resource + 'static>(&self) -> ResourceRef<'_, R> {
-        let item = self.resources.iter().clone();
-        // print!("{:#?}", item);
+        println!("{:#?} || {:#?}", self.resources.keys(), TypeId::of::<R>());
         let item = self.resources.get(&TypeId::of::<R>()).unwrap();
         let borrowed = item.try_borrow().unwrap();
         let resource = Ref::map(borrowed, |resource| {
@@ -83,6 +80,11 @@ impl World {
     }
 
     pub fn get_mut<R: Resource + 'static>(&self) -> ResourceMut<'_, R> {
+        println!(
+            " Mut {:#?} || {:#?}",
+            self.resources.keys(),
+            TypeId::of::<R>()
+        );
         let item = self.resources.get(&TypeId::of::<R>()).unwrap();
         let borrow_mut = item.try_borrow_mut().unwrap();
         let resource = RefMut::map(borrow_mut, |resource| {
@@ -108,7 +110,7 @@ impl World {
             resource.as_mut().as_any_mut().downcast_mut::<R>().unwrap()
         });
         f(self, ResourceMut(resource));
-        self.insert(item);
+        self.resources.insert(TypeId::of::<R>(), item);
     }
 
     pub fn insert_default_resources(&mut self, window: Arc<Window>) {
@@ -151,8 +153,6 @@ impl World {
     pub fn get_or_create_archetype_id_by_type_ids(&mut self, type_ids: Vec<TypeId>) -> ArchetypeID {
         for archetype in self.archetypes.iter() {
             if archetype.components.iter().eq(&type_ids) {
-                println!("Found archetype");
-                println!("{:#?}", archetype);
                 return archetype.archetype_id;
             }
         }
@@ -160,8 +160,6 @@ impl World {
         let arch_id = ArchetypeID(self.archetypes.len() as u32);
 
         let archetype = Archetype::new_with_type_ids(type_ids, arch_id);
-        println!("Created archetype");
-        println!("{:#?}", archetype);
         self.archetypes.push(archetype);
         arch_id
     }
@@ -191,8 +189,7 @@ impl World {
     }
 
     pub fn get_entity<'w, D: QueryData<'w>>(&'w self, entity: Entity) -> D::Output {
-        let location = &self.object_locations[entity.0 as usize];
-        self.query::<D>().get(location.row)
+        self.query::<D>().get(entity.0)
     }
 
     pub fn get_all_entities_in_archetype<'w, D: QueryData<'w> + 'w>(

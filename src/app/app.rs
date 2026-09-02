@@ -38,8 +38,6 @@ impl App {
     pub fn run(&mut self) -> anyhow::Result<()> {
         let event_loop = EventLoop::new()?;
         event_loop.set_control_flow(winit::event_loop::ControlFlow::Poll);
-        // let empty = self.engine_app.is_some();
-        // println!("{:#?}", empty);
         self.insert_default_systems();
         event_loop.run_app(self)?;
         Ok(())

@@ -1,3 +1,4 @@
+use std::any::TypeId;
 use std::sync::Arc;
 
 use winit::event::DeviceEvent;
@@ -71,6 +72,7 @@ pub fn camera_update_system(world: &mut World) {
     if let Some(camera_entity) = renderer.default_camera {
         let window_size = window.inner_size();
         let camera = world.get_entity::<(Camera,)>(camera_entity).0;
+        // println!("Camera: {:#?}", TypeId::of::<Camera>());
         camera.aspect = (window_size.width as f32) / window_size.height as f32;
         let view_proj = camera.build_projection_matrix();
         graphics.queue.write_buffer(

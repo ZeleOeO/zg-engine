@@ -9,8 +9,12 @@ pub struct RenderQueue {
 }
 
 impl RenderQueue {
-    pub fn flush(&mut self, render_pass: &mut wgpu::RenderPass, world: &World) {
-        let graphics = world.get::<InternalGraphics>();
+    pub fn flush(
+        &mut self,
+        render_pass: &mut wgpu::RenderPass,
+        world: &World,
+        graphics: &InternalGraphics,
+    ) {
         let assets = world.get::<Assets>();
         for command in self.commands.drain(..) {
             match command {

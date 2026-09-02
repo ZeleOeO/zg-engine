@@ -18,7 +18,7 @@ struct MaterialUniform {
 
 struct ItemUniform {
     transform: mat4x4<f32>,
-    normal_matrix: mat3x3<f32>,
+    // normal_matrix: mat3x3<f32>,
 }
 
 struct Light {
@@ -41,7 +41,7 @@ fn vs_main(in: VertexInput) -> VertexOutput {
     var out: VertexOutput;
     out.tex_cords = in.tex_cords;
     let world_position = model_transform.transform * vec4<f32>(in.position, 1.0);
-    out.normal = (model_transform.normal_matrix * in.normal);
+    // out.normal = (model_transform.normal_matrix * in.normal);
     out.world_position = world_position.xyz;
     out.clip_position = camera * world_position;
     return out;

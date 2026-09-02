@@ -20,6 +20,8 @@ pub fn render_items_system(world: &mut World) {
 
     let mut render_queue = world.get_mut::<RenderQueue>();
     let assets = &world.get::<Assets>();
+
+    println!("What about here");
     let mut gpu = world.get_mut::<InternalGraphics>();
 
     let archetype_id = &world.get_archetype_by_type_ids(components).unwrap();
@@ -50,6 +52,9 @@ pub fn render_items_system(world: &mut World) {
 
         render_queue.commands.push(RenderCommand::SetVertexBuffer {
             mesh_handle: mesh.0,
+        });
+        render_queue.commands.push(RenderCommand::SetIndexBuffer {
+            index_handle: mesh.0,
         });
         render_queue.commands.push(RenderCommand::SetBindGroup {
             bind_group_handle: material_bind_group_handle,

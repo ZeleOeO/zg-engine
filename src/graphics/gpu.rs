@@ -202,7 +202,7 @@ impl InternalGraphics {
                 multiview_mask: None,
             });
 
-            render_queue.flush(&mut render_pass, world);
+            render_queue.flush(&mut render_pass, world, self);
         }
         self.queue.submit(Some(encoder.finish()));
     }
