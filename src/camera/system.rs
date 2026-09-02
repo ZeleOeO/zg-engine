@@ -21,7 +21,6 @@ use crate::{camera::camera_controller::CameraController, world::world::World};
 
 // This is cute, but this is not how a system looks like
 // It needs to get the active camera as a component?
-
 pub fn camera_controller_device_sytem(world: &mut World, event: &DeviceEvent) {
     let mut camera_controller = world.get_mut::<CameraController>();
     match event {
@@ -95,9 +94,9 @@ pub fn camera_controller_update_system(world: &mut World) {
     camera_controller.camera_update(camera, time.time_delta);
 }
 
-pub fn camera_input_system(
+pub fn camera_window_event(
     world: &mut World,
-    window_event: WindowEvent,
+    window_event: &WindowEvent,
     event_loop: &ActiveEventLoop,
 ) {
     match window_event {
@@ -110,12 +109,12 @@ pub fn camera_input_system(
                 },
             ..
         } => {
-            if code == KeyCode::Escape && key_state.is_pressed() {
+            if *code == KeyCode::Escape && key_state.is_pressed() {
                 event_loop.exit();
             } else {
                 handle_key_controller(
                     &mut world.get_mut::<CameraController>(),
-                    code,
+                    *code,
                     key_state.is_pressed(),
                 );
             }

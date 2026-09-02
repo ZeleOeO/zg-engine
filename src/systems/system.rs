@@ -11,7 +11,7 @@ use crate::{
     },
 };
 
-pub fn draw_items(world: &mut World) {
+pub fn render_items_system(world: &mut World) {
     let components = vec![
         TypeId::of::<MeshComponent>(),
         TypeId::of::<MaterialComponent>(),

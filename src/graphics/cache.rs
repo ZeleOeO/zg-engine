@@ -8,10 +8,11 @@ use crate::{
     render::buffer::BindGroupCacheKey,
 };
 
-#[derive(Clone, Copy, Hash)]
+#[derive(Clone, Copy, Hash, Debug)]
 // position, bind_group_slot
 pub struct BindGroupCacheHandle(pub u32, pub u32);
 
+#[derive(Debug)]
 pub struct Cache {
     // All the layouts used
     pub layouts: Vec<BindGroupLayout>,

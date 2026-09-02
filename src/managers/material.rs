@@ -20,7 +20,7 @@ struct MaterialUniform {
     _padding: Vec3,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum MaterialType {
     Textured { location: String },
     NonTexture { color: Vec3 },
@@ -32,19 +32,18 @@ pub struct TextureData {
     pub sampler: wgpu::Sampler,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct MaterialHandle(pub u32);
 
+#[derive(Clone, Debug)]
 pub struct MaterialManager {
     material_bind_group: Vec<BindGroupCacheHandle>,
-    layout: u32,
 }
 
 impl MaterialManager {
     pub fn new() -> MaterialManager {
         Self {
             material_bind_group: Vec::new(),
-            layout: 1,
         }
     }
 

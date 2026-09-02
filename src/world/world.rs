@@ -1,6 +1,7 @@
 use std::{
-    any::{Any, TypeId},
+    any::TypeId,
     cell::{Ref, RefCell, RefMut},
+    fmt::Debug,
     marker::PhantomData,
     ops::Deref,
     sync::Arc,
@@ -29,7 +30,7 @@ pub struct World {
     pub resources: TypeIdMap<RefCell<Box<dyn Resource>>>,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct ObjectLocation {
     pub archetype_id: ArchetypeID,
     pub row: u32,
@@ -46,9 +47,10 @@ impl World {
     }
 
     // Replacing the T with a trait Bundle
-    pub fn spawn<T: Bundle>(&mut self, bundle: T) -> Entity {
-        let items = T::get_archetype();
-        let archetype_id = self.get_or_create_archetype_id_by_type_ids(&items);
+    pub fn spawn<T: Bundle + Debug + 'static>(&mut self, bundle: T) -> Entity {
+        let archetype_id = self.get_or_create_archetype_id_by_bundle::<T>();
+        // println!("{:#?}", bundle);
+        // println!("{:#?}", archetype_id);
         let archetype = &mut self.archetypes[archetype_id.0 as usize];
         bundle.insert_into(archetype);
 
@@ -69,7 +71,9 @@ impl World {
         entity
     }
 
-    pub fn get<R: Resource + 'static>(&self) -> ResourceRef<R> {
+    pub fn get<R: Resource + 'static>(&self) -> ResourceRef<'_, R> {
+        let item = self.resources.iter().clone();
+        // print!("{:#?}", item);
         let item = self.resources.get(&TypeId::of::<R>()).unwrap();
         let borrowed = item.try_borrow().unwrap();
         let resource = Ref::map(borrowed, |resource| {
@@ -78,7 +82,7 @@ impl World {
         ResourceRef(resource)
     }
 
-    pub fn get_mut<R: Resource + 'static>(&self) -> ResourceMut<R> {
+    pub fn get_mut<R: Resource + 'static>(&self) -> ResourceMut<'_, R> {
         let item = self.resources.get(&TypeId::of::<R>()).unwrap();
         let borrow_mut = item.try_borrow_mut().unwrap();
         let resource = RefMut::map(borrow_mut, |resource| {
@@ -124,17 +128,14 @@ impl World {
         self.insert(time);
     }
 
-    pub fn get_or_create_archetype_by_items<T: 'static>(&mut self, items: &Vec<T>) -> &Archetype {
-        let archetype_id = self.get_or_create_archetype_id_by_items(items);
-        let archetype = Self::get_archetype_by_id(self, archetype_id);
-        archetype
-    }
+    // pub fn get_or_create_archetype_by_items<T: 'static>(&mut self, items: &Vec<T>) -> &Archetype {
+    //     let archetype_id = self.get_or_create_archetype_id_by_items(items);
+    //     let archetype = Self::get_archetype_by_id(self, archetype_id);
+    //     archetype
+    // }
 
-    pub fn get_or_create_archetype_id_by_items<T: 'static>(
-        &mut self,
-        items: &Vec<T>,
-    ) -> ArchetypeID {
-        let type_ids: Vec<TypeId> = items.iter().map(|item| (item).type_id()).collect();
+    pub fn get_or_create_archetype_id_by_bundle<T: Bundle + 'static>(&mut self) -> ArchetypeID {
+        let type_ids: Vec<TypeId> = T::get_archetype();
         for archetype in self.archetypes.iter() {
             if archetype.components.iter().eq(type_ids.deref()) {
                 return archetype.archetype_id;
@@ -142,23 +143,25 @@ impl World {
         }
         let arch_id = ArchetypeID(self.archetypes.len() as u32);
 
-        let archetype = Archetype::new(items, arch_id);
+        let archetype = Archetype::new::<T>(arch_id);
         self.archetypes.push(archetype);
         arch_id
     }
 
-    pub fn get_or_create_archetype_id_by_type_ids(
-        &mut self,
-        type_ids: &Vec<TypeId>,
-    ) -> ArchetypeID {
+    pub fn get_or_create_archetype_id_by_type_ids(&mut self, type_ids: Vec<TypeId>) -> ArchetypeID {
         for archetype in self.archetypes.iter() {
-            if archetype.components.iter().eq(type_ids) {
+            if archetype.components.iter().eq(&type_ids) {
+                println!("Found archetype");
+                println!("{:#?}", archetype);
                 return archetype.archetype_id;
             }
         }
+
         let arch_id = ArchetypeID(self.archetypes.len() as u32);
 
-        let archetype = Archetype::new(&type_ids, arch_id);
+        let archetype = Archetype::new_with_type_ids(type_ids, arch_id);
+        println!("Created archetype");
+        println!("{:#?}", archetype);
         self.archetypes.push(archetype);
         arch_id
     }

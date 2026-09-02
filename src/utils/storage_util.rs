@@ -2,8 +2,6 @@ use std::any::TypeId;
 use std::collections::HashMap;
 use std::hash::{BuildHasherDefault, Hasher};
 
-use crate::world::resources::Resource;
-
 #[derive(Default)]
 pub struct IdentityHasher(u64);
 

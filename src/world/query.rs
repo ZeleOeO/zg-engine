@@ -22,10 +22,11 @@ macro_rules! impl_query_for_tuples {
             fn get(world: &'w  $crate::world::world::World, row: usize) -> Self::Output {
                 let location = &world.object_locations[row];
                 let archetype = world.get_archetype_by_id(location.archetype_id);
+                println!("Macro: {:#?}", archetype);
 
                 // Takes pointer so I can mutate without worrying about multiple mutation borrows
                 unsafe {
-                    ($( (&mut *archetype.get_column_ptr_by_type::<$T>()).get_mut(row).unwrap(),)*)
+                   ($( (&mut *archetype.get_column_ptr_by_type::<$T>()).get_mut(row).unwrap(),)*)
                 }
             }
 

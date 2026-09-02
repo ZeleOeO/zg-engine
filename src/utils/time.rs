@@ -2,6 +2,7 @@ use std::time::Instant;
 
 use crate::world::world::World;
 
+#[derive(Debug)]
 pub struct Time {
     pub time_delta: f32,
     pub last_frame: Instant,

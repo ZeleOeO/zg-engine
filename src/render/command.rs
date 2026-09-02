@@ -3,6 +3,7 @@ use crate::{
     pipeline::pipeline_id::PipelineID,
 };
 
+#[derive(Debug)]
 pub enum RenderCommand {
     SetVertexBuffer {
         mesh_handle: MeshHandle,

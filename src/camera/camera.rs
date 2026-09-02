@@ -4,6 +4,7 @@ use wgpu::{BindGroup, Buffer};
 
 use crate::math::*;
 
+#[derive(Debug, Clone, Copy)]
 pub struct Camera {
     pub eye: Vec3,
     pub target: Vec3,

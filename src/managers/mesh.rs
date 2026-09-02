@@ -1,7 +1,6 @@
 use bytemuck::{Pod, Zeroable};
 use wgpu::{
-    Buffer, BufferAddress, BufferSlice, BufferUsages, RenderPass, VertexAttribute,
-    VertexBufferLayout, VertexFormat,
+    Buffer, BufferAddress, BufferUsages, VertexAttribute, VertexBufferLayout, VertexFormat,
     util::{BufferInitDescriptor, DeviceExt},
 };
 
@@ -44,13 +43,14 @@ impl Vertex {
     }
 }
 
+#[derive(Debug)]
 pub struct MeshManager {
     vertex_buffers: Vec<Buffer>,
     index_buffers: Vec<Buffer>,
     meshes: Vec<MeshMetaData>,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct MeshHandle(pub u32);
 
 // This is for draw

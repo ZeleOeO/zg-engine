@@ -5,6 +5,7 @@ use crate::{
     math::{vec3_add, vec3_cross_product, vec3_mult_scal, vec3_normalize, vec3_sub},
 };
 
+#[derive(Clone, Debug)]
 pub struct CameraController {
     pub speed: f32,
     pub sensitivity: f32,

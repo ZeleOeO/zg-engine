@@ -1,15 +1,16 @@
 use std::{
     any::Any,
     cell::{Ref, RefMut},
+    fmt::Debug,
     ops::{Deref, DerefMut},
 };
 
-pub trait Resource: 'static {
+pub trait Resource: 'static + Debug {
     fn as_any(&self) -> &dyn Any;
     fn as_any_mut(&mut self) -> &mut dyn Any;
 }
 
-impl<T: 'static> Resource for T {
+impl<T: 'static + Debug> Resource for T {
     fn as_any(&self) -> &dyn Any {
         self
     }

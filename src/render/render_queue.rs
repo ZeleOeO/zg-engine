@@ -3,7 +3,7 @@ use crate::{
     world::world::World,
 };
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct RenderQueue {
     pub commands: Vec<RenderCommand>,
 }

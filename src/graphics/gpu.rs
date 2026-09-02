@@ -14,6 +14,7 @@ use crate::render::buffer::{BindGroupCacheKey, BindGroupResourceType};
 use crate::render::render_queue::RenderQueue;
 use crate::world::world::World;
 
+#[derive(Debug)]
 pub struct InternalGraphics {
     pub surface: Surface<'static>,
     pub device: Device,

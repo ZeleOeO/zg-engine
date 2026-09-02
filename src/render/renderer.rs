@@ -2,6 +2,7 @@ use wgpu::{Buffer, BufferUsages, wgt::BufferDescriptor};
 
 use crate::{graphics::gpu::InternalGraphics, math::Mat4, world::archetypes::Entity};
 
+#[derive(Clone, Debug)]
 pub struct WorldRenderer {
     pub default_camera: Option<Entity>,
     pub camera_buffer: Buffer,

@@ -1,13 +1,17 @@
-use std::any::{Any, TypeId};
+use std::{
+    any::{Any, TypeId},
+    fmt::Debug,
+};
 
 use crate::world::{bundle::Bundle, components::ComponentColumn};
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct ArchetypeID(pub u32);
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Entity(pub u32);
 
+#[derive(Debug)]
 pub struct Archetype {
     pub archetype_id: ArchetypeID,
     pub entities: Vec<Entity>,
@@ -15,10 +19,11 @@ pub struct Archetype {
     pub columns: Vec<Column>,
 }
 
+#[derive(Debug)]
 pub struct Column {
     // Can't even remember why I wanted to use this
-    column_type_id: TypeId,
-    data: Box<dyn ComponentColumn>,
+    pub column_type_id: TypeId,
+    pub data: Box<dyn ComponentColumn>,
 }
 
 impl Column {
@@ -32,11 +37,18 @@ impl Column {
 }
 
 impl Archetype {
-    pub fn new<T: 'static>(components: &Vec<T>, archetype_id: ArchetypeID) -> Self {
-        let type_ids = components
-            .iter()
-            .map(|component| (component).type_id())
-            .collect();
+    pub fn new<T: Bundle + 'static>(archetype_id: ArchetypeID) -> Self {
+        let type_ids = T::get_archetype();
+        let items = T::empty_columns();
+        Self {
+            archetype_id: archetype_id,
+            entities: Vec::new(),
+            components: type_ids,
+            columns: items,
+        }
+    }
+
+    pub fn new_with_type_ids(type_ids: Vec<TypeId>, archetype_id: ArchetypeID) -> Self {
         Self {
             archetype_id: archetype_id,
             entities: Vec::new(),

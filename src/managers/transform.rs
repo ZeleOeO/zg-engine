@@ -13,11 +13,19 @@ pub struct ItemUniform {
     transform: Mat4,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Transform {
     pub position: Vec3,
     // rotation: Quat,
-    pub scale: Vec3,
+    // pub scale: Vec3,
+}
+
+impl Default for Transform {
+    fn default() -> Self {
+        Self {
+            position: [0.0, 0.0, 0.0],
+        }
+    }
 }
 
 impl Transform {
