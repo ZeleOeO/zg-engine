@@ -45,4 +45,8 @@ impl Transform {
         };
         gpu.get_or_create_bind_group(cache_key)
     }
+
+    pub fn new(position: Vec3) -> Self {
+        Self { position: position }
+    }
 }

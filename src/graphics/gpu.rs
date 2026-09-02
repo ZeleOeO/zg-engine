@@ -115,8 +115,12 @@ impl InternalGraphics {
 
     pub fn get_or_create_bind_group(&mut self, key: BindGroupCacheKey) -> BindGroupCacheHandle {
         let bind_group = match self.cache.bind_groups_cache_map.entry(key) {
-            hash_map::Entry::Occupied(occupied) => *occupied.get(),
+            hash_map::Entry::Occupied(occupied) => {
+                println!("Found");
+                *occupied.get()
+            }
             hash_map::Entry::Vacant(vacant) => {
+                println!("Missed");
                 let key_ref = vacant.key();
                 let layout = &self.cache.layouts[key_ref.layout_num as usize];
                 let entries = key_ref

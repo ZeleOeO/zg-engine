@@ -70,7 +70,6 @@ impl World {
     }
 
     pub fn get<R: Resource + 'static>(&self) -> ResourceRef<'_, R> {
-        println!("{:#?} || {:#?}", self.resources.keys(), TypeId::of::<R>());
         let item = self.resources.get(&TypeId::of::<R>()).unwrap();
         let borrowed = item.try_borrow().unwrap();
         let resource = Ref::map(borrowed, |resource| {
@@ -80,11 +79,6 @@ impl World {
     }
 
     pub fn get_mut<R: Resource + 'static>(&self) -> ResourceMut<'_, R> {
-        println!(
-            " Mut {:#?} || {:#?}",
-            self.resources.keys(),
-            TypeId::of::<R>()
-        );
         let item = self.resources.get(&TypeId::of::<R>()).unwrap();
         let borrow_mut = item.try_borrow_mut().unwrap();
         let resource = RefMut::map(borrow_mut, |resource| {
@@ -116,7 +110,7 @@ impl World {
     pub fn insert_default_resources(&mut self, window: Arc<Window>) {
         let internal_graphics = pollster::block_on(InternalGraphics::new(&window)).unwrap();
         let assets = Assets::new();
-        let camera_controller = CameraController::new(0.1, 2.0);
+        let camera_controller = CameraController::new(2.0, 0.2);
         let render_queue = RenderQueue::default();
         let renderer = WorldRenderer::new(&internal_graphics);
         let time = Time::new();

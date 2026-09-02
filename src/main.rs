@@ -1,7 +1,7 @@
 use crate::{
     app::app::App,
     graphics::gpu::InternalGraphics,
-    managers::Assets,
+    managers::{Assets, transform::Transform},
     world::{components::TransformComponent, world::World},
 };
 
@@ -45,5 +45,9 @@ pub fn instantiate_mesh(world: &mut World) {
 
     // I could get the vector of the typeId interestingly
     world.spawn((cube_mesh, tree_material, TransformComponent::default()));
-    world.spawn((prism_mesh, color_mat, TransformComponent::default()));
+    world.spawn((
+        prism_mesh,
+        color_mat,
+        TransformComponent(Transform::new([1.0, 2.0, 3.0])),
+    ));
 }

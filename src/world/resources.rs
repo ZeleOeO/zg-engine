@@ -20,7 +20,10 @@ impl<T: 'static + Debug> Resource for T {
     }
 }
 
+#[derive(Debug)]
 pub struct ResourceRef<'a, R: Resource>(pub Ref<'a, R>);
+
+#[derive(Debug)]
 pub struct ResourceMut<'a, R: Resource>(pub RefMut<'a, R>);
 
 impl<R: Resource> Deref for ResourceRef<'_, R> {

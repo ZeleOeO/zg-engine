@@ -16,8 +16,6 @@ use crate::{
 struct MaterialUniform {
     color: Vec3,
     has_texture: f32,
-    emmisive: f32,
-    _padding: Vec3,
 }
 
 #[derive(Clone, Debug)]
@@ -64,8 +62,6 @@ impl MaterialManager {
                     contents: bytemuck::cast_slice(&[MaterialUniform {
                         color: [0.0, 0.0, 0.0],
                         has_texture: 1.0,
-                        emmisive: 0.0,
-                        _padding: [0.0, 0.0, 0.0],
                     }]),
                     usage: BufferUsages::UNIFORM | BufferUsages::COPY_DST,
                 });
@@ -97,8 +93,6 @@ impl MaterialManager {
                     contents: bytemuck::cast_slice(&[MaterialUniform {
                         color,
                         has_texture: 0.0,
-                        emmisive: 1.0, // this is for selection in shader
-                        _padding: [0.0, 0.0, 0.0],
                     }]),
                     usage: BufferUsages::UNIFORM | BufferUsages::COPY_DST,
                 });

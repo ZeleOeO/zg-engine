@@ -21,7 +21,6 @@ pub fn render_items_system(world: &mut World) {
     let mut render_queue = world.get_mut::<RenderQueue>();
     let assets = &world.get::<Assets>();
 
-    println!("What about here");
     let mut gpu = world.get_mut::<InternalGraphics>();
 
     let archetype_id = &world.get_archetype_by_type_ids(components).unwrap();

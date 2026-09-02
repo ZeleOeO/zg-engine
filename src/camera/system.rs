@@ -41,22 +41,7 @@ pub fn camera_init_system(world: &mut World) {
     let camera = Camera::default();
     let entity = world.spawn((camera,));
     let mut renderer = world.get_mut::<WorldRenderer>();
-    let mut graphics = world.get_mut::<InternalGraphics>();
-    let mut render_queue = world.get_mut::<RenderQueue>();
     renderer.default_camera = Some(entity);
-    let cache_key = BindGroupCacheKey {
-        layout_num: 0,
-        entries: vec![(
-            0,
-            BindGroupResourceType::Buffer {
-                buffer: renderer.camera_buffer.clone(),
-            },
-        )],
-    };
-    let camera_bind_group_cache_handle = graphics.get_or_create_bind_group(cache_key);
-    render_queue.commands.push(RenderCommand::SetBindGroup {
-        bind_group_handle: camera_bind_group_cache_handle,
-    });
 }
 
 // This then updates the camera
@@ -67,7 +52,9 @@ pub fn camera_init_system(world: &mut World) {
 // writes to the buffer
 pub fn camera_update_system(world: &mut World) {
     let renderer = world.get::<WorldRenderer>();
-    let graphics = world.get_mut::<InternalGraphics>();
+    let mut graphics = world.get_mut::<InternalGraphics>();
+    let mut render_queue = world.get_mut::<RenderQueue>();
+
     let window = world.get::<Arc<Window>>();
     if let Some(camera_entity) = renderer.default_camera {
         let window_size = window.inner_size();
@@ -80,6 +67,21 @@ pub fn camera_update_system(world: &mut World) {
             0,
             bytemuck::cast_slice(&[view_proj]),
         );
+
+        let cache_key = BindGroupCacheKey {
+            layout_num: 0,
+            entries: vec![(
+                0,
+                BindGroupResourceType::Buffer {
+                    buffer: renderer.camera_buffer.clone(),
+                },
+            )],
+        };
+        let camera_bind_group_cache_handle = graphics.get_or_create_bind_group(cache_key);
+
+        render_queue.commands.push(RenderCommand::SetBindGroup {
+            bind_group_handle: camera_bind_group_cache_handle,
+        });
     }
 }
 
@@ -101,6 +103,7 @@ pub fn camera_window_event(
     window_event: &WindowEvent,
     event_loop: &ActiveEventLoop,
 ) {
+    let controller = &mut world.get_mut::<CameraController>();
     match window_event {
         WindowEvent::KeyboardInput {
             event:
@@ -114,11 +117,8 @@ pub fn camera_window_event(
             if *code == KeyCode::Escape && key_state.is_pressed() {
                 event_loop.exit();
             } else {
-                handle_key_controller(
-                    &mut world.get_mut::<CameraController>(),
-                    *code,
-                    key_state.is_pressed(),
-                );
+                println!("{:#?}", key_state);
+                handle_key_controller(controller, *code, key_state.is_pressed());
             }
         }
         _ => {}
