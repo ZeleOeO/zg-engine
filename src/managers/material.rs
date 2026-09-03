@@ -133,6 +133,7 @@ impl MaterialManager {
 
     fn from_image(gpu: &InternalGraphics, image: &DynamicImage) -> anyhow::Result<TextureData> {
         let dimensions = image.dimensions();
+        let img_rgba = image.clone().into_rgba8();
 
         let texture_size = wgpu::Extent3d {
             width: dimensions.0,
@@ -161,6 +162,22 @@ impl MaterialManager {
             mipmap_filter: wgpu::MipmapFilterMode::Nearest,
             ..Default::default()
         });
+
+        gpu.queue.write_texture(
+            wgpu::TexelCopyTextureInfo {
+                texture: &texture,
+                mip_level: 0,
+                origin: wgpu::Origin3d::ZERO,
+                aspect: wgpu::TextureAspect::All,
+            },
+            &img_rgba,
+            wgpu::TexelCopyBufferLayout {
+                offset: 0,
+                bytes_per_row: Some(img_rgba.dimensions().0 * 4),
+                rows_per_image: Some(img_rgba.dimensions().1),
+            },
+            texture_size,
+        );
 
         Ok(TextureData {
             view: texture_view,
