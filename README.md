@@ -4,6 +4,10 @@ A Rust-based 3D Graphics Engine built with WebGPU (wgpu). Renders a textured, ro
 
 > Thinking out loud: It's crazy to me how fast this all is. GPU Programming is so insanely cool
 
+---
+
+> 🚧🚧🚧 EVERYTHING IS BLOCKED FOR NOW, IT'S IN BUILD MODE 🚧🚧🚧
+
 ## Technologies
 
 [![Rust](https://img.shields.io/badge/Rust-1.85%2B-orange?logo=rust&logoColor=white)](https://www.rust-lang.org) [![wgpu](https://img.shields.io/badge/wgpu-29.0-brightgreen?logo=webgpu&logoColor=white)](https://wgpu.rs) [![winit](https://img.shields.io/badge/Windowing-winit-blue)](https://github.com/rust-windowing/winit) [![WGSL](https://img.shields.io/badge/Shader-WGSL-purple)](https://www.w3.org/TR/WGSL/)
@@ -49,8 +53,18 @@ The embedded texture (`happy-tree.png`) is mapped onto all six faces of the cube
 
 ### TODO
 
+In no particular order
+
 - [X] Make the code cleaner - ongoing
 - [X] Camera controls (orbit)
+- [X] Create Systems
+- [ ] Switch querying to use Query
+- [ ] Make folders into crates
+- [ ] Add crate level access modifiers
+- [ ] Add a central "system" function
+- [ ] Fix all the places where there's an unwrap and handle it properly
+- [ ] Add ordering to systems
+- [ ] Asynchrounous and multithreading
 - [ ] Multiple objects / scene graph
 - [ ] Lighting (Phong / PBR)
 - [ ] OBJ / GLTF model loading
