@@ -53,10 +53,18 @@ The embedded texture (`happy-tree.png`) is mapped onto all six faces of the cube
 
 ### TODO
 
+In no particular order
+
 - [X] Make the code cleaner - ongoing
 - [X] Camera controls (orbit)
-- [ ] Create Systems
-- [ ] Create item generation
+- [X] Create Systems
+- [ ] Switch querying to use Query
+- [ ] Make folders into crates
+- [ ] Add crate level access modifiers
+- [ ] Add a central "system" function
+- [ ] Fix all the places where there's an unwrap and handle it properly
+- [ ] Add ordering to systems
+- [ ] Asynchrounous and multithreading
 - [ ] Multiple objects / scene graph
 - [ ] Lighting (Phong / PBR)
 - [ ] OBJ / GLTF model loading
