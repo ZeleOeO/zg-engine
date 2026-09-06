@@ -26,21 +26,12 @@ pub fn render_items_system(world: &mut World) {
     let archetype_id = &world.get_archetype_by_type_ids(components).unwrap();
     let archetype = &world.archetypes[archetype_id.archetype_id.0 as usize];
 
-    let mesh_column: &Vec<MeshComponent> =
-        archetype.get_column_by_type_id(TypeId::of::<MeshComponent>());
-    let material_column: &Vec<MaterialComponent> =
-        archetype.get_column_by_type_id(TypeId::of::<MaterialComponent>());
+    let item = world
+        .get_all_entities_in_archetype::<(MeshComponent, MaterialComponent, TransformComponent)>(
+            archetype,
+        );
 
-    let transform_column: &Vec<TransformComponent> =
-        archetype.get_column_by_type_id(TypeId::of::<TransformComponent>());
-
-    // TODO change this to use new querying system
-
-    let item_iter = mesh_column
-        .iter()
-        .zip(material_column.iter().zip(transform_column.iter()));
-
-    for (mesh, (material, transform)) in item_iter {
+    for (mesh, material, transform) in item {
         let material_bind_group_handle = assets.material_manager.get_material(material.0);
         let transform_bind_group_handle = transform.0.get_or_create_bind_group(gpu.as_mut());
         let mesh_meta_data = assets.mesh_manager.get_mesh_data(mesh.0.0);

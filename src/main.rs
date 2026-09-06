@@ -50,4 +50,9 @@ pub fn instantiate_mesh(world: &mut World) {
         color_mat,
         TransformComponent(Transform::new([1.0, 2.0, 3.0])),
     ));
+    world.spawn((
+        cube_mesh,
+        color_mat,
+        TransformComponent(Transform::new([8.0, 2.0, 3.0])),
+    ));
 }

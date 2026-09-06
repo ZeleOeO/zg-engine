@@ -191,6 +191,6 @@ impl World {
         archetype: &Archetype,
     ) -> Vec<D::Output> {
         let query = self.query::<D>();
-        query.iter(archetype).collect::<Vec<_>>()
+        query.iter(archetype).collect::<Vec<D::Output>>()
     }
 }

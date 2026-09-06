@@ -58,7 +58,7 @@ In no particular order
 - [X] Make the code cleaner - ongoing
 - [X] Camera controls (orbit)
 - [X] Create Systems
-- [ ] Switch querying to use Query
+- [X] Switch querying to use Query
 - [ ] Make folders into crates
 - [ ] Add crate level access modifiers
 - [ ] Add a central "system" function
