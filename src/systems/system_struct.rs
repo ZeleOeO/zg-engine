@@ -13,12 +13,6 @@ pub struct Systems {
     pub device_events: SystemsStorage<DeviceSystemEvent>,
 }
 
-pub enum SystemSchedule {
-    Setup,
-    Update,
-    WindowEvent,
-}
-
 impl Systems {
     pub fn add_setup_system<F: FnMut(&mut World) + 'static>(&mut self, callback: F) -> &mut Self {
         self.setups.systems.push(Box::new(callback));
