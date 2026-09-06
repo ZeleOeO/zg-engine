@@ -3,6 +3,7 @@ use winit::{event::WindowEvent, event_loop::ActiveEventLoop};
 
 use crate::{
     graphics::gpu::InternalGraphics,
+    systems::system_struct::SystemAggregator,
     world::{resources::ResourceMut, world::World},
 };
 
@@ -38,4 +39,8 @@ pub fn graphics_window_event_system(
         }
         _ => {}
     }
+}
+
+pub fn system(system: &mut SystemAggregator) {
+    system.insert_window_event_sytem(graphics_window_event_system);
 }

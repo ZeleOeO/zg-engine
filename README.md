@@ -59,11 +59,11 @@ In no particular order
 - [X] Camera controls (orbit)
 - [X] Create Systems
 - [X] Switch querying to use Query
+- [X] Add a central "system" function
+- [ ] Add ordering to systems
 - [ ] Make folders into crates
 - [ ] Add crate level access modifiers
-- [ ] Add a central "system" function
 - [ ] Fix all the places where there's an unwrap and handle it properly
-- [ ] Add ordering to systems
 - [ ] Asynchrounous and multithreading
 - [ ] Multiple objects / scene graph
 - [ ] Lighting (Phong / PBR)

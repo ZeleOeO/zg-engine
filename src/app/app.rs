@@ -8,16 +8,7 @@ use winit::{
     window::Window,
 };
 
-use crate::{
-    app::engine_app::EngineApp,
-    camera::system::{
-        camera_controller_device_sytem, camera_controller_update_system, camera_init_system,
-        camera_update_system, camera_window_event,
-    },
-    graphics::system::graphics_window_event_system,
-    render::system::render_items_system,
-    world::world::World,
-};
+use crate::{app::engine_app::EngineApp, camera, graphics, render, world::world::World};
 
 pub struct App {
     engine_app: Option<EngineApp>,
@@ -88,13 +79,21 @@ impl App {
     }
 
     pub fn insert_default_systems(&mut self) {
-        self.add_setup_system(camera_init_system);
-        self.add_update_system(camera_update_system);
-        self.add_update_system(camera_controller_update_system);
-        self.add_update_system(render_items_system);
-        self.add_window_event_sytem(camera_window_event);
-        self.add_window_event_sytem(graphics_window_event_system);
-        self.add_device_event_sytem(camera_controller_device_sytem);
+        self.engine_app
+            .as_mut()
+            .unwrap()
+            .systems
+            .add_system(camera::system::system);
+        self.engine_app
+            .as_mut()
+            .unwrap()
+            .systems
+            .add_system(render::system::system);
+        self.engine_app
+            .as_mut()
+            .unwrap()
+            .systems
+            .add_system(graphics::system::system);
     }
 }
 

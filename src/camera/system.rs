@@ -16,6 +16,7 @@ use crate::render::buffer::{BindGroupCacheKey, BindGroupResourceType};
 use crate::render::command::RenderCommand;
 use crate::render::render_queue::RenderQueue;
 use crate::render::renderer::WorldRenderer;
+use crate::systems::system_struct::SystemAggregator;
 use crate::utils::time::Time;
 use crate::{camera::camera_controller::CameraController, world::world::World};
 
@@ -125,14 +126,12 @@ pub fn camera_window_event(
     }
 }
 
-// Taking a playbook from cFlake
-//
-// i can put all these systems into one system called camera system
-//
-// pub fn camera_system(system: &System) {
-// system.init(camera...)
-// system.event()
-// }
-//
-//
-// so that I can just put them all together
+pub fn system(system: &mut SystemAggregator) {
+    system.insert_init_system(camera_init_system);
+    system.insert_update_system(camera_update_system);
+    system.insert_update_system(camera_controller_update_system);
+    system.insert_window_event_sytem(camera_window_event);
+    system.insert_device_event_sytem(camera_controller_device_sytem);
+}
+
+// I did it

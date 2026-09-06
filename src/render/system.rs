@@ -5,6 +5,7 @@ use crate::{
     managers::Assets,
     pipeline::pipeline_id::PipelineID,
     render::{command::RenderCommand, render_queue::RenderQueue},
+    systems::system_struct::SystemAggregator,
     world::{
         components::{MaterialComponent, MeshComponent, TransformComponent},
         world::World,
@@ -56,4 +57,8 @@ pub fn render_items_system(world: &mut World) {
             num_to_draw: mesh_meta_data.index_count,
         });
     }
+}
+
+pub fn system(system: &mut SystemAggregator) {
+    system.insert_update_system(render_items_system);
 }
