@@ -6,7 +6,7 @@ A Rust-based 3D Graphics Engine built with WebGPU (wgpu). Renders a textured, ro
 
 ---
 
-> 🚧🚧🚧 EVERYTHING IS BLOCKED FOR NOW, IT'S IN BUILD MODE 🚧🚧🚧
+>  EVERYTHING IS BLOCKED FOR NOW, IT'S IN BUILD MODE 
 
 ## Technologies
 
