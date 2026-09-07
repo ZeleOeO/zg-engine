@@ -11,7 +11,6 @@ pub mod camera;
 pub mod graphics;
 pub mod layouts;
 pub mod managers;
-pub mod math;
 pub mod pipeline;
 pub mod render;
 pub mod systems;

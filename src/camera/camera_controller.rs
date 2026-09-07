@@ -2,7 +2,7 @@ use winit::keyboard::KeyCode;
 
 use crate::{
     camera::camera::Camera,
-    math::{vec3_add, vec3_cross_product, vec3_mult_scal, vec3_normalize, vec3_sub},
+    utils::math::{vec3_add, vec3_cross_product, vec3_mult_scal, vec3_normalize, vec3_sub},
 };
 
 #[derive(Clone, Debug)]

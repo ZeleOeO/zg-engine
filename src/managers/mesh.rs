@@ -6,7 +6,7 @@ use wgpu::{
 
 use crate::{
     graphics::gpu::InternalGraphics,
-    math::{Vec3, vec3_add, vec3_cross_product, vec3_normalize},
+    utils::math::{Vec3, vec3_add, vec3_cross_product, vec3_normalize},
 };
 
 #[repr(C)]

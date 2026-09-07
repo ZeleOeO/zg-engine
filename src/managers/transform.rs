@@ -3,8 +3,8 @@ use wgpu::util::{BufferInitDescriptor, DeviceExt};
 
 use crate::{
     graphics::{cache::BindGroupCacheHandle, gpu::InternalGraphics},
-    math::{Mat4, Vec3, mat4_transpose, vec3_translation_matrix},
     render::buffer::{BindGroupCacheKey, BindGroupResourceType},
+    utils::math::{Mat4, Vec3, mat4_transpose, vec3_translation_matrix},
 };
 
 #[derive(Clone, Pod, Copy, Zeroable)]

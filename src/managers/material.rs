@@ -7,8 +7,8 @@ use wgpu::{
 
 use crate::{
     graphics::{cache::BindGroupCacheHandle, gpu::InternalGraphics},
-    math::Vec3,
     render::buffer::{BindGroupCacheKey, BindGroupResourceType},
+    utils::math::Vec3,
 };
 
 #[repr(C)]

@@ -1,4 +1,4 @@
-use std::any::{Any, TypeId};
+use std::any::TypeId;
 
 use winit::{
     event::{DeviceEvent, WindowEvent},

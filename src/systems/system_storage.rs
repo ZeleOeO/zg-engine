@@ -26,6 +26,19 @@ impl<A: SystemFunction + 'static> SystemsStorage<A> {
             A::execute(&mut system.callback, &mut args);
         }
     }
+
+    pub fn sort() {
+        // i need to sort this by the systemID
+        // I need the SystemMut to store a before and after thing
+        // we go through each one and then arrange them in that way
+        // alredy have a note with a naive approach
+        // it goes
+        // 1 -> before 3 after 2
+        // 2, 1, 3
+        // 2 -> after 3, but it'll move 2 behind 3 without thinking about why it's there
+        // so this may need a data structure
+        // going to  implement my own topo sort
+    }
 }
 
 impl<A: SystemFunction> Default for SystemsStorage<A> {

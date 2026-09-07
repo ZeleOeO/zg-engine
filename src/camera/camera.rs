@@ -2,7 +2,7 @@ use std::f32::consts::PI;
 
 use wgpu::{BindGroup, Buffer};
 
-use crate::math::*;
+use crate::utils::math::*;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Camera {
