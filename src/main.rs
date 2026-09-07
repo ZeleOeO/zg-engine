@@ -2,6 +2,7 @@ use crate::{
     app::app::App,
     graphics::gpu::InternalGraphics,
     managers::{Assets, transform::Transform},
+    systems::system_struct::SystemAggregator,
     world::{components::TransformComponent, world::World},
 };
 
@@ -18,7 +19,7 @@ pub mod utils;
 pub mod world;
 
 fn main() -> anyhow::Result<()> {
-    App::new()?.add_setup_system(instantiate_mesh).run()
+    App::new()?.insert_system(show_system).run()
 }
 
 pub fn instantiate_mesh(world: &mut World) {
@@ -55,4 +56,8 @@ pub fn instantiate_mesh(world: &mut World) {
         color_mat,
         TransformComponent(Transform::new([8.0, 2.0, 3.0])),
     ));
+}
+
+pub fn show_system(system: &mut SystemAggregator) {
+    system.insert_init_system(instantiate_mesh);
 }

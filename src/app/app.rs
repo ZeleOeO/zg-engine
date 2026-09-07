@@ -2,13 +2,12 @@ use std::sync::Arc;
 
 use anyhow::Ok;
 use winit::{
-    application::ApplicationHandler,
-    event::{DeviceEvent, WindowEvent},
-    event_loop::{ActiveEventLoop, EventLoop},
-    window::Window,
+    application::ApplicationHandler, event::DeviceEvent, event_loop::EventLoop, window::Window,
 };
 
-use crate::{app::engine_app::EngineApp, camera, graphics, render, world::world::World};
+use crate::{
+    app::engine_app::EngineApp, camera, graphics, render, systems::system_struct::SystemAggregator,
+};
 
 pub struct App {
     engine_app: Option<EngineApp>,
@@ -34,47 +33,12 @@ impl App {
         Ok(())
     }
 
-    pub fn add_setup_system<F: FnMut(&mut World) + 'static>(&mut self, callback: F) -> &mut Self {
+    pub fn insert_system<F: FnOnce(&mut SystemAggregator)>(mut self, callback: F) -> Self {
         self.engine_app
             .as_mut()
             .unwrap()
             .systems
-            .add_setup_system(callback);
-        self
-    }
-
-    pub fn add_update_system<F: FnMut(&mut World) + 'static>(&mut self, callback: F) -> &mut Self {
-        self.engine_app
-            .as_mut()
-            .unwrap()
-            .systems
-            .add_update_system(callback);
-        self
-    }
-
-    pub fn add_window_event_sytem<
-        F: FnMut(&mut World, &WindowEvent, &ActiveEventLoop) + 'static,
-    >(
-        &mut self,
-        callback: F,
-    ) -> &mut Self {
-        self.engine_app
-            .as_mut()
-            .unwrap()
-            .systems
-            .add_window_event_sytem(callback);
-        self
-    }
-
-    pub fn add_device_event_sytem<F: FnMut(&mut World, &DeviceEvent) + 'static>(
-        &mut self,
-        callback: F,
-    ) -> &mut Self {
-        self.engine_app
-            .as_mut()
-            .unwrap()
-            .systems
-            .add_device_event_sytem(callback);
+            .add_system(callback);
         self
     }
 

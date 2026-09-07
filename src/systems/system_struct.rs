@@ -20,28 +20,6 @@ pub struct SystemAggregator<'a> {
     pub device_events: &'a mut SystemsStorage<DeviceSystemEvent>,
 }
 
-// This is how I want System to work
-// I have a function
-// fn system(system: System) {
-// system.init()
-// system.whatever()
-// }
-//
-// and then when I add a system, it goes through each one and slots it
-// to handle schedule I can do
-//
-// fn system(system: System) {
-// system.init().after() // insert system it should go before or after
-// system.whatever().before()
-// This means we will need a sorter of some sort but we will get to that later
-// }
-//
-// pub fn add_system(system: SystemAgg) {
-//  self.setup.push(system.setup);
-//  self.setup.push(system.setup);
-//  self.setup.push(system.setup);
-// }
-
 impl<'a> SystemAggregator<'a> {
     pub fn insert_init_system<F: FnMut(&mut World) + 'static>(&mut self, callback: F) -> &mut Self {
         self.setups.systems.push(Box::new(callback));
@@ -84,34 +62,6 @@ impl Systems {
             device_events: &mut self.device_events,
         };
         function(&mut agg);
-    }
-
-    pub fn add_setup_system<F: FnMut(&mut World) + 'static>(&mut self, callback: F) -> &mut Self {
-        self.setups.systems.push(Box::new(callback));
-        self
-    }
-
-    pub fn add_update_system<F: FnMut(&mut World) + 'static>(&mut self, callback: F) -> &mut Self {
-        self.updates.insert(Box::new(callback));
-        self
-    }
-
-    pub fn add_window_event_sytem<
-        F: FnMut(&mut World, &WindowEvent, &ActiveEventLoop) + 'static,
-    >(
-        &mut self,
-        callback: F,
-    ) -> &mut Self {
-        self.window_events.insert(Box::new(callback));
-        self
-    }
-
-    pub fn add_device_event_sytem<F: FnMut(&mut World, &DeviceEvent) + 'static>(
-        &mut self,
-        callback: F,
-    ) -> &mut Self {
-        self.device_events.insert(Box::new(callback));
-        self
     }
 }
 
