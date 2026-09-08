@@ -42,6 +42,18 @@ impl<A: SystemFunction + 'static> SystemMut<A> {
     }
 }
 
+impl Systems {
+    pub fn add_system<F: FnOnce(&mut SystemAggregator)>(&mut self, function: F) {
+        let mut agg = SystemAggregator {
+            setups: &mut self.setups,
+            updates: &mut self.updates,
+            window_events: &mut self.window_events,
+            device_events: &mut self.device_events,
+        };
+        function(&mut agg);
+    }
+}
+
 impl<'a> SystemAggregator<'a> {
     pub fn insert_init_system<F: FnMut(&mut World) + 'static>(
         &mut self,
@@ -95,17 +107,5 @@ impl<'a> SystemAggregator<'a> {
         };
         let item = self.device_events.insert(system_mut);
         item
-    }
-}
-
-impl Systems {
-    pub fn add_system<F: FnOnce(&mut SystemAggregator)>(&mut self, function: F) {
-        let mut agg = SystemAggregator {
-            setups: &mut self.setups,
-            updates: &mut self.updates,
-            window_events: &mut self.window_events,
-            device_events: &mut self.device_events,
-        };
-        function(&mut agg);
     }
 }
