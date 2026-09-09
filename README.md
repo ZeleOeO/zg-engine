@@ -60,7 +60,7 @@ In no particular order
 - [X] Create Systems
 - [X] Switch querying to use Query
 - [X] Add a central "system" function
-- [ ] Add ordering to systems
+- [X] Add ordering to systems
 - [ ] Make folders into crates
 - [ ] Add crate level access modifiers
 - [ ] Fix all the places where there's an unwrap and handle it properly
