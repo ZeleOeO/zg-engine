@@ -133,5 +133,3 @@ pub fn system(system: &mut SystemAggregator) {
     system.insert_window_event_sytem(camera_window_event);
     system.insert_device_event_sytem(camera_controller_device_sytem);
 }
-
-// I did it

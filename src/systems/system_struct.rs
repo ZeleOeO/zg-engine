@@ -1,4 +1,4 @@
-use std::any::TypeId;
+use std::any::{Any, TypeId};
 
 use winit::{
     event::{DeviceEvent, WindowEvent},
@@ -36,9 +36,21 @@ pub struct SystemMut<A: SystemFunction> {
 }
 
 impl<A: SystemFunction + 'static> SystemMut<A> {
-    pub fn before(&mut self) {
+    pub fn before<F, M>(&mut self, callback: F)
+    where
+        M: SystemFunction,
+        F: IntoSystem<M>,
+    {
         self.sorts
-            .push(SystemSort::Before(SystemID(TypeId::of::<A::Fntype>())));
+            .push(SystemSort::Before(SystemID(callback.type_id())));
+    }
+    pub fn after<F, M>(&mut self, callback: F)
+    where
+        M: SystemFunction,
+        F: IntoSystem<M>,
+    {
+        self.sorts
+            .push(SystemSort::After(SystemID(callback.type_id())));
     }
 }
 
@@ -109,3 +121,52 @@ impl<'a> SystemAggregator<'a> {
         item
     }
 }
+
+pub trait SystemFunction: Sized {
+    type Fntype: ?Sized;
+    type Args<'a, 'b>;
+
+    // changed the lifetimes cause I need to know it's differnt lol
+    fn execute<'e, 'f>(function: &mut Box<Self::Fntype>, args: &mut Self::Args<'e, 'f>);
+}
+
+pub struct WorldOnly {}
+pub struct WindowSystemEvent {}
+pub struct DeviceSystemEvent {}
+
+impl SystemFunction for WorldOnly {
+    type Fntype = dyn FnMut(&mut World);
+    type Args<'a, 'b> = &'a mut World;
+
+    fn execute<'e, 'f>(function: &mut Box<Self::Fntype>, args: &mut Self::Args<'e, 'f>) {
+        function(args)
+    }
+}
+
+impl SystemFunction for WindowSystemEvent {
+    type Fntype = dyn FnMut(&mut World, &WindowEvent, &ActiveEventLoop);
+    type Args<'a, 'b> = (&'a mut World, &'b WindowEvent, &'b ActiveEventLoop);
+
+    fn execute<'e, 'f>(function: &mut Box<Self::Fntype>, args: &mut Self::Args<'e, 'f>) {
+        function(args.0, args.1, args.2)
+    }
+}
+impl SystemFunction for DeviceSystemEvent {
+    type Fntype = dyn FnMut(&mut World, &DeviceEvent);
+    type Args<'a, 'b> = (&'a mut World, &'b DeviceEvent);
+
+    fn execute<'e, 'f>(function: &mut Box<Self::Fntype>, args: &mut Self::Args<'e, 'f>) {
+        function(args.0, args.1)
+    }
+}
+
+pub trait IntoSystem<M: SystemFunction>: 'static {}
+
+impl<F> IntoSystem<WorldOnly> for F where F: FnMut(&mut World) + 'static {}
+
+impl<F> IntoSystem<WindowSystemEvent> for F where
+    F: FnMut(&mut World, &WindowEvent, &ActiveEventLoop) + 'static
+{
+}
+
+impl<F> IntoSystem<DeviceSystemEvent> for F where F: FnMut(&mut World, &DeviceEvent) + 'static {}
