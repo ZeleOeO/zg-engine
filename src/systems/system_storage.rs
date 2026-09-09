@@ -1,7 +1,19 @@
-use crate::systems::system_struct::*;
+use std::fmt::Debug;
+
+use crate::{systems::system_struct::*, utils::topo_sort::sort_vector};
 
 pub struct SystemsStorage<A: SystemFunction + 'static> {
     pub systems: Vec<SystemMut<A>>,
+}
+
+impl<A: SystemFunction + 'static> Debug for SystemsStorage<A> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for system in &self.systems {
+            write!(f, "{:?}", system.id.0)?;
+        }
+
+        Ok(())
+    }
 }
 
 impl<A: SystemFunction> Default for SystemsStorage<A> {
@@ -24,5 +36,10 @@ impl<A: SystemFunction + 'static> SystemsStorage<A> {
         }
     }
 
-    pub fn sort() {}
+    pub fn sort(&mut self) {
+        println!("ID Before Sort {:#?}", self);
+        if !sort_vector(&mut self.systems) {
+            panic!("Cyclic dependency")
+        };
+    }
 }

@@ -1,4 +1,7 @@
-use std::any::{Any, TypeId};
+use std::{
+    any::{Any, TypeId},
+    fmt::Debug,
+};
 
 use winit::{
     event::{DeviceEvent, WindowEvent},
@@ -7,6 +10,7 @@ use winit::{
 
 use crate::{
     systems::{system_sort::SystemSort, system_storage::*},
+    utils::topo_sort::NodeTrait,
     world::world::World,
 };
 
@@ -122,6 +126,34 @@ impl<'a> SystemAggregator<'a> {
     }
 }
 
+impl<A: SystemFunction> NodeTrait for SystemMut<A> {
+    type ID = TypeId;
+
+    fn node_id(&self) -> &Self::ID {
+        &self.id.0
+    }
+
+    fn prev_ids(&self) -> Vec<Self::ID> {
+        self.sorts
+            .iter()
+            .filter_map(|sort| match sort {
+                SystemSort::After(id) => Some(id.0),
+                _ => None,
+            })
+            .collect()
+    }
+
+    fn next_ids(&self) -> Vec<Self::ID> {
+        self.sorts
+            .iter()
+            .filter_map(|sort| match sort {
+                SystemSort::Before(id) => Some(id.0),
+                _ => None,
+            })
+            .collect()
+    }
+}
+
 pub trait SystemFunction: Sized {
     type Fntype: ?Sized;
     type Args<'a, 'b>;
@@ -130,8 +162,12 @@ pub trait SystemFunction: Sized {
     fn execute<'e, 'f>(function: &mut Box<Self::Fntype>, args: &mut Self::Args<'e, 'f>);
 }
 
+#[derive(Debug)]
 pub struct WorldOnly {}
+
+#[derive(Debug)]
 pub struct WindowSystemEvent {}
+
 pub struct DeviceSystemEvent {}
 
 impl SystemFunction for WorldOnly {

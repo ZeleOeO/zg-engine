@@ -1,7 +1,6 @@
 use std::any::TypeId;
 
 use crate::{
-    camera::system::camera_update_system,
     graphics::gpu::InternalGraphics,
     managers::Assets,
     pipeline::pipeline_id::PipelineID,
@@ -61,7 +60,5 @@ pub fn render_items_system(world: &mut World) {
 }
 
 pub fn system(system: &mut SystemAggregator) {
-    system
-        .insert_update_system(render_items_system)
-        .before(camera_update_system);
+    system.insert_update_system(render_items_system);
 }

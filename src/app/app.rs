@@ -59,6 +59,14 @@ impl App {
             .systems
             .add_system(graphics::system::system);
     }
+
+    pub fn sort_all_systems(&mut self) {
+        let item = &mut self.engine_app.as_mut().unwrap().systems;
+        item.setups.sort();
+        item.updates.sort();
+        item.window_events.sort();
+        item.device_events.sort();
+    }
 }
 
 impl ApplicationHandler for App {
