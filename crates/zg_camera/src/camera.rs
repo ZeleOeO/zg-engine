@@ -1,7 +1,5 @@
 use std::f32::consts::PI;
 
-use wgpu::{BindGroup, Buffer};
-
 use crate::utils::math::*;
 
 #[derive(Debug, Clone, Copy)]
@@ -13,12 +11,6 @@ pub struct Camera {
     pub znear: f32,
     pub zfar: f32,
     pub aspect: f32,
-}
-
-pub struct CameraUniform {
-    pub view_proj: Mat4,
-    pub bind_group: BindGroup,
-    pub buffer: Buffer,
 }
 
 impl Camera {
