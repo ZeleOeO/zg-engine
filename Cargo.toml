@@ -1,9 +1,11 @@
-[package]
-name = "zg-engine"
-version = "0.1.0"
-edition = "2024"
+[workspace]
+resolver = "2"
+members = ["crates/zg_app", "crates/zg_camera", "crates/zg_graphics", "crates/zg_layouts", "crates/zg_managers", "crates/zg_pipeline", "crates/zg_render",  "crates/zg_systems", "crates/zg_utils", "crates/zg_world"]
+# name = "zg-engine"
+# version = "0.1.0"
+# edition = "2024"
 
-[dependencies]
+[workspace.dependencies]
 anyhow = "1.0.102"
 bytemuck = "1.25.0"
 env_logger = "0.11.10"
