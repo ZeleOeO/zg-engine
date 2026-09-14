@@ -1,17 +1,15 @@
-use crate::{
-    graphics::gpu::InternalGraphics,
-    managers::{
-        material::{MaterialManager, MaterialType},
-        mesh::{MeshData, MeshManager, Vertex},
-    },
-    world::components::{MaterialComponent, MeshComponent},
-};
+use zg_graphics::InternalGraphics;
 
-pub mod camera;
+use crate::{
+    material::{MaterialManager, MaterialType},
+    mesh::{MeshData, MeshManager},
+};
+use zg_utils::Vertex;
+use zg_world::components::{MaterialComponent, MeshComponent};
+
 pub mod light;
 pub mod material;
 pub mod mesh;
-pub mod transform;
 
 #[derive(Debug)]
 pub struct Assets {

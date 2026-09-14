@@ -1,4 +1,4 @@
-use crate::world::{archetypes::Archetype, world::World};
+use crate::{archetypes::Archetype, world::World};
 
 // I need to get all components in an archetype
 // We'll get the archetype
@@ -14,12 +14,12 @@ pub trait QueryData<'w> {
 }
 macro_rules! impl_query_for_tuples {
     ($($T:ident),*) => {
-        impl<'w, $($T),*> $crate::world::query::QueryData<'w> for ($($T,)*)
+        impl<'w, $($T),*> $crate::query::QueryData<'w> for ($($T,)*)
         where
         $($T: 'static),*
         {
             type Output = ($(&'w mut $T,)*);
-            fn get(world: &'w  $crate::world::world::World, row: usize) -> Self::Output {
+            fn get(world: &'w  $crate::world::World, row: usize) -> Self::Output {
                 // this is where the problem is
                 let location = &world.object_locations[row];
                 let archetype = world.get_archetype_by_id(location.archetype_id);

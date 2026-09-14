@@ -1,9 +1,7 @@
 use std::{any::Any, fmt::Debug};
 
-use crate::{
-    managers::{material::MaterialHandle, mesh::MeshHandle, transform::Transform},
-    world::resources::Resource,
-};
+use crate::resources::Resource;
+use zg_utils::{MaterialHandle, MeshHandle, Transform};
 
 pub trait ComponentColumn: Any + Debug {
     fn len(&self) -> usize;
@@ -20,6 +18,7 @@ impl<T: Debug + 'static> ComponentColumn for Vec<T> {
     fn as_any(&self) -> &dyn Any {
         self
     }
+
     fn as_any_mut(&mut self) -> &mut dyn Any {
         self
     }

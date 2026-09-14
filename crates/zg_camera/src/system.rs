@@ -9,16 +9,14 @@ use winit::{
     keyboard::{KeyCode, PhysicalKey},
 };
 
-use crate::camera::camera::Camera;
-use crate::camera::camera_controller::handle_key_controller;
-use crate::graphics::gpu::InternalGraphics;
-use crate::render::buffer::{BindGroupCacheKey, BindGroupResourceType};
-use crate::render::command::RenderCommand;
-use crate::render::render_queue::RenderQueue;
-use crate::render::renderer::WorldRenderer;
-use crate::systems::system_struct::SystemAggregator;
-use crate::utils::time::Time;
-use crate::{camera::camera_controller::CameraController, world::world::World};
+use crate::camera::Camera;
+use crate::camera_controller::{CameraController, handle_key_controller};
+
+use zg_graphics::*;
+use zg_render::{RenderCommand, RenderQueue, WorldRenderer};
+use zg_systems::SystemAggregator;
+use zg_utils::time::Time;
+use zg_world::World;
 
 // This is cute, but this is not how a system looks like
 // It needs to get the active camera as a component?

@@ -1,6 +1,8 @@
 use wgpu::{Buffer, BufferUsages, wgt::BufferDescriptor};
 
-use crate::{graphics::gpu::InternalGraphics, utils::math::Mat4, world::archetypes::Entity};
+use zg_graphics::InternalGraphics;
+use zg_utils::math::Mat4;
+use zg_world::Entity;
 
 #[derive(Clone, Debug)]
 pub struct WorldRenderer {

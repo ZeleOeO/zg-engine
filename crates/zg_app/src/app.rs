@@ -5,9 +5,10 @@ use winit::{
     application::ApplicationHandler, event::DeviceEvent, event_loop::EventLoop, window::Window,
 };
 
-use crate::{
-    app::engine_app::EngineApp, camera, graphics, render, systems::system_struct::SystemAggregator,
-};
+use crate::engine_app::EngineApp;
+use zg_camera::system::system as camera_system;
+use zg_render::system::system as render_system;
+use zg_systems::SystemAggregator;
 
 pub struct App {
     engine_app: Option<EngineApp>,
@@ -47,17 +48,12 @@ impl App {
             .as_mut()
             .unwrap()
             .systems
-            .add_system(camera::system::system);
+            .add_system(camera_system);
         self.engine_app
             .as_mut()
             .unwrap()
             .systems
-            .add_system(render::system::system);
-        self.engine_app
-            .as_mut()
-            .unwrap()
-            .systems
-            .add_system(graphics::system::system);
+            .add_system(render_system);
     }
 
     pub fn sort_all_systems(&mut self) {
@@ -82,9 +78,8 @@ impl ApplicationHandler for App {
         };
 
         app.add_window(window.clone());
-        let world = &mut app.world;
-        world.insert_default_resources(window.clone());
-        app.systems.setups.execute(world);
+        app.insert_default_resources(window.clone());
+        app.systems.setups.execute(&mut app.world);
         window.request_redraw();
     }
 

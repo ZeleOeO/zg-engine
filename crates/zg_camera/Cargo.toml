@@ -5,3 +5,11 @@ edition = "2024"
 
 [dependencies]
 winit = {workspace = true}
+bytemuck = {workspace = true}
+
+zg_render = {path = "../zg_render"}
+zg_systems = {path = "../zg_systems"}
+zg_utils = {path = "../zg_utils"}
+zg_world = {path = "../zg_world"}
+zg_graphics = {path = "../zg_graphics"}
+

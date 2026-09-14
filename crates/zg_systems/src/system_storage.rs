@@ -1,6 +1,8 @@
 use std::fmt::Debug;
 
-use crate::{systems::system_struct::*, utils::topo_sort::sort_vector};
+use zg_utils::sort_vector;
+
+use crate::system_struct::{SystemFunction, SystemMut};
 
 pub struct SystemsStorage<A: SystemFunction + 'static> {
     pub systems: Vec<SystemMut<A>>,

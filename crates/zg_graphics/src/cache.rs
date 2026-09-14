@@ -2,7 +2,9 @@ use std::collections::HashMap;
 
 use wgpu::{BindGroup, BindGroupLayout};
 
-use crate::{layouts::*, pipeline::pipeline::main_pipeline, render::buffer::BindGroupCacheKey};
+use crate::buffer::BindGroupCacheKey;
+use zg_layouts::*;
+use zg_pipeline::main_pipeline;
 
 #[derive(Clone, Copy, Hash, Debug)]
 // position, bind_group_slot
@@ -11,7 +13,7 @@ pub struct BindGroupCacheHandle(pub u32, pub u32);
 #[derive(Debug)]
 pub struct Cache {
     // All the layouts used
-    pub layouts: Vec<BindGroupLayout>,
+    pub(crate) layouts: Vec<BindGroupLayout>,
     // Hashmap for matching the bind group cachekey and the bind group cache handle
     pub bind_groups_cache_map: HashMap<BindGroupCacheKey, BindGroupCacheHandle>,
     pub pipelines: [wgpu::RenderPipeline; 1],

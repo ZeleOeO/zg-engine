@@ -4,14 +4,15 @@ use wgpu::{
     RenderPipelineDescriptor, StencilState, SurfaceConfiguration, TextureFormat, VertexState,
 };
 
-use crate::managers::mesh::Vertex;
+use zg_utils::Vertex;
 
 pub fn main_pipeline(
     device: &Device,
     config: &SurfaceConfiguration,
     bg_layouts: &[Option<&BindGroupLayout>],
 ) -> anyhow::Result<RenderPipeline> {
-    let shader = &device.create_shader_module(wgpu::include_wgsl!("./../shaders/mesh.wgsl"));
+    let shader =
+        &device.create_shader_module(wgpu::include_wgsl!("./../../../assets/shaders/mesh.wgsl"));
     let render_pipeline_layout = device.create_pipeline_layout(&PipelineLayoutDescriptor {
         label: Some("Opaque Pipeline Layout"),
         bind_group_layouts: bg_layouts,
@@ -68,7 +69,8 @@ pub fn light_pipeline(
     config: &SurfaceConfiguration,
     bg_layouts: &[Option<&BindGroupLayout>],
 ) -> anyhow::Result<RenderPipeline> {
-    let shader = device.create_shader_module(wgpu::include_wgsl!("./../shaders/light.wgsl"));
+    let shader =
+        device.create_shader_module(wgpu::include_wgsl!("./../../../assets/shaders/light.wgsl"));
 
     let render_pipeline_layout = device.create_pipeline_layout(&PipelineLayoutDescriptor {
         label: Some("Light Pipeline Layout"),

@@ -5,3 +5,5 @@ edition = "2024"
 
 [dependencies]
 winit = {workspace = true}
+zg_utils = {path = "../zg_utils"}
+zg_world = {path = "../zg_world"}

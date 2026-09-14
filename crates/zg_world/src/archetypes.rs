@@ -3,7 +3,7 @@ use std::{
     fmt::Debug,
 };
 
-use crate::world::{bundle::Bundle, components::ComponentColumn};
+use crate::{bundle::Bundle, components::ComponentColumn};
 
 #[derive(Clone, Copy, Debug)]
 pub struct ArchetypeID(pub u32);

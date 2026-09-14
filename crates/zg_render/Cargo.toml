@@ -4,4 +4,13 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+
+zg_graphics = {path = "../zg_graphics"}
+zg_managers = {path = "../zg_managers"}
+zg_systems = {path = "../zg_systems"}
+zg_world = {path = "../zg_world"}
+zg_utils = {path = "../zg_utils"}
+
 wgpu = {workspace = true}
+winit = {workspace = true}
+bytemuck = {workspace = true}

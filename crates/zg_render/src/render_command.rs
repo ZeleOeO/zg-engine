@@ -1,7 +1,5 @@
-use crate::{
-    graphics::cache::BindGroupCacheHandle, managers::mesh::MeshHandle,
-    pipeline::pipeline_id::PipelineID,
-};
+use zg_graphics::BindGroupCacheHandle;
+use zg_utils::{MeshHandle, PipelineID};
 
 #[derive(Debug)]
 pub enum RenderCommand {

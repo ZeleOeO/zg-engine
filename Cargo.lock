@@ -3436,21 +3436,40 @@ dependencies = [
  "env_logger",
  "pollster",
  "winit",
+ "zg_camera",
+ "zg_graphics",
+ "zg_managers",
+ "zg_render",
+ "zg_systems",
+ "zg_utils",
+ "zg_world",
 ]
 
 [[package]]
 name = "zg_camera"
 version = "0.1.0"
 dependencies = [
+ "bytemuck",
  "winit",
+ "zg_graphics",
+ "zg_render",
+ "zg_systems",
+ "zg_utils",
+ "zg_world",
 ]
 
 [[package]]
 name = "zg_graphics"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "wgpu",
  "winit",
+ "zg_layouts",
+ "zg_pipeline",
+ "zg_systems",
+ "zg_utils",
+ "zg_world",
 ]
 
 [[package]]
@@ -3464,23 +3483,36 @@ dependencies = [
 name = "zg_managers"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "bytemuck",
  "image",
  "wgpu",
+ "zg_graphics",
+ "zg_utils",
+ "zg_world",
 ]
 
 [[package]]
 name = "zg_pipeline"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "wgpu",
+ "zg_utils",
 ]
 
 [[package]]
 name = "zg_render"
 version = "0.1.0"
 dependencies = [
+ "bytemuck",
  "wgpu",
+ "winit",
+ "zg_graphics",
+ "zg_managers",
+ "zg_systems",
+ "zg_utils",
+ "zg_world",
 ]
 
 [[package]]
@@ -3488,17 +3520,25 @@ name = "zg_systems"
 version = "0.1.0"
 dependencies = [
  "winit",
+ "zg_utils",
+ "zg_world",
 ]
 
 [[package]]
 name = "zg_utils"
 version = "0.1.0"
+dependencies = [
+ "bytemuck",
+ "wgpu",
+]
 
 [[package]]
 name = "zg_world"
 version = "0.1.0"
 dependencies = [
+ "pollster",
  "winit",
+ "zg_utils",
 ]
 
 [[package]]

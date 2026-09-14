@@ -8,3 +8,11 @@ anyhow = {workspace = true}
 winit = {workspace = true}
 env_logger = {workspace = true}
 pollster = {workspace=true}
+
+zg_camera = {path = "../zg_camera"}
+zg_graphics = {path = "../zg_graphics"}
+zg_render = {path = "../zg_render"}
+zg_systems = {path = "../zg_systems"}
+zg_world = {path = "../zg_world"}
+zg_managers = {path = "../zg_managers"}
+zg_utils = {path = "../zg_utils"}

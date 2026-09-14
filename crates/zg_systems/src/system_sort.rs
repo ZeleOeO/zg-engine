@@ -1,4 +1,4 @@
-use crate::systems::system_struct::SystemID;
+use crate::system_struct::SystemID;
 
 #[derive(Debug)]
 pub enum SystemSort {

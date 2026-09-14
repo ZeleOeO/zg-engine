@@ -1,7 +1,8 @@
-use crate::{
-    graphics::gpu::InternalGraphics, managers::Assets, render::command::RenderCommand,
-    world::world::World,
-};
+use zg_managers::Assets;
+use zg_world::World;
+
+use crate::render_command::RenderCommand;
+use zg_graphics::InternalGraphics;
 
 #[derive(Default, Debug)]
 pub struct RenderQueue {

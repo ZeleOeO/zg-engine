@@ -4,4 +4,8 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+
+zg_utils = {path = "../zg_utils"}
+
 winit = {workspace = true}
+pollster = {workspace = true}

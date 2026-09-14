@@ -5,11 +5,11 @@ use wgpu::{
     util::{BufferInitDescriptor, DeviceExt},
 };
 
-use crate::{
-    graphics::{cache::BindGroupCacheHandle, gpu::InternalGraphics},
-    render::buffer::{BindGroupCacheKey, BindGroupResourceType},
-    utils::math::Vec3,
+use zg_graphics::{
+    BindGroupCacheHandle, BindGroupCacheKey, BindGroupResourceType, InternalGraphics,
 };
+use zg_utils::MaterialHandle;
+use zg_utils::math::Vec3;
 
 #[repr(C)]
 #[derive(Pod, Zeroable, Clone, Copy)]
@@ -29,9 +29,6 @@ pub struct TextureData {
     pub view: wgpu::TextureView,
     pub sampler: wgpu::Sampler,
 }
-
-#[derive(Clone, Copy, Debug)]
-pub struct MaterialHandle(pub u32);
 
 #[derive(Clone, Debug)]
 pub struct MaterialManager {
@@ -214,3 +211,4 @@ impl MaterialManager {
         }
     }
 }
+

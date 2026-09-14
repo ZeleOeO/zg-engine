@@ -7,12 +7,10 @@ use winit::{
     event::{DeviceEvent, WindowEvent},
     event_loop::ActiveEventLoop,
 };
+use zg_utils::NodeTrait;
+use zg_world::World;
 
-use crate::{
-    systems::{system_sort::SystemSort, system_storage::*},
-    utils::topo_sort::NodeTrait,
-    world::world::World,
-};
+use crate::{system_sort::SystemSort, system_storage::SystemsStorage};
 
 #[derive(Default)]
 pub struct Systems {

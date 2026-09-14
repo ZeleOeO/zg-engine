@@ -1,6 +1,6 @@
 use std::f32::consts::PI;
 
-use crate::utils::math::*;
+use zg_utils::math::*;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Camera {

@@ -8,11 +8,9 @@ use wgpu::{
 use wgpu::{Queue, TextureView};
 use winit::window::Window;
 
-use crate::graphics::cache::{BindGroupCacheHandle, Cache};
-use crate::pipeline::pipeline_id::PipelineID;
-use crate::render::buffer::{BindGroupCacheKey, BindGroupResourceType};
-use crate::render::render_queue::RenderQueue;
-use crate::world::world::World;
+use crate::cache::*;
+use crate::buffer::{BindGroupCacheKey, BindGroupResourceType};
+use zg_utils::PipelineID;
 
 #[derive(Debug)]
 pub struct InternalGraphics {
@@ -169,45 +167,4 @@ impl InternalGraphics {
         &self.cache.pipelines[pipeline_id as usize]
     }
 
-    pub fn execute(&mut self, world: &mut World, surface_view: &TextureView) {
-        let mut encoder = self
-            .device
-            .create_command_encoder(&wgpu::CommandEncoderDescriptor {
-                label: Some("Encoder"),
-            });
-        let mut render_queue = world.get_mut::<RenderQueue>();
-        {
-            let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
-                label: Some("Render Pass"),
-                color_attachments: &[Some(wgpu::RenderPassColorAttachment {
-                    view: surface_view,
-                    depth_slice: None,
-                    resolve_target: None,
-                    ops: wgpu::Operations {
-                        load: wgpu::LoadOp::Clear(wgpu::Color {
-                            r: 0.1,
-                            g: 0.2,
-                            b: 0.3,
-                            a: 1.0,
-                        }),
-                        store: wgpu::StoreOp::Store,
-                    },
-                })],
-                depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
-                    view: &self.depth_texture_view,
-                    depth_ops: Some(wgpu::Operations {
-                        load: wgpu::LoadOp::Clear(1.0),
-                        store: wgpu::StoreOp::Store,
-                    }),
-                    stencil_ops: None,
-                }),
-                timestamp_writes: None,
-                occlusion_query_set: None,
-                multiview_mask: None,
-            });
-
-            render_queue.flush(&mut render_pass, world, self);
-        }
-        self.queue.submit(Some(encoder.finish()));
-    }
 }

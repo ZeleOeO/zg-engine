@@ -1,6 +1,6 @@
 use std::any::TypeId;
 
-use crate::world::archetypes::{Archetype, Column};
+use crate::archetypes::{Archetype, Column};
 
 pub trait Bundle {
     fn insert_into(self, archetype: &mut Archetype);
@@ -11,11 +11,11 @@ pub trait Bundle {
 macro_rules! impl_tuple_for_bundle {
     ($($T:ident),*) => {
         #[allow(non_snake_case)]
-        impl< $($T),*> $crate::world::bundle::Bundle for ($($T,)*)
+        impl< $($T),*> $crate::bundle::Bundle for ($($T,)*)
         where
         $($T: 'static + std::fmt::Debug ),*
         {
-            fn insert_into(self,  archetype: &mut $crate::world::archetypes::Archetype) {
+            fn insert_into(self,  archetype: &mut $crate::archetypes::Archetype) {
                 let ($($T,)*) = self;
                 ($(archetype.insert_component($T )), *);
 

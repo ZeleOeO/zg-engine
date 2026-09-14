@@ -1,47 +1,12 @@
-use bytemuck::{Pod, Zeroable};
 use wgpu::{
-    Buffer, BufferAddress, BufferUsages, VertexAttribute, VertexBufferLayout, VertexFormat,
+    Buffer, BufferUsages,
     util::{BufferInitDescriptor, DeviceExt},
 };
 
-use crate::{
-    graphics::gpu::InternalGraphics,
-    utils::math::{Vec3, vec3_add, vec3_cross_product, vec3_normalize},
-};
-
-#[repr(C)]
-#[derive(Debug, Clone, Copy, Pod, Zeroable)]
-pub struct Vertex {
-    pub position: Vec3,
-    pub tex_coords: [f32; 2],
-    pub normal: Vec3,
-}
-
-impl Vertex {
-    pub fn desc() -> VertexBufferLayout<'static> {
-        VertexBufferLayout {
-            array_stride: std::mem::size_of::<Vertex>() as BufferAddress,
-            step_mode: wgpu::VertexStepMode::Vertex,
-            attributes: &[
-                VertexAttribute {
-                    format: VertexFormat::Float32x3,
-                    shader_location: 0,
-                    offset: 0,
-                },
-                VertexAttribute {
-                    format: VertexFormat::Float32x2,
-                    offset: std::mem::size_of::<[f32; 3]>() as BufferAddress,
-                    shader_location: 1,
-                },
-                VertexAttribute {
-                    format: VertexFormat::Float32x3,
-                    offset: std::mem::size_of::<[f32; 2]>() as BufferAddress,
-                    shader_location: 2,
-                },
-            ],
-        }
-    }
-}
+use zg_graphics::InternalGraphics;
+use zg_utils::MeshHandle;
+use zg_utils::Vertex;
+use zg_utils::math::{Vec3, vec3_add, vec3_cross_product, vec3_normalize};
 
 #[derive(Debug)]
 pub struct MeshManager {
@@ -49,9 +14,6 @@ pub struct MeshManager {
     index_buffers: Vec<Buffer>,
     meshes: Vec<MeshMetaData>,
 }
-
-#[derive(Clone, Copy, Debug)]
-pub struct MeshHandle(pub u32);
 
 // This is for draw
 #[derive(Debug, Clone, Copy)]
@@ -144,3 +106,4 @@ impl MeshManager {
         self.meshes[mesh_handle as usize]
     }
 }
+

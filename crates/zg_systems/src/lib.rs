@@ -1,4 +1,7 @@
-pub mod schedule_types;
-pub mod system_sort;
-pub mod system_storage;
-pub mod system_struct;
+mod schedule_types;
+mod system_sort;
+mod system_storage;
+mod system_struct;
+
+pub use system_struct::SystemAggregator;
+pub use system_struct::Systems;

@@ -1,9 +1,7 @@
 use winit::keyboard::KeyCode;
 
-use crate::{
-    camera::camera::Camera,
-    utils::math::{vec3_add, vec3_cross_product, vec3_mult_scal, vec3_normalize, vec3_sub},
-};
+use crate::camera::Camera;
+use zg_utils::math::{vec3_add, vec3_cross_product, vec3_mult_scal, vec3_normalize, vec3_sub};
 
 #[derive(Clone, Debug)]
 pub struct CameraController {

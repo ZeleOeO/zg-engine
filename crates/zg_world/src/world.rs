@@ -4,23 +4,15 @@ use std::{
     fmt::Debug,
     marker::PhantomData,
     ops::Deref,
-    sync::Arc,
 };
 
-use winit::window::Window;
+use zg_utils::TypeIdMap;
 
 use crate::{
-    camera::camera_controller::CameraController,
-    graphics::gpu::InternalGraphics,
-    managers::Assets,
-    render::{render_queue::RenderQueue, renderer::WorldRenderer},
-    utils::{storage_util::TypeIdMap, time::Time},
-    world::{
-        archetypes::{Archetype, ArchetypeID, Entity},
-        bundle::Bundle,
-        query::{Query, QueryData},
-        resources::{Resource, ResourceMut, ResourceRef},
-    },
+    archetypes::{Archetype, ArchetypeID, Entity},
+    bundle::Bundle,
+    query::{Query, QueryData},
+    resources::{Resource, ResourceMut, ResourceRef},
 };
 
 pub struct World {
@@ -105,23 +97,6 @@ impl World {
         });
         f(self, ResourceMut(resource));
         self.resources.insert(TypeId::of::<R>(), item);
-    }
-
-    pub fn insert_default_resources(&mut self, window: Arc<Window>) {
-        let internal_graphics = pollster::block_on(InternalGraphics::new(&window)).unwrap();
-        let assets = Assets::new();
-        let camera_controller = CameraController::new(2.0, 0.2);
-        let render_queue = RenderQueue::default();
-        let renderer = WorldRenderer::new(&internal_graphics);
-        let time = Time::new();
-
-        self.insert(window);
-        self.insert(internal_graphics);
-        self.insert(assets);
-        self.insert(camera_controller);
-        self.insert(render_queue);
-        self.insert(renderer);
-        self.insert(time);
     }
 
     // pub fn get_or_create_archetype_by_items<T: 'static>(&mut self, items: &Vec<T>) -> &Archetype {
