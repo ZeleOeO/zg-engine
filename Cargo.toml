@@ -1,10 +1,12 @@
+[package]
+name = "zg-engine"
+version = "0.1.0"
+edition = "2024"
+
 [workspace]
 resolver = "2"
 # members = ["crates/zg_app", "crates/zg_camera", "crates/zg_graphics", "crates/zg_layouts", "crates/zg_managers", "crates/zg_pipeline", "crates/zg_render",  "crates/zg_systems", "crates/zg_utils", "crates/zg_world"]
 members = ["crates/*"]
-# name = "zg-engine"
-# version = "0.1.0"
-# edition = "2024"
 
 [workspace.dependencies]
 anyhow = "1.0.102"
@@ -15,3 +17,14 @@ log = "0.4.33"
 pollster = "0.4.0"
 wgpu = "29.0.3"
 winit = "0.30.13"
+
+[dependencies]
+zg_app = { path = "crates/zg_app" }
+zg_camera = { path = "crates/zg_camera" }
+zg_graphics = { path = "crates/zg_graphics" }
+zg_managers = { path = "crates/zg_managers" }
+zg_render = { path = "crates/zg_render" }
+zg_systems = { path = "crates/zg_systems" }
+zg_utils = { path = "crates/zg_utils" }
+zg_world = { path = "crates/zg_world" }
+anyhow = { workspace = true }

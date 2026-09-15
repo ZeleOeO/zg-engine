@@ -3429,6 +3429,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "zg-engine"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "zg_app",
+ "zg_camera",
+ "zg_graphics",
+ "zg_managers",
+ "zg_render",
+ "zg_systems",
+ "zg_utils",
+ "zg_world",
+]
+
+[[package]]
 name = "zg_app"
 version = "0.1.0"
 dependencies = [
