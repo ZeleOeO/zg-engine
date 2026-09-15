@@ -61,9 +61,9 @@ In no particular order
 - [X] Switch querying to use Query
 - [X] Add a central "system" function
 - [X] Add ordering to systems
-- [ ] Make folders into crates
-- [ ] Add crate level access modifiers
-- [ ] Fix all the places where there's an unwrap and handle it properly
+- [X] Make folders into crates
+- [X] Add crate level access modifiers
+- [ ] Fix all the places where there's an unwrap and handle it properly (cancelled cause i ain't got time for allat)
 - [ ] Asynchrounous and multithreading
 - [ ] Multiple objects / scene graph
 - [ ] Lighting (Phong / PBR)
@@ -71,20 +71,6 @@ In no particular order
 - [ ] MSAA / post-processing effects
 - [ ] ImGui debug overlay
 
-
-### Potential Folder Structure
-``` bash
-app/           -- windowing, input, game loop, ties everything together
-renderer/      -- the actual wgpu engine (device, passes, pipelines)
-  core/        -- Device/Queue/Surface wrapper, resize handling
-  resources/   -- buffers, textures, samplers, bind groups (with pooling/caching)
-  passes/      -- render passes as discrete, composable units
-  pipelines/   -- pipeline layouts, shader modules, pipeline cache
-  scene/       -- render graph / draw list construction
-  shaders/     -- .wgsl files, often with includes/preprocessing
-assets/        -- loaders (gltf, textures, etc.), converted into GPU resources
-ecs/ or scene graph/  -- your actual game/scene data, independent of renderer
-```
 
 ## Tests
 
