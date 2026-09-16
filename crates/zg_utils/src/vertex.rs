@@ -1,22 +1,24 @@
 use bytemuck::{Pod, Zeroable};
-use wgpu::{
-    BufferAddress, VertexAttribute, VertexBufferLayout, VertexFormat,
-};
+use wgpu::{BufferAddress, VertexAttribute, VertexBufferLayout, VertexFormat};
 
 use crate::math::Vec3;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, Pod, Zeroable)]
-pub struct Vertex {
+pub struct ModelVertex {
     pub position: Vec3,
     pub tex_coords: [f32; 2],
     pub normal: Vec3,
 }
 
-impl Vertex {
-    pub fn desc() -> VertexBufferLayout<'static> {
+pub trait VertexTrait {
+    fn desc() -> VertexBufferLayout<'static>;
+}
+
+impl VertexTrait for ModelVertex {
+    fn desc() -> VertexBufferLayout<'static> {
         VertexBufferLayout {
-            array_stride: std::mem::size_of::<Vertex>() as BufferAddress,
+            array_stride: std::mem::size_of::<ModelVertex>() as BufferAddress,
             step_mode: wgpu::VertexStepMode::Vertex,
             attributes: &[
                 VertexAttribute {

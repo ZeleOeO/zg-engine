@@ -1,10 +1,11 @@
+use anyhow::Ok;
 use zg_graphics::InternalGraphics;
 
 use crate::{
     material::{MaterialManager, MaterialType},
     mesh::{MeshData, MeshManager},
 };
-use zg_utils::Vertex;
+use zg_utils::ModelVertex;
 use zg_world::components::{MaterialComponent, MeshComponent};
 
 pub mod light;
@@ -28,127 +29,127 @@ impl Assets {
     pub fn create_cube(&mut self, graphics: &InternalGraphics) -> MeshComponent {
         let vertices = [
             // Front face (z = 0.5) — normal: [0, 0, 1]
-            Vertex {
+            ModelVertex {
                 position: [-0.5, -0.5, 0.5],
                 tex_coords: [0.0, 1.0],
                 normal: [0.0, 0.0, 1.0],
             },
-            Vertex {
+            ModelVertex {
                 position: [0.5, -0.5, 0.5],
                 tex_coords: [1.0, 1.0],
                 normal: [0.0, 0.0, 1.0],
             },
-            Vertex {
+            ModelVertex {
                 position: [0.5, 0.5, 0.5],
                 tex_coords: [1.0, 0.0],
                 normal: [0.0, 0.0, 1.0],
             },
-            Vertex {
+            ModelVertex {
                 position: [-0.5, 0.5, 0.5],
                 tex_coords: [0.0, 0.0],
                 normal: [0.0, 0.0, 1.0],
             },
             // Back face (z = -0.5) — normal: [0, 0, -1]
-            Vertex {
+            ModelVertex {
                 position: [0.5, -0.5, -0.5],
                 tex_coords: [0.0, 1.0],
                 normal: [0.0, 0.0, -1.0],
             },
-            Vertex {
+            ModelVertex {
                 position: [-0.5, -0.5, -0.5],
                 tex_coords: [1.0, 1.0],
                 normal: [0.0, 0.0, -1.0],
             },
-            Vertex {
+            ModelVertex {
                 position: [-0.5, 0.5, -0.5],
                 tex_coords: [1.0, 0.0],
                 normal: [0.0, 0.0, -1.0],
             },
-            Vertex {
+            ModelVertex {
                 position: [0.5, 0.5, -0.5],
                 tex_coords: [0.0, 0.0],
                 normal: [0.0, 0.0, -1.0],
             },
             // Right face (x = 0.5) — normal: [1, 0, 0]
-            Vertex {
+            ModelVertex {
                 position: [0.5, -0.5, 0.5],
                 tex_coords: [0.0, 1.0],
                 normal: [1.0, 0.0, 0.0],
             },
-            Vertex {
+            ModelVertex {
                 position: [0.5, -0.5, -0.5],
                 tex_coords: [1.0, 1.0],
                 normal: [1.0, 0.0, 0.0],
             },
-            Vertex {
+            ModelVertex {
                 position: [0.5, 0.5, -0.5],
                 tex_coords: [1.0, 0.0],
                 normal: [1.0, 0.0, 0.0],
             },
-            Vertex {
+            ModelVertex {
                 position: [0.5, 0.5, 0.5],
                 tex_coords: [0.0, 0.0],
                 normal: [1.0, 0.0, 0.0],
             },
             // Left face (x = -0.5) — normal: [-1, 0, 0]
-            Vertex {
+            ModelVertex {
                 position: [-0.5, -0.5, -0.5],
                 tex_coords: [0.0, 1.0],
                 normal: [-1.0, 0.0, 0.0],
             },
-            Vertex {
+            ModelVertex {
                 position: [-0.5, -0.5, 0.5],
                 tex_coords: [1.0, 1.0],
                 normal: [-1.0, 0.0, 0.0],
             },
-            Vertex {
+            ModelVertex {
                 position: [-0.5, 0.5, 0.5],
                 tex_coords: [1.0, 0.0],
                 normal: [-1.0, 0.0, 0.0],
             },
-            Vertex {
+            ModelVertex {
                 position: [-0.5, 0.5, -0.5],
                 tex_coords: [0.0, 0.0],
                 normal: [-1.0, 0.0, 0.0],
             },
             // Top face (y = 0.5) — normal: [0, 1, 0]
-            Vertex {
+            ModelVertex {
                 position: [-0.5, 0.5, 0.5],
                 tex_coords: [0.0, 1.0],
                 normal: [0.0, 1.0, 0.0],
             },
-            Vertex {
+            ModelVertex {
                 position: [0.5, 0.5, 0.5],
                 tex_coords: [1.0, 1.0],
                 normal: [0.0, 1.0, 0.0],
             },
-            Vertex {
+            ModelVertex {
                 position: [0.5, 0.5, -0.5],
                 tex_coords: [1.0, 0.0],
                 normal: [0.0, 1.0, 0.0],
             },
-            Vertex {
+            ModelVertex {
                 position: [-0.5, 0.5, -0.5],
                 tex_coords: [0.0, 0.0],
                 normal: [0.0, 1.0, 0.0],
             },
             // Bottom face (y = -0.5) — normal: [0, -1, 0]
-            Vertex {
+            ModelVertex {
                 position: [-0.5, -0.5, -0.5],
                 tex_coords: [0.0, 1.0],
                 normal: [0.0, -1.0, 0.0],
             },
-            Vertex {
+            ModelVertex {
                 position: [0.5, -0.5, -0.5],
                 tex_coords: [1.0, 1.0],
                 normal: [0.0, -1.0, 0.0],
             },
-            Vertex {
+            ModelVertex {
                 position: [0.5, -0.5, 0.5],
                 tex_coords: [1.0, 0.0],
                 normal: [0.0, -1.0, 0.0],
             },
-            Vertex {
+            ModelVertex {
                 position: [-0.5, -0.5, 0.5],
                 tex_coords: [0.0, 0.0],
                 normal: [0.0, -1.0, 0.0],
@@ -174,99 +175,99 @@ impl Assets {
     }
 
     pub fn create_prism(&mut self, graphics: &InternalGraphics) -> MeshComponent {
-        let vertices: &mut [Vertex] = &mut [
+        let vertices: &mut [ModelVertex] = &mut [
             // Front face (z = 0.5) — normal: [0, 0, 1]
-            Vertex {
+            ModelVertex {
                 position: [0.0, 0.5, 0.5],
                 tex_coords: [0.5, 0.0],
                 normal: [0.0, 0.0, 1.0],
             },
-            Vertex {
+            ModelVertex {
                 position: [-0.5, -0.5, 0.5],
                 tex_coords: [0.0, 1.0],
                 normal: [0.0, 0.0, 1.0],
             },
-            Vertex {
+            ModelVertex {
                 position: [0.5, -0.5, 0.5],
                 tex_coords: [1.0, 1.0],
                 normal: [0.0, 0.0, 1.0],
             },
             // Back face (z = -0.5) — normal: [0, 0, -1]
-            Vertex {
+            ModelVertex {
                 position: [0.0, 0.5, -0.5],
                 tex_coords: [0.5, 0.0],
                 normal: [0.0, 0.0, -1.0],
             },
-            Vertex {
+            ModelVertex {
                 position: [0.5, -0.5, -0.5],
                 tex_coords: [0.0, 1.0],
                 normal: [0.0, 0.0, -1.0],
             },
-            Vertex {
+            ModelVertex {
                 position: [-0.5, -0.5, -0.5],
                 tex_coords: [1.0, 1.0],
                 normal: [0.0, 0.0, -1.0],
             },
             // Bottom face (y = -0.5) — normal: [0, -1, 0]
-            Vertex {
+            ModelVertex {
                 position: [-0.5, -0.5, 0.5],
                 tex_coords: [0.0, 1.0],
                 normal: [0.0, -1.0, 0.0],
             },
-            Vertex {
+            ModelVertex {
                 position: [-0.5, -0.5, -0.5],
                 tex_coords: [1.0, 1.0],
                 normal: [0.0, -1.0, 0.0],
             },
-            Vertex {
+            ModelVertex {
                 position: [0.5, -0.5, -0.5],
                 tex_coords: [1.0, 0.0],
                 normal: [0.0, -1.0, 0.0],
             },
-            Vertex {
+            ModelVertex {
                 position: [0.5, -0.5, 0.5],
                 tex_coords: [0.0, 0.0],
                 normal: [0.0, -1.0, 0.0],
             },
             // Left face (A-B edge) — normal: perpendicular to edge, pointing outward
             // Normal for left face: [-0.894, 0.447, 0] (normalized)
-            Vertex {
+            ModelVertex {
                 position: [0.0, 0.5, 0.5],
                 tex_coords: [0.0, 1.0],
                 normal: [-0.894, 0.447, 0.0],
             },
-            Vertex {
+            ModelVertex {
                 position: [0.0, 0.5, -0.5],
                 tex_coords: [1.0, 1.0],
                 normal: [-0.894, 0.447, 0.0],
             },
-            Vertex {
+            ModelVertex {
                 position: [-0.5, -0.5, -0.5],
                 tex_coords: [1.0, 0.0],
                 normal: [-0.894, 0.447, 0.0],
             },
-            Vertex {
+            ModelVertex {
                 position: [-0.5, -0.5, 0.5],
                 tex_coords: [0.0, 0.0],
                 normal: [-0.894, 0.447, 0.0],
             },
             // Right face (A-C edge) — normal: [0.894, 0.447, 0]
-            Vertex {
+            ModelVertex {
                 position: [0.0, 0.5, 0.5],
                 tex_coords: [0.0, 1.0],
                 normal: [0.894, 0.447, 0.0],
             },
-            Vertex {
+            ModelVertex {
                 position: [0.5, -0.5, 0.5],
                 tex_coords: [1.0, 1.0],
                 normal: [0.894, 0.447, 0.0],
             },
-            Vertex {
+            ModelVertex {
                 position: [0.5, -0.5, -0.5],
                 tex_coords: [1.0, 0.0],
                 normal: [0.894, 0.447, 0.0],
             },
-            Vertex {
+            ModelVertex {
                 position: [0.0, 0.5, -0.5],
                 tex_coords: [0.0, 0.0],
                 normal: [0.894, 0.447, 0.0],
@@ -297,5 +298,57 @@ impl Assets {
     ) -> MaterialComponent {
         let handle = self.material_manager.add_new_material(material_type, gpu);
         MaterialComponent(handle)
+    }
+
+    pub fn load_obj_model(
+        &mut self,
+        graphics: &InternalGraphics,
+        location: &str,
+    ) -> anyhow::Result<MeshComponent> {
+        let (models, _materials) = tobj::load_obj(
+            location,
+            &tobj::LoadOptions {
+                single_index: true,
+                triangulate: true,
+                ..Default::default()
+            },
+        )?;
+
+        let mesh = &models[0].mesh;
+        let vertices: Vec<ModelVertex> = (0..mesh.positions.len() / 3)
+            .map(|i| {
+                let normals = if !mesh.normals.is_empty() {
+                    [
+                        mesh.normals[i * 3],
+                        mesh.normals[i * 3 + 1],
+                        mesh.normals[i * 3 + 2],
+                    ]
+                } else {
+                    [0.0, 0.0, 0.0]
+                };
+
+                let tex_coords = if !mesh.texcoords.is_empty() {
+                    [mesh.texcoords[i * 2], mesh.texcoords[i * 2 + 1]]
+                } else {
+                    [0.0, 0.0]
+                };
+
+                ModelVertex {
+                    position: [
+                        mesh.positions[i * 3],
+                        mesh.positions[i * 3 + 1],
+                        mesh.positions[i * 3 + 2],
+                    ],
+                    tex_coords,
+                    normal: normals,
+                }
+            })
+            .collect();
+        let indices = mesh.indices.clone();
+        let mut mesh_data = MeshData { vertices, indices };
+
+        let handle = self.mesh_manager.add_mesh_data(&mut mesh_data, graphics);
+
+        Ok(MeshComponent(handle))
     }
 }

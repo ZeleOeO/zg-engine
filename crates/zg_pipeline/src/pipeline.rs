@@ -4,7 +4,7 @@ use wgpu::{
     RenderPipelineDescriptor, StencilState, SurfaceConfiguration, TextureFormat, VertexState,
 };
 
-use zg_utils::Vertex;
+use zg_utils::{ModelVertex, VertexTrait};
 
 pub fn main_pipeline(
     device: &Device,
@@ -26,7 +26,7 @@ pub fn main_pipeline(
             module: &shader,
             entry_point: Some("vs_main"),
             compilation_options: PipelineCompilationOptions::default(),
-            buffers: &[Vertex::desc()],
+            buffers: &[ModelVertex::desc()],
         },
         primitive: wgpu::PrimitiveState {
             topology: wgpu::PrimitiveTopology::TriangleList,
@@ -85,7 +85,7 @@ pub fn light_pipeline(
             module: &shader,
             entry_point: Some("vs_main"),
             compilation_options: PipelineCompilationOptions::default(),
-            buffers: &[Vertex::desc()],
+            buffers: &[ModelVertex::desc()],
         },
         primitive: wgpu::PrimitiveState {
             topology: wgpu::PrimitiveTopology::TriangleList,

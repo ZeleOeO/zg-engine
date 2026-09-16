@@ -5,7 +5,7 @@ use wgpu::{
 
 use zg_graphics::InternalGraphics;
 use zg_utils::MeshHandle;
-use zg_utils::Vertex;
+use zg_utils::ModelVertex;
 use zg_utils::math::{Vec3, vec3_add, vec3_cross_product, vec3_normalize};
 
 #[derive(Debug)]
@@ -24,8 +24,9 @@ pub struct MeshMetaData {
 }
 
 // Right now, only vertices with indices can be drawn
+#[derive(Debug, Clone)]
 pub struct MeshData {
-    pub vertices: Vec<Vertex>,
+    pub vertices: Vec<ModelVertex>,
     pub indices: Vec<u32>,
 }
 
@@ -106,4 +107,3 @@ impl MeshManager {
         self.meshes[mesh_handle as usize]
     }
 }
-

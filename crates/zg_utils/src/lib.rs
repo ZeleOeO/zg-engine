@@ -12,4 +12,4 @@ pub use topo_sort::sort_vector;
 pub use managers_util::{MaterialHandle, MeshHandle, Transform};
 pub use pipeline::PipelineID;
 pub use storage_util::TypeIdMap;
-pub use vertex::Vertex;
+pub use vertex::{ModelVertex, VertexTrait};
