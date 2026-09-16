@@ -108,7 +108,7 @@ impl World {
     pub fn get_or_create_archetype_id_by_bundle<T: Bundle + 'static>(&mut self) -> ArchetypeID {
         let type_ids: Vec<TypeId> = T::get_archetype();
         for archetype in self.archetypes.iter() {
-            if archetype.components.iter().eq(type_ids.deref()) {
+            if archetype.components.iter().all(|c| type_ids.contains(c)) {
                 return archetype.archetype_id;
             }
         }
@@ -121,7 +121,7 @@ impl World {
 
     pub fn get_or_create_archetype_id_by_type_ids(&mut self, type_ids: Vec<TypeId>) -> ArchetypeID {
         for archetype in self.archetypes.iter() {
-            if archetype.components.iter().eq(&type_ids) {
+            if archetype.components.iter().all(|c| type_ids.contains(c)) {
                 return archetype.archetype_id;
             }
         }
@@ -143,7 +143,7 @@ impl World {
 
     pub fn get_archetype_by_type_ids(&self, type_ids: Vec<TypeId>) -> Option<&Archetype> {
         for archetype in self.archetypes.iter() {
-            if archetype.components.iter().eq(&type_ids) {
+            if archetype.components.iter().all(|c| type_ids.contains(c)) {
                 return Some(self.get_archetype_by_id(archetype.archetype_id));
             }
         }

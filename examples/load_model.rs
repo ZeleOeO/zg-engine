@@ -22,7 +22,7 @@ pub fn instantiate_mesh(world: &mut World) {
     drop(assets);
     drop(graphics);
 
-    world.spawn((obj_mesh, color_mat, TransformComponent::default()));
+    world.spawn((obj_mesh, TransformComponent::default(), color_mat));
 
     // let cube_mesh = assets.create_cube(&graphics);
     // let prism_mesh = assets.create_prism(&graphics);
