@@ -19,41 +19,12 @@ pub fn instantiate_mesh(world: &mut World) {
         },
     );
 
+    // to prevent this, I might need to make a "scene" type that will handle the ecs stuff
+
     drop(assets);
     drop(graphics);
 
     world.spawn((obj_mesh, TransformComponent::default(), color_mat));
-
-    // let cube_mesh = assets.create_cube(&graphics);
-    // let prism_mesh = assets.create_prism(&graphics);
-    // let tree_material = assets.create_material(
-    //     &mut graphics,
-    //     zg_managers::material::MaterialType::Textured {
-    //         location: "assets/images/happy-tree.png".to_string(),
-    //     },
-    // );
-    // let color_mat = assets.create_material(
-    //     &mut graphics,
-    //     zg_managers::material::MaterialType::NonTexture {
-    //         color: [0.0, 0.0, 1.0],
-    //     },
-    // );
-    //
-    // drop(assets);
-    // drop(graphics);
-    //
-    // // I could get the vector of the typeId interestingly
-    // world.spawn((cube_mesh, tree_material, TransformComponent::default()));
-    // world.spawn((
-    //     prism_mesh,
-    //     color_mat,
-    //     TransformComponent(Transform::new([1.0, 2.0, 3.0])),
-    // ));
-    // world.spawn((
-    //     cube_mesh,
-    //     color_mat,
-    //     TransformComponent(Transform::new([8.0, 2.0, 3.0])),
-    // ));
 }
 
 pub fn show_system(system: &mut SystemAggregator) {
