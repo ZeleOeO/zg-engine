@@ -13,4 +13,3 @@ bytemuck = {workspace = true}
 wgpu = {workspace = true}
 image = {workspace = true}
 anyhow = {workspace = true}
-tobj = "4.0.5"

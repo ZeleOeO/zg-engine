@@ -3503,18 +3503,9 @@ dependencies = [
  "anyhow",
  "wgpu",
  "winit",
- "zg_layouts",
- "zg_pipeline",
  "zg_systems",
  "zg_utils",
  "zg_world",
-]
-
-[[package]]
-name = "zg_layouts"
-version = "0.1.0"
-dependencies = [
- "wgpu",
 ]
 
 [[package]]
@@ -3524,20 +3515,10 @@ dependencies = [
  "anyhow",
  "bytemuck",
  "image",
- "tobj",
  "wgpu",
  "zg_graphics",
  "zg_utils",
  "zg_world",
-]
-
-[[package]]
-name = "zg_pipeline"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "wgpu",
- "zg_utils",
 ]
 
 [[package]]

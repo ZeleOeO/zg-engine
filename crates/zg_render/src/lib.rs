@@ -1,8 +1,8 @@
 mod render_command;
-pub mod render_queue;
+mod render_queue;
 mod render_utils;
 mod renderer;
-pub mod system;
+mod system;
 
 pub use render_command::RenderCommand;
 pub use render_queue::RenderQueue;

@@ -9,8 +9,9 @@ use wgpu::{
 use zg_graphics::{
     BindGroupCacheHandle, BindGroupCacheKey, BindGroupResourceType, InternalGraphics,
 };
+use zg_utils::load_binary;
 use zg_utils::math::Vec3;
-use zg_utils::{MaterialHandle, load_binary};
+use zg_world::components::MaterialHandle;
 
 #[repr(C)]
 #[derive(Pod, Zeroable, Clone, Copy)]

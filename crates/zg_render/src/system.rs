@@ -8,14 +8,13 @@ use crate::{render_command::RenderCommand, render_utils::create_transform_bind_g
 use zg_graphics::*;
 use zg_managers::Assets;
 use zg_systems::SystemAggregator;
-use zg_utils::PipelineID;
 use zg_world::{ResourceMut, World, components::*};
 
 pub fn render_items_system(world: &mut World) {
     let components = vec![
         TypeId::of::<MeshComponent>(),
         TypeId::of::<MaterialComponent>(),
-        TypeId::of::<TransformComponent>(),
+        TypeId::of::<Transform>(),
     ];
 
     let mut render_queue = world.get_mut::<RenderQueue>();

@@ -19,3 +19,8 @@ impl Hasher for IdentityHasher {
 
 #[allow(private_interfaces)]
 pub type TypeIdMap<V> = HashMap<TypeId, V, BuildHasherDefault<IdentityHasher>>;
+
+pub fn load_binary(location: &str) -> anyhow::Result<Vec<u8>> {
+    let data = std::fs::read(location)?;
+    Ok(data)
+}

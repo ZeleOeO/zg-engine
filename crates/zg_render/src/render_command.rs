@@ -1,5 +1,5 @@
-use zg_graphics::BindGroupCacheHandle;
-use zg_utils::{MeshHandle, PipelineID};
+use zg_graphics::{BindGroupCacheHandle, PipelineID};
+use zg_world::components::MeshHandle;
 
 #[derive(Debug)]
 pub enum RenderCommand {

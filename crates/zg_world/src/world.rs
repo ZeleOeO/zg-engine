@@ -3,7 +3,6 @@ use std::{
     cell::{Ref, RefCell, RefMut},
     fmt::Debug,
     marker::PhantomData,
-    ops::Deref,
 };
 
 use zg_utils::TypeIdMap;

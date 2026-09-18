@@ -67,7 +67,7 @@ impl Camera {
         ]
     }
 
-    pub fn build_projection_matrix(&self) -> Mat4 {
+    pub(crate) fn build_projection_matrix(&self) -> Mat4 {
         let view = Self::look_at_matrix(self.eye, self.target, self.up);
         let perspective = Self::perspective_matrix(self.fovy, self.aspect, self.znear, self.zfar);
         let view_proj = mat4_mul(perspective, view);

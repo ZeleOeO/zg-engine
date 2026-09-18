@@ -3,8 +3,8 @@ use std::collections::HashMap;
 use wgpu::{BindGroup, BindGroupLayout};
 
 use crate::buffer::BindGroupCacheKey;
-use zg_layouts::*;
-use zg_pipeline::main_pipeline;
+use crate::layout::*;
+use crate::pipeline::*;
 
 #[derive(Clone, Copy, Hash, Debug)]
 // position, bind_group_slot

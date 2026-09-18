@@ -8,9 +8,9 @@ use wgpu::{
 use wgpu::{Queue, TextureView};
 use winit::window::Window;
 
-use crate::cache::*;
 use crate::buffer::{BindGroupCacheKey, BindGroupResourceType};
-use zg_utils::PipelineID;
+use crate::cache::*;
+use crate::pipeline::PipelineID;
 
 #[derive(Debug)]
 pub struct InternalGraphics {
@@ -166,5 +166,4 @@ impl InternalGraphics {
     pub fn get_pipeline_cache(&self, pipeline_id: PipelineID) -> &RenderPipeline {
         &self.cache.pipelines[pipeline_id as usize]
     }
-
 }

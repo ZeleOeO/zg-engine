@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use winit::window::{CursorGrabMode, Window};
 
-use zg_camera::camera_controller::CameraController;
+use zg_camera::CameraController;
 use zg_graphics::InternalGraphics;
 use zg_render::{RenderQueue, WorldRenderer};
 use zg_systems::Systems;
@@ -17,7 +17,7 @@ pub(crate) struct EngineApp {
 }
 
 impl EngineApp {
-    pub async fn new() -> Self {
+    pub(crate) async fn new() -> Self {
         Self {
             world: World::new(),
             systems: Systems::default(),
@@ -34,7 +34,7 @@ impl EngineApp {
         self.window = Some(window)
     }
 
-    pub fn insert_default_resources(&mut self, window: Arc<Window>) {
+    pub(crate) fn insert_default_resources(&mut self, window: Arc<Window>) {
         let internal_graphics = pollster::block_on(InternalGraphics::new(&window)).unwrap();
         let assets = Assets::new();
         let camera_controller = CameraController::new(2.0, 0.2);

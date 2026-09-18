@@ -6,8 +6,8 @@ use winit::{
 };
 
 use crate::engine_app::EngineApp;
-use zg_camera::system::system as camera_system;
-use zg_render::system::system as render_system;
+use zg_camera::system as camera_system;
+use zg_render::system as render_system;
 use zg_systems::SystemAggregator;
 
 pub struct App {

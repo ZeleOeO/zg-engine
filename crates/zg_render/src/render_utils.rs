@@ -2,8 +2,8 @@ use wgpu::util::{BufferInitDescriptor, DeviceExt};
 
 use bytemuck::{Pod, Zeroable};
 use zg_graphics::*;
-use zg_utils::Transform;
 use zg_utils::math::{Mat4, mat4_transpose, vec3_translation_matrix};
+use zg_world::components::Transform;
 
 #[derive(Clone, Pod, Copy, Zeroable)]
 #[repr(C)]

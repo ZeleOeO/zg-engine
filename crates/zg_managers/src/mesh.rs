@@ -4,9 +4,9 @@ use wgpu::{
 };
 
 use zg_graphics::InternalGraphics;
-use zg_utils::MeshHandle;
 use zg_utils::ModelVertex;
 use zg_utils::math::{Vec3, vec3_add, vec3_cross_product, vec3_normalize};
+use zg_world::components::MeshHandle;
 
 #[derive(Debug)]
 pub struct MeshManager {
