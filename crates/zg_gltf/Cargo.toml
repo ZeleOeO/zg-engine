@@ -1,0 +1,14 @@
+[package]
+name = "zg_gltf"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+zg_utils = {path = "../zg_utils"}
+zg_graphics = {path = "../zg_graphics"}
+zg_world = {path = "../zg_world"}
+zg_managers = {path = "../zg_managers"}
+
+tobj = "4.0.5"
+image = {workspace = true}
+anyhow = {workspace = true}

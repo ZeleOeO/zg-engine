@@ -53,6 +53,7 @@ impl<'w, D: QueryData<'w>> Query<'w, D> {
     }
 
     pub fn iter(&self, archetype: &Archetype) -> impl Iterator<Item = D::Output> + '_ {
-        (0..archetype.len()).map(|row| D::get(self.world, row))
+        let entities = archetype.entities.clone();
+        entities.into_iter().map(move |entity| D::get(self.world, entity.0 as usize))
     }
 }

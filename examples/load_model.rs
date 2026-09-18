@@ -5,26 +5,8 @@ fn main() -> anyhow::Result<()> {
 }
 
 pub fn instantiate_mesh(world: &mut World) {
-    let mut graphics = world.get_mut::<InternalGraphics>();
-    let mut assets = world.get_mut::<Assets>();
-
-    let obj_mesh = assets
-        .load_obj_model(&graphics, "assets/obj/test.obj")
-        .unwrap();
-
-    let color_mat = assets.create_material(
-        &mut graphics,
-        zg_managers::material::MaterialType::NonTexture {
-            color: [0.3, 0.7, 1.0],
-        },
-    );
-
-    // to prevent this, I might need to make a "scene" type that will handle the ecs stuff
-
-    drop(assets);
-    drop(graphics);
-
-    world.spawn((obj_mesh, TransformComponent::default(), color_mat));
+    let chicken = Model::load_obj(world, "assets/obj/animals_obj/chicken_001.obj").unwrap();
+    println!("Spawned Cowboy Hat parts as entities: {:?}", chicken);
 }
 
 pub fn show_system(system: &mut SystemAggregator) {

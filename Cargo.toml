@@ -27,4 +27,5 @@ zg_render = { path = "crates/zg_render" }
 zg_systems = { path = "crates/zg_systems" }
 zg_utils = { path = "crates/zg_utils" }
 zg_world = { path = "crates/zg_world" }
+zg_gltf = { path = "crates/zg_gltf" }
 anyhow = { workspace = true }

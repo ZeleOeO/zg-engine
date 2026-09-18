@@ -1,3 +1,4 @@
+use anyhow::Ok;
 use bytemuck::{Pod, Zeroable};
 use image::{DynamicImage, GenericImageView, ImageReader};
 use wgpu::{
@@ -8,8 +9,8 @@ use wgpu::{
 use zg_graphics::{
     BindGroupCacheHandle, BindGroupCacheKey, BindGroupResourceType, InternalGraphics,
 };
-use zg_utils::MaterialHandle;
 use zg_utils::math::Vec3;
+use zg_utils::{MaterialHandle, load_binary};
 
 #[repr(C)]
 #[derive(Pod, Zeroable, Clone, Copy)]
@@ -44,6 +45,51 @@ impl MaterialManager {
 
     pub fn get_material(&self, material_handle: MaterialHandle) -> BindGroupCacheHandle {
         self.material_bind_group[material_handle.0 as usize]
+    }
+
+    pub fn add_obj_material(
+        &mut self,
+        gpu: &mut InternalGraphics,
+        location: &str,
+    ) -> anyhow::Result<MaterialHandle> {
+        let bind_group = {
+            let texture = Self::from_bytes(gpu, location)?;
+            let buffer = gpu.device.create_buffer_init(&BufferInitDescriptor {
+                label: Some("Buffer Init Descriptor Matieral Color"),
+                contents: bytemuck::cast_slice(&[MaterialUniform {
+                    color: [0.0, 0.0, 0.0],
+                    has_texture: 1.0,
+                }]),
+                usage: BufferUsages::UNIFORM | BufferUsages::COPY_DST,
+            });
+
+            println!("Texture View: {:#?}", texture.view);
+            println!("Sampler: {:#?}", texture.sampler);
+
+            let cache_key = BindGroupCacheKey {
+                layout_num: 1,
+                entries: vec![
+                    (2, BindGroupResourceType::Buffer { buffer }),
+                    (
+                        1,
+                        BindGroupResourceType::Sampler {
+                            sampler: texture.sampler,
+                        },
+                    ),
+                    (
+                        0,
+                        BindGroupResourceType::Texture {
+                            texture_view: texture.view,
+                        },
+                    ),
+                ],
+            };
+
+            gpu.get_or_create_bind_group(cache_key)
+        };
+
+        self.material_bind_group.push(bind_group);
+        Ok(MaterialHandle(self.material_bind_group.len() as u32 - 1))
     }
 
     pub fn add_new_material(
@@ -124,6 +170,13 @@ impl MaterialManager {
 
     fn from_location(gpu: &InternalGraphics, location: &str) -> anyhow::Result<TextureData> {
         let img = ImageReader::open(location)?.decode()?;
+
+        Self::from_image(gpu, &img)
+    }
+
+    fn from_bytes(gpu: &InternalGraphics, location: &str) -> anyhow::Result<TextureData> {
+        let data = load_binary(location)?;
+        let img = image::load_from_memory(&data)?;
 
         Self::from_image(gpu, &img)
     }
@@ -211,4 +264,3 @@ impl MaterialManager {
         }
     }
 }
-

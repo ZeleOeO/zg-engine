@@ -12,4 +12,5 @@ pub mod prelude {
     pub use zg_systems::SystemAggregator;
     pub use zg_utils::Transform;
     pub use zg_world::{World, components::TransformComponent};
+    pub use zg_gltf::Model;
 }

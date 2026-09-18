@@ -9,7 +9,7 @@ mod vertex;
 pub use topo_sort::NodeTrait;
 pub use topo_sort::sort_vector;
 
-pub use managers_util::{MaterialHandle, MeshHandle, Transform};
+pub use managers_util::{MaterialHandle, MeshHandle, Transform, load_binary};
 pub use pipeline::PipelineID;
 pub use storage_util::TypeIdMap;
 pub use vertex::{ModelVertex, VertexTrait};

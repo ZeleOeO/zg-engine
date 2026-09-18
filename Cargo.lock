@@ -3444,6 +3444,7 @@ dependencies = [
  "anyhow",
  "zg_app",
  "zg_camera",
+ "zg_gltf",
  "zg_graphics",
  "zg_managers",
  "zg_render",
@@ -3478,6 +3479,19 @@ dependencies = [
  "zg_graphics",
  "zg_render",
  "zg_systems",
+ "zg_utils",
+ "zg_world",
+]
+
+[[package]]
+name = "zg_gltf"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "image",
+ "tobj",
+ "zg_graphics",
+ "zg_managers",
  "zg_utils",
  "zg_world",
 ]
@@ -3553,6 +3567,7 @@ dependencies = [
 name = "zg_utils"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "bytemuck",
  "wgpu",
 ]

@@ -26,3 +26,8 @@ impl Transform {
         Self { position }
     }
 }
+
+pub fn load_binary(location: &str) -> anyhow::Result<Vec<u8>> {
+    let data = std::fs::read(location)?;
+    Ok(data)
+}

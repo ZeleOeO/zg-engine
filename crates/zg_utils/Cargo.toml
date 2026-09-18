@@ -7,3 +7,4 @@ edition = "2024"
 
 bytemuck = {workspace = true}
 wgpu = {workspace = true}
+anyhow = {workspace = true}
