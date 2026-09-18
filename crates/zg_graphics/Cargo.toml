@@ -4,7 +4,6 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-zg_world = {path = "../zg_world"}
 zg_systems = {path = "../zg_systems"}
 zg_utils = {path = "../zg_utils"}
 

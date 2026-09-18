@@ -3505,7 +3505,6 @@ dependencies = [
  "winit",
  "zg_systems",
  "zg_utils",
- "zg_world",
 ]
 
 [[package]]
