@@ -26,13 +26,11 @@ pub fn render_items_system(world: &mut World) {
     let archetype = &world.archetypes[archetype_id.archetype_id.0 as usize];
 
     let item = world
-        .get_all_entities_in_archetype::<(MeshComponent, MaterialComponent, TransformComponent)>(
-            archetype,
-        );
+        .get_all_entities_in_archetype::<(MeshComponent, MaterialComponent, Transform)>(archetype);
 
     for (mesh, material, transform) in item {
         let material_bind_group_handle = assets.material_manager.get_material(material.0);
-        let transform_bind_group_handle = create_transform_bind_group(&transform.0, gpu.as_mut());
+        let transform_bind_group_handle = create_transform_bind_group(&transform, gpu.as_mut());
         let mesh_meta_data = assets.mesh_manager.get_mesh_data(mesh.0.0);
 
         render_queue.commands.push(RenderCommand::SetPipeline {

@@ -3,7 +3,7 @@ use zg_managers::{Assets, material::MaterialType, mesh::MeshData};
 use zg_utils::ModelVertex;
 use zg_world::{
     Entity, World,
-    components::{MaterialComponent, MeshComponent, TransformComponent},
+    components::{MaterialComponent, MeshComponent, Transform},
 };
 
 pub struct Model;
@@ -104,7 +104,7 @@ impl Model {
 
         let mut spawned_entities = Vec::new();
         for (mesh, material) in components_to_spawn {
-            let entity = world.spawn((mesh, material, TransformComponent::default()));
+            let entity = world.spawn((mesh, material, Transform::default()));
             spawned_entities.push(entity);
         }
 
