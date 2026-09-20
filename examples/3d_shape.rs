@@ -27,9 +27,17 @@ pub fn instantiate_mesh(world: &mut World) {
     drop(graphics);
 
     // I could get the vector of the typeId interestingly
-    world.spawn((cube_mesh, tree_material, Transform::default()));
-    world.spawn((prism_mesh, color_mat, Transform::new([1.0, 2.0, 3.0])));
-    world.spawn((cube_mesh, color_mat, Transform::new([8.0, 2.0, 3.0])));
+    world.spawn((cube_mesh, tree_material, Transform::IDENTITY));
+    world.spawn((
+        prism_mesh,
+        color_mat,
+        Transform::from_translation(1.0, 2.0, 3.0),
+    ));
+    world.spawn((
+        cube_mesh,
+        color_mat,
+        Transform::from_translation(8.0, 2.0, 3.0).with_scale(4.0, 3.0, 4.0),
+    ));
 }
 
 pub fn show_system(system: &mut SystemAggregator) {

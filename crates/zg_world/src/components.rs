@@ -37,22 +37,42 @@ pub struct MeshHandle(pub u32);
 
 #[derive(Clone, Copy, Debug)]
 pub struct Transform {
-    pub position: Vec3,
-    // rotation: Quat,
-    // pub scale: Vec3,
+    position: Vec3,
+    rotation: Vec3,
+    scale: Vec3,
 }
 
 impl Default for Transform {
     fn default() -> Self {
-        Self {
-            position: [0.0, 0.0, 0.0],
-        }
+        Self::IDENTITY
     }
 }
 
 impl Transform {
-    pub fn new(position: Vec3) -> Self {
-        Self { position }
+    pub const IDENTITY: Self = Self {
+        position: [0.0, 0.0, 0.0],
+        rotation: [0.0, 0.0, 0.0],
+        scale: [1.0, 1.0, 1.0],
+    };
+    pub fn from_translation(x: f32, y: f32, z: f32) -> Self {
+        let position = [x, y, z];
+        Self {
+            position,
+            ..Default::default()
+        }
+    }
+    pub fn with_scale(mut self, x_scale: f32, y_scale: f32, z_scale: f32) -> Self {
+        self.scale = [x_scale, y_scale, z_scale];
+        self
+    }
+    pub fn position(&self) -> Vec3 {
+        self.position
+    }
+    pub fn scale(&self) -> Vec3 {
+        self.scale
+    }
+    pub fn rotation(&self) -> Vec3 {
+        self.rotation
     }
 }
 

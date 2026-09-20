@@ -60,6 +60,33 @@ pub fn vec3_translation_matrix(translate: Vec3) -> Mat4 {
     ]
 }
 
+pub fn vec3_scaling_matrix(scaling: Vec3) -> Mat4 {
+    [
+        [scaling[0], 0.0, 0.0, 0.0],
+        [0.0, scaling[1], 0.0, 0.0],
+        [0.0, 0.0, scaling[2], 0.0],
+        [0.0, 0.0, 0.0, 1.0],
+    ]
+}
+
+// I do not want to do matrix multiplicatin for all of them
+pub fn vec3_general_rotation_matrix(rotation: Vec3) -> Mat4 {
+    let a = rotation[0]; // x yaw
+    let b = rotation[1]; // y pitch
+    let c = rotation[2]; // z roll
+
+    let (sa, ca) = a.sin_cos();
+    let (sb, cb) = b.sin_cos();
+    let (sc, cc) = c.sin_cos();
+
+    [
+        [ca * cb, ca * sb * sc - sa * cc, ca * sb * cc + sa * sc, 0.0],
+        [sa * cb, sa * sb * sc + ca * cc, sa * sb * cc - ca * sc, 0.0],
+        [-sb, cb * sc, cb * cc, 0.0],
+        [0.0, 0.0, 0.0, 1.0],
+    ]
+}
+
 pub fn vec3_rotate_by_y(vector: Vec3, degree: f32) -> Vec3 {
     let radians: f32 = degree * PI / 180.0;
 
