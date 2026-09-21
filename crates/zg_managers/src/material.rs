@@ -64,9 +64,6 @@ impl MaterialManager {
                 usage: BufferUsages::UNIFORM | BufferUsages::COPY_DST,
             });
 
-            println!("Texture View: {:#?}", texture.view);
-            println!("Sampler: {:#?}", texture.sampler);
-
             let cache_key = BindGroupCacheKey {
                 layout_num: 1,
                 entries: vec![

@@ -15,7 +15,6 @@ use crate::camera_controller::{CameraController, handle_key_controller};
 use zg_graphics::*;
 use zg_render::{RenderCommand, RenderQueue, WorldRenderer};
 use zg_systems::SystemAggregator;
-use zg_utils::time::Time;
 use zg_world::World;
 
 // This is cute, but this is not how a system looks like
@@ -48,7 +47,7 @@ pub fn camera_init_system(world: &mut World) {
 // updates the ratio
 // updates the view projection matrix
 // writes to the buffer
-pub fn camera_update_system(world: &mut World) {
+pub fn camera_update_system(world: &mut World, _dt: f32) {
     let renderer = world.get::<WorldRenderer>();
     let mut graphics = world.get_mut::<InternalGraphics>();
     let mut render_queue = world.get_mut::<RenderQueue>();
@@ -84,7 +83,7 @@ pub fn camera_update_system(world: &mut World) {
     }
 }
 
-pub fn camera_controller_update_system(world: &mut World) {
+pub fn camera_controller_update_system(world: &mut World, dt: f32) {
     //mt anem  is osose and o=im the best in the world i wrote
     //this code
     //
@@ -93,8 +92,7 @@ pub fn camera_controller_update_system(world: &mut World) {
     let camera_entity = renderer.default_camera.unwrap();
     let camera = world.get_entity::<(Camera,)>(camera_entity).0;
     let camera_controller = world.get::<CameraController>();
-    let mut time = world.get_mut::<Time>();
-    let delta = time.calculate_time_delta().min(0.1);
+    let delta = dt.min(0.1);
     camera_controller.camera_update(camera, delta);
 }
 

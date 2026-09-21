@@ -4,6 +4,7 @@ use anyhow::Ok;
 use winit::{
     application::ApplicationHandler, event::DeviceEvent, event_loop::EventLoop, window::Window,
 };
+use zg_utils::time::Time;
 
 use crate::engine_app::EngineApp;
 use zg_camera::system as camera_system;
@@ -102,7 +103,13 @@ impl ApplicationHandler for App {
             return;
         };
         let world = &mut app.world;
-        app.systems.updates.execute(world);
+        let mut time = world.get_mut::<Time>();
+        time.update();
+        let delta = time.time_delta_secs();
+        println!("FPS: {:#?}", time.fps());
+        drop(time);
+
+        app.systems.updates.execute((world, delta));
         let Some(window) = &mut app.window else {
             return;
         };

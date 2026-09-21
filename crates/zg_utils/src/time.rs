@@ -2,8 +2,8 @@ use std::time::Instant;
 
 #[derive(Debug)]
 pub struct Time {
-    pub time_delta: f32,
-    pub last_frame: Instant,
+    time_delta: f32,
+    last_frame: Instant,
 }
 
 impl Time {
@@ -15,10 +15,23 @@ impl Time {
     }
 
     // This checks between the last time and now
-    pub fn calculate_time_delta(&mut self) -> f32 {
+    pub fn update(&mut self) -> f32 {
         let now = Instant::now();
         self.time_delta = now.duration_since(self.last_frame).as_secs_f32();
+        self.last_frame = now;
         self.time_delta
+    }
+
+    pub fn time_delta_secs(&self) -> f32 {
+        self.time_delta
+    }
+
+    pub fn time_delta_ms(&self) -> f32 {
+        self.time_delta * 1000.0
+    }
+
+    pub fn fps(&self) -> u32 {
+        1000 / (self.time_delta_ms() as u32) as u32
     }
 }
 

@@ -14,15 +14,15 @@ use crate::{system_sort::SystemSort, system_storage::SystemsStorage};
 
 #[derive(Default)]
 pub struct Systems {
-    pub setups: SystemsStorage<WorldOnly>,
-    pub updates: SystemsStorage<WorldOnly>,
+    pub setups: SystemsStorage<Setup>,
+    pub updates: SystemsStorage<Update>,
     pub window_events: SystemsStorage<WindowSystemEvent>,
     pub device_events: SystemsStorage<DeviceSystemEvent>,
 }
 
 pub struct SystemAggregator<'a> {
-    pub setups: &'a mut SystemsStorage<WorldOnly>,
-    pub updates: &'a mut SystemsStorage<WorldOnly>,
+    pub setups: &'a mut SystemsStorage<Setup>,
+    pub updates: &'a mut SystemsStorage<Update>,
     pub window_events: &'a mut SystemsStorage<WindowSystemEvent>,
     pub device_events: &'a mut SystemsStorage<DeviceSystemEvent>,
 }
@@ -72,8 +72,8 @@ impl<'a> SystemAggregator<'a> {
     pub fn insert_init_system<F: FnMut(&mut World) + 'static>(
         &mut self,
         callback: F,
-    ) -> &mut SystemMut<WorldOnly> {
-        let system_mut: SystemMut<WorldOnly> = SystemMut {
+    ) -> &mut SystemMut<Setup> {
+        let system_mut: SystemMut<Setup> = SystemMut {
             id: SystemID(TypeId::of::<F>()),
             sorts: Vec::new(),
             callback: Box::new(callback),
@@ -82,11 +82,11 @@ impl<'a> SystemAggregator<'a> {
         item
     }
 
-    pub fn insert_update_system<F: FnMut(&mut World) + 'static>(
+    pub fn insert_update_system<F: FnMut(&mut World, f32) + 'static>(
         &mut self,
         callback: F,
-    ) -> &mut SystemMut<WorldOnly> {
-        let system_mut: SystemMut<WorldOnly> = SystemMut {
+    ) -> &mut SystemMut<Update> {
+        let system_mut: SystemMut<Update> = SystemMut {
             id: SystemID(TypeId::of::<F>()),
             sorts: Vec::new(),
             callback: Box::new(callback),
@@ -161,19 +161,31 @@ pub trait SystemFunction: Sized {
 }
 
 #[derive(Debug)]
-pub struct WorldOnly {}
+pub struct Setup {}
+
+#[derive(Debug)]
+pub struct Update {}
 
 #[derive(Debug)]
 pub struct WindowSystemEvent {}
 
 pub struct DeviceSystemEvent {}
 
-impl SystemFunction for WorldOnly {
+impl SystemFunction for Setup {
     type Fntype = dyn FnMut(&mut World);
     type Args<'a, 'b> = &'a mut World;
 
     fn execute<'e, 'f>(function: &mut Box<Self::Fntype>, args: &mut Self::Args<'e, 'f>) {
         function(args)
+    }
+}
+
+impl SystemFunction for Update {
+    type Fntype = dyn FnMut(&mut World, f32);
+    type Args<'a, 'b> = (&'a mut World, f32);
+
+    fn execute<'e, 'f>(function: &mut Box<Self::Fntype>, args: &mut Self::Args<'e, 'f>) {
+        function(args.0, args.1)
     }
 }
 
@@ -196,7 +208,7 @@ impl SystemFunction for DeviceSystemEvent {
 
 pub trait IntoSystem<M: SystemFunction>: 'static {}
 
-impl<F> IntoSystem<WorldOnly> for F where F: FnMut(&mut World) + 'static {}
+impl<F> IntoSystem<Setup> for F where F: FnMut(&mut World) + 'static {}
 
 impl<F> IntoSystem<WindowSystemEvent> for F where
     F: FnMut(&mut World, &WindowEvent, &ActiveEventLoop) + 'static

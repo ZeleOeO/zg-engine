@@ -2,6 +2,7 @@ use std::any::TypeId;
 
 use wgpu::{CurrentSurfaceTexture, TextureView};
 use winit::{event::WindowEvent, event_loop::ActiveEventLoop};
+use zg_utils::time::Time;
 
 use crate::render_queue::RenderQueue;
 use crate::{render_command::RenderCommand, render_utils::create_transform_bind_group};
@@ -10,7 +11,7 @@ use zg_managers::Assets;
 use zg_systems::SystemAggregator;
 use zg_world::{ResourceMut, World, components::*};
 
-pub fn render_items_system(world: &mut World) {
+pub fn render_items_system(world: &mut World, _dt: f32) {
     let components = vec![
         TypeId::of::<MeshComponent>(),
         TypeId::of::<MaterialComponent>(),
@@ -107,6 +108,7 @@ pub fn graphics_window_event_system(
 ) {
     match event {
         WindowEvent::RedrawRequested => {
+            let time = world.get::<Time>();
             let graphics = world.get::<InternalGraphics>();
             let frame = match graphics.surface.get_current_texture() {
                 CurrentSurfaceTexture::Success(texture)
@@ -122,6 +124,8 @@ pub fn graphics_window_event_system(
             };
 
             drop(graphics);
+            drop(time);
+
             let view = frame
                 .texture
                 .create_view(&wgpu::TextureViewDescriptor::default());
