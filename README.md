@@ -49,7 +49,9 @@ Once the application starts, a window titled **"Graphics Engine"** opens with a 
 - Press **Escape** to close the window and exit
 - Set log verbosity via the `RUST_LOG` environment variable (e.g., `RUST_LOG=info cargo run --release`)
 
-The embedded texture (`happy-tree.png`) is mapped onto all six faces of the cube. The rotation speed is driven by a uniform buffer passed to the vertex shader.
+Can scale objects and load .obj projects
+
+Currently learning PBR so that's coming up next. Previously had the full Blinn Phong Model, but ...gave up lol
 
 ### TODO
 
@@ -63,11 +65,11 @@ In no particular order
 - [X] Add ordering to systems
 - [X] Make folders into crates
 - [X] Add crate level access modifiers
+- [X] OBJ / GLTF model loading
 - [ ] Fix all the places where there's an unwrap and handle it properly (cancelled cause i ain't got time for allat)
 - [ ] Asynchrounous and multithreading
 - [ ] Multiple objects / scene graph
 - [ ] Lighting (Phong / PBR)
-- [ ] OBJ / GLTF model loading
 - [ ] MSAA / post-processing effects
 - [ ] ImGui debug overlay
 
