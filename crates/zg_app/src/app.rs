@@ -28,6 +28,7 @@ impl App {
     }
 
     pub fn run(&mut self) -> anyhow::Result<()> {
+        tracy_client::Client::start();
         let event_loop = EventLoop::new()?;
         event_loop.set_control_flow(winit::event_loop::ControlFlow::Poll);
         self.insert_default_systems();
@@ -103,10 +104,8 @@ impl ApplicationHandler for App {
             return;
         };
         let world = &mut app.world;
-        let mut time = world.get_mut::<Time>();
-        time.update();
+        let time = world.get_mut::<Time>();
         let delta = time.time_delta_secs();
-        println!("FPS: {:#?}", time.fps());
         drop(time);
 
         app.systems.updates.execute((world, delta));

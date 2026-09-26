@@ -14,3 +14,4 @@ zg_utils = {path = "../zg_utils"}
 wgpu = {workspace = true}
 winit = {workspace = true}
 bytemuck = {workspace = true}
+tracy-client = {workspace = true}

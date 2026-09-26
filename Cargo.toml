@@ -5,7 +5,6 @@ edition = "2024"
 
 [workspace]
 resolver = "2"
-# members = ["crates/zg_app", "crates/zg_camera", "crates/zg_graphics", "crates/zg_layouts", "crates/zg_managers", "crates/zg_pipeline", "crates/zg_render",  "crates/zg_systems", "crates/zg_utils", "crates/zg_world"]
 members = ["crates/*"]
 
 [workspace.dependencies]
@@ -17,6 +16,7 @@ log = "0.4.33"
 pollster = "0.4.0"
 wgpu = "29.0.3"
 winit = "0.30.13"
+tracy-client = { version = "0.19.0", features = ["enable"] }
 
 [dependencies]
 zg_app = { path = "crates/zg_app" }

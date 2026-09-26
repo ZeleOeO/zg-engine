@@ -1,7 +1,9 @@
 use std::any::TypeId;
 
+use tracy_client::span;
 use wgpu::{CurrentSurfaceTexture, TextureView};
 use winit::{event::WindowEvent, event_loop::ActiveEventLoop};
+
 use zg_utils::time::Time;
 
 use crate::render_queue::RenderQueue;
@@ -60,13 +62,18 @@ pub fn execute_frame(
     world: &mut World,
     surface_view: &TextureView,
 ) {
-    let mut encoder = graphics
-        .device
-        .create_command_encoder(&wgpu::CommandEncoderDescriptor {
-            label: Some("Encoder"),
-        });
+    let _ = span!("execute frame");
+    let mut encoder = {
+        let _ = span!("create encoder");
+        graphics
+            .device
+            .create_command_encoder(&wgpu::CommandEncoderDescriptor {
+                label: Some("Encoder"),
+            })
+    };
     let mut render_queue = world.get_mut::<RenderQueue>();
     {
+        let _ = span!("main render pass");
         let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
             label: Some("Render Pass"),
             color_attachments: &[Some(wgpu::RenderPassColorAttachment {
@@ -108,31 +115,46 @@ pub fn graphics_window_event_system(
 ) {
     match event {
         WindowEvent::RedrawRequested => {
-            let time = world.get::<Time>();
+            let _ = span!("redraw request");
+            let mut time = world.get_mut::<Time>();
+            time.update();
             let graphics = world.get::<InternalGraphics>();
-            let frame = match graphics.surface.get_current_texture() {
-                CurrentSurfaceTexture::Success(texture)
-                | CurrentSurfaceTexture::Suboptimal(texture) => texture,
-                CurrentSurfaceTexture::Timeout | CurrentSurfaceTexture::Occluded => return,
-                CurrentSurfaceTexture::Outdated | CurrentSurfaceTexture::Lost => {
-                    graphics
-                        .surface
-                        .configure(&graphics.device, &graphics.config);
-                    return;
+            let frame = {
+                let _ = span!("retrieve current texture");
+                match graphics.surface.get_current_texture() {
+                    CurrentSurfaceTexture::Success(texture)
+                    | CurrentSurfaceTexture::Suboptimal(texture) => texture,
+                    CurrentSurfaceTexture::Timeout | CurrentSurfaceTexture::Occluded => return,
+                    CurrentSurfaceTexture::Outdated | CurrentSurfaceTexture::Lost => {
+                        println!("Error");
+                        graphics
+                            .surface
+                            .configure(&graphics.device, &graphics.config);
+                        return;
+                    }
+                    CurrentSurfaceTexture::Validation => return,
                 }
-                CurrentSurfaceTexture::Validation => return,
             };
 
             drop(graphics);
             drop(time);
 
-            let view = frame
-                .texture
-                .create_view(&wgpu::TextureViewDescriptor::default());
+            let view = {
+                let _ = span!("create view");
+                frame
+                    .texture
+                    .create_view(&wgpu::TextureViewDescriptor::default())
+            };
             world.resource_scope(|world, mut gpu: ResourceMut<InternalGraphics>| {
                 execute_frame(&mut gpu, world, &view);
             });
-            frame.present();
+
+            {
+                let _ = span!("present frame");
+                frame.present();
+                tracy_client::frame_mark();
+                // println!("PRESENT");
+            }
         }
         _ => {}
     }
