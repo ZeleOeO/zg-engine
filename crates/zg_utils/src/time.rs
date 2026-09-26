@@ -4,6 +4,9 @@ use std::time::Instant;
 pub struct Time {
     time_delta: f32,
     last_frame: Instant,
+    frames: u32,
+    elapsed: f32,
+    fps: f32,
 }
 
 impl Time {
@@ -11,15 +14,27 @@ impl Time {
         Self {
             time_delta: 0.0,
             last_frame: Instant::now(),
+            frames: 0,
+            elapsed: 0.0,
+            fps: 0.0,
         }
     }
 
     // This checks between the last time and now
-    pub fn update(&mut self) -> f32 {
+    pub fn update(&mut self) {
+        self.frames += 1;
         let now = Instant::now();
         self.time_delta = now.duration_since(self.last_frame).as_secs_f32();
+        self.elapsed += self.time_delta;
         self.last_frame = now;
-        self.time_delta
+
+        // This should be accurate regardless of what the time_delta says
+        if self.elapsed >= 1.0 {
+            self.fps = self.frames as f32 / self.elapsed;
+            println!("FPS: {:#?}", self.fps().floor());
+            self.elapsed = 0.0;
+            self.frames = 0;
+        }
     }
 
     pub fn time_delta_secs(&self) -> f32 {
@@ -30,18 +45,7 @@ impl Time {
         self.time_delta * 1000.0
     }
 
-    pub fn fps(&self) -> u32 {
-        1000 / (self.time_delta_ms() as u32) as u32
+    pub fn fps(&self) -> f32 {
+        self.fps
     }
 }
-
-// So on first run, time is nothing and last_frame is the current one, all the updates will run
-// I believe we would possibly face an issue with a 0 delta time if we run this before the camera update
-// if we do, I'll either change it to run at the beginning of each frame orrrr, I update the
-// intital time_delta to 0.1
-// pub fn update_time_system(world: &mut World) {
-//     let mut time = world.get_mut::<Time>();
-//     // Every update, this checks the current time
-//     // gets how much it is from the previous time
-//     time.calculate_time_delta();
-// }
