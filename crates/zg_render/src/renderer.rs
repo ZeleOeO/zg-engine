@@ -1,8 +1,9 @@
 use wgpu::{Buffer, BufferUsages, wgt::BufferDescriptor};
 
 use zg_graphics::InternalGraphics;
-use zg_utils::math::Mat4;
 use zg_world::Entity;
+
+use crate::render_utils::CameraUniform;
 
 #[derive(Clone, Debug)]
 pub struct WorldRenderer {
@@ -14,7 +15,7 @@ impl WorldRenderer {
     pub fn new(graphics: &InternalGraphics) -> Self {
         let buffer = graphics.device.create_buffer(&BufferDescriptor {
             label: None,
-            size: std::mem::size_of::<Mat4>() as u64,
+            size: std::mem::size_of::<CameraUniform>() as u64,
             usage: BufferUsages::COPY_DST | BufferUsages::UNIFORM,
             mapped_at_creation: false,
         });

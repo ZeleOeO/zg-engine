@@ -13,7 +13,7 @@ use crate::camera::Camera;
 use crate::camera_controller::{CameraController, handle_key_controller};
 
 use zg_graphics::*;
-use zg_render::{RenderCommand, RenderQueue, WorldRenderer};
+use zg_render::{RenderCommand, RenderQueue, WorldRenderer, create_camera_bind_group};
 use zg_systems::SystemAggregator;
 use zg_world::World;
 
@@ -60,22 +60,9 @@ pub fn camera_update_system(world: &mut World, _dt: f32) {
         camera.aspect = (window_size.width as f32) / window_size.height as f32;
 
         let view_proj = camera.build_projection_matrix();
-        graphics.queue.write_buffer(
-            &renderer.camera_buffer,
-            0,
-            bytemuck::cast_slice(&[view_proj]),
-        );
 
-        let cache_key = BindGroupCacheKey {
-            layout_num: 0,
-            entries: vec![(
-                0,
-                BindGroupResourceType::Buffer {
-                    buffer: renderer.camera_buffer.clone(),
-                },
-            )],
-        };
-        let camera_bind_group_cache_handle = graphics.get_or_create_bind_group(cache_key);
+        let camera_bind_group_cache_handle =
+            create_camera_bind_group(view_proj, camera.eye, &mut graphics, &renderer);
 
         render_queue.commands.push(RenderCommand::SetBindGroup {
             bind_group_handle: camera_bind_group_cache_handle,

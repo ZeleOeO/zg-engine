@@ -105,7 +105,11 @@ pub fn execute_frame(
 
         render_queue.flush(&mut render_pass, world, graphics);
     }
-    graphics.queue.submit(Some(encoder.finish()));
+    {
+        let span = span!("submit");
+        span.emit_color(0xE346B4);
+        graphics.queue.submit(Some(encoder.finish()));
+    }
 }
 
 pub fn graphics_window_event_system(

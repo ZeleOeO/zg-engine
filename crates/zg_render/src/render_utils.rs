@@ -3,14 +3,16 @@ use wgpu::util::{BufferInitDescriptor, DeviceExt};
 use bytemuck::{Pod, Zeroable};
 use zg_graphics::*;
 use zg_utils::math::{
-    Mat4, mat4_mul, mat4_transpose, vec3_general_rotation_matrix, vec3_scaling_matrix,
+    Mat4, Vec3, mat4_mul, mat4_transpose, vec3_general_rotation_matrix, vec3_scaling_matrix,
     vec3_translation_matrix,
 };
 use zg_world::components::Transform;
 
+use crate::WorldRenderer;
+
 #[derive(Clone, Pod, Copy, Zeroable)]
 #[repr(C)]
-pub struct ItemUniform {
+pub(crate) struct ItemUniform {
     transform: Mat4,
 }
 
@@ -48,6 +50,44 @@ pub fn create_transform_bind_group(
     let cache_key = BindGroupCacheKey {
         layout_num: 2,
         entries: vec![(0, BindGroupResourceType::Buffer { buffer })],
+    };
+    gpu.get_or_create_bind_group(cache_key)
+}
+
+#[repr(C)]
+#[derive(Pod, Zeroable, Clone, Copy)]
+pub(crate) struct CameraUniform {
+    projection_matrix: Mat4,
+    position: Vec3,
+    _padding: f32,
+}
+
+pub fn create_camera_bind_group(
+    projection: Mat4,
+    position: Vec3,
+    gpu: &mut InternalGraphics,
+    renderer: &WorldRenderer,
+) -> BindGroupCacheHandle {
+    let camera_uniform = CameraUniform {
+        projection_matrix: projection,
+        position: position,
+        _padding: 0.0,
+    };
+
+    gpu.queue.write_buffer(
+        &renderer.camera_buffer,
+        0,
+        bytemuck::cast_slice(&[camera_uniform]),
+    );
+
+    let cache_key = BindGroupCacheKey {
+        layout_num: 0,
+        entries: vec![(
+            0,
+            BindGroupResourceType::Buffer {
+                buffer: renderer.camera_buffer.clone(),
+            },
+        )],
     };
     gpu.get_or_create_bind_group(cache_key)
 }
