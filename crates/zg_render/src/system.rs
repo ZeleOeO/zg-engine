@@ -5,8 +5,9 @@ use winit::{event::WindowEvent, event_loop::ActiveEventLoop};
 use zg_managers::{PointLight, create_light_bind_group};
 use zg_utils::time::Time;
 
-use crate::render_queue::RenderQueue;
-use crate::{render_command::RenderCommand, render_utils::create_transform_bind_group};
+use crate::RenderQueue;
+use crate::render_command::{DrawItem, FrameBinding};
+use crate::render_utils::create_transform_bind_group;
 use zg_graphics::*;
 use zg_managers::Assets;
 use zg_systems::SystemAggregator;
@@ -30,27 +31,14 @@ pub fn render_items_system(world: &mut World, _dt: f32) {
         );
 
     for (mesh, material, transform) in item {
-        let material_bind_group_handle = assets.material_manager.get_material(material.0);
-        let transform_bind_group_handle = create_transform_bind_group(&transform, gpu.as_mut());
         let mesh_meta_data = assets.mesh_manager.get_mesh_data(mesh.0.0);
-
-        render_queue.commands.push(RenderCommand::SetPipeline {
-            pipeline_id: PipelineID::MAIN,
-        });
-        render_queue.commands.push(RenderCommand::SetVertexBuffer {
-            mesh_handle: mesh.0,
-        });
-        render_queue.commands.push(RenderCommand::SetIndexBuffer {
-            index_handle: mesh.0,
-        });
-        render_queue.commands.push(RenderCommand::SetBindGroup {
-            bind_group_handle: material_bind_group_handle,
-        });
-        render_queue.commands.push(RenderCommand::SetBindGroup {
-            bind_group_handle: transform_bind_group_handle,
-        });
-        render_queue.commands.push(RenderCommand::DrawIndexed {
-            num_to_draw: mesh_meta_data.index_count,
+        render_queue.draw_items.push(DrawItem {
+            layer: crate::render_command::RenderLayer::Opaque,
+            pipeline: PipelineID::MAIN,
+            material: assets.material_manager.get_material(material.0),
+            transform: create_transform_bind_group(&transform, gpu.as_mut()),
+            mesh: mesh.0,
+            index_count: mesh_meta_data.index_count,
         });
     }
 }
@@ -65,13 +53,8 @@ pub fn render_lights_system(world: &mut World, _dt: f32) {
     let items = world.get_all_entities_in_archetypes::<(PointLight,)>(&archetypes);
 
     for (light,) in items {
-        let light_bind_group_handle = create_light_bind_group(&mut gpu, light);
-        render_queue.commands.push(RenderCommand::SetPipeline {
-            pipeline_id: PipelineID::MAIN,
-        });
-
-        render_queue.commands.push(RenderCommand::SetBindGroup {
-            bind_group_handle: light_bind_group_handle,
+        render_queue.frame_binding.push(FrameBinding {
+            bind_group: create_light_bind_group(&mut gpu, light),
         });
     }
 }
@@ -91,6 +74,7 @@ pub fn execute_frame(
             })
     };
     let mut render_queue = world.get_mut::<RenderQueue>();
+    let assets = world.get::<Assets>();
     {
         let _ = span!("main render pass");
         let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
@@ -122,7 +106,7 @@ pub fn execute_frame(
             multiview_mask: None,
         });
 
-        render_queue.flush(&mut render_pass, world, graphics);
+        render_queue.flush(&mut render_pass, &assets, graphics);
     }
     {
         let span = span!("submit");

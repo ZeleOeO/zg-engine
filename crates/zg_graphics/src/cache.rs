@@ -6,7 +6,7 @@ use crate::buffer::BindGroupCacheKey;
 use crate::layout::*;
 use crate::pipeline::*;
 
-#[derive(Clone, Copy, Hash, Debug)]
+#[derive(Clone, Copy, Hash, Debug, PartialEq, Eq, PartialOrd, Ord)]
 // position, bind_group_slot
 pub struct BindGroupCacheHandle(pub u32, pub u32);
 

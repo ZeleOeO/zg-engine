@@ -7,7 +7,7 @@ use wgpu::{
 use zg_utils::{ModelVertex, VertexTrait};
 
 #[repr(usize)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug)]
 pub enum PipelineID {
     MAIN = 0,
     LIGHT = 1,

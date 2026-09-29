@@ -13,7 +13,7 @@ use crate::camera::Camera;
 use crate::camera_controller::{CameraController, handle_key_controller};
 
 use zg_graphics::*;
-use zg_render::{RenderCommand, RenderQueue, WorldRenderer, create_camera_bind_group};
+use zg_render::{FrameBinding, RenderQueue, WorldRenderer, create_camera_bind_group};
 use zg_systems::SystemAggregator;
 use zg_world::World;
 
@@ -64,8 +64,8 @@ pub fn camera_update_system(world: &mut World, _dt: f32) {
         let camera_bind_group_cache_handle =
             create_camera_bind_group(view_proj, camera.eye, &mut graphics, &renderer);
 
-        render_queue.commands.push(RenderCommand::SetBindGroup {
-            bind_group_handle: camera_bind_group_cache_handle,
+        render_queue.frame_binding.push(FrameBinding {
+            bind_group: camera_bind_group_cache_handle,
         });
     }
 }

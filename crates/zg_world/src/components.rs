@@ -29,10 +29,10 @@ pub trait ComponentColumn: Any + Debug {
     fn get_entity(&self, row: u32) -> &dyn Any;
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct MaterialHandle(pub u32);
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct MeshHandle(pub u32);
 
 #[derive(Clone, Copy, Debug)]
@@ -61,7 +61,13 @@ impl Transform {
             ..Default::default()
         }
     }
-    pub fn with_scale(mut self, x_scale: f32, y_scale: f32, z_scale: f32) -> Self {
+
+    pub fn with_uniform_scale(mut self, scale: f32) -> Self {
+        self.scale = [scale, scale, scale];
+        self
+    }
+
+    pub fn with_scale_xyz(mut self, x_scale: f32, y_scale: f32, z_scale: f32) -> Self {
         self.scale = [x_scale, y_scale, z_scale];
         self
     }

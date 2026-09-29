@@ -55,7 +55,8 @@ fn vs_main(in: VertexInput) -> VertexOutput {
     var out: VertexOutput;
     out.tex_cords = in.tex_cords;
     let world_position = model_transform.transform * vec4<f32>(in.position, 1.0);
-    out.normal = (model_transform.transform * vec4<f32>(in.normal, 1.0)).xyz;
+    // out.normal = (model_transform.transform * vec4<f32>(in.normal, 1.0)).xyz;
+    out.normal = in.normal;
     out.world_position = world_position.xyz;
     out.clip_position = camera.projection * world_position;
     return out;
@@ -69,14 +70,31 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
         material_uniform.has_texture == 1.0
     );
 
-    let light = normalize(light_uniform.position - in.world_position);
+    //let light_dir = normalize(light_uniform.position - in.world_position);
+
+    //let shaded = clamp(dot(light, normal), 0.0, 1.0);
+    // let light_final = shaded * light_uniform.color * lit(light, normal, view);
+
+    //let final_color = base_color * light_final;
+
+    // ambient lighting
+    let ambient_light_intensity = 0.2;
+    let ambient_color = ambient_light_intensity * light_uniform.color;
+
+    // diffuse lighting
+    let light_dir = normalize(light_uniform.position - in.world_position);
+    let diffuse_strength = max(dot(in.normal, light_dir), 0.0);
+    let diffuse_color = light_uniform.color * diffuse_strength;
+
+    // specular lighting
     let normal = normalize(in.normal);
     let view = normalize(camera.position - in.world_position);
+    let reflect_dir = reflect(-light_dir, normal);
+    let specular_strength = pow(max(dot(view, reflect_dir), 0.0), 32.0);
 
-    let shaded = clamp(dot(light, normal), 0.0, 1.0);
-    let light_final = shaded * light_uniform.color * lit(light, normal, view);
-
-    let final_color = base_color + light_final;
+    let light_final = ambient_color + diffuse_color;
+    // let final_color = base_color * lightFinal;
+    let final_color = vec3<f32>(0.0, 0.0, 0.0) * light_final;
 
     return vec4<f32>(final_color, 1.0);
 }
