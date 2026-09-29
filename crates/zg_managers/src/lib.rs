@@ -11,7 +11,7 @@ mod light;
 pub mod material;
 pub mod mesh;
 
-pub use light::{PointLight, create_light_bind_group};
+pub use light::{PointLight, create_light_bind_group, get_or_create_default_light_material};
 
 #[derive(Debug)]
 pub struct Assets {

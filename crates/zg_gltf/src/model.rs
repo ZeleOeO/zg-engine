@@ -104,7 +104,7 @@ impl Model {
 
         let mut spawned_entities = Vec::new();
         for (mesh, material) in components_to_spawn {
-            let entity = world.spawn((mesh, material, Transform::default()));
+            let entity = world.spawn((mesh, material, Transform::IDENTITY));
             spawned_entities.push(entity);
         }
 

@@ -7,7 +7,18 @@ fn main() -> anyhow::Result<()> {
 pub fn instantiate_mesh(world: &mut World) {
     let chicken = Model::load_obj(world, "assets/obj/animals_obj/chicken_001.obj").unwrap();
 
-    world.spawn((PointLight::new([-2.0, 1.0, 1.0], [1.0, 1.0, 1.0]),));
+    let graphics = world.get_mut::<InternalGraphics>();
+    let mut assets = world.get_mut::<Assets>();
+
+    let cube_mesh = assets.create_cube(&graphics);
+
+    drop(graphics);
+    drop(assets);
+
+    world.spawn((
+        PointLight::new([0.0, 0.5, -0.6], [1.0, 1.0, 1.0]),
+        cube_mesh,
+    ));
     println!("Spawned object as entities: {:?}", chicken);
 }
 

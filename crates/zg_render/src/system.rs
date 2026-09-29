@@ -2,7 +2,7 @@ use tracy_client::span;
 use wgpu::{CurrentSurfaceTexture, TextureView};
 use winit::{event::WindowEvent, event_loop::ActiveEventLoop};
 
-use zg_managers::{PointLight, create_light_bind_group};
+use zg_managers::{PointLight, create_light_bind_group, get_or_create_default_light_material};
 use zg_utils::time::Time;
 
 use crate::RenderQueue;
@@ -59,6 +59,31 @@ pub fn render_lights_system(world: &mut World, _dt: f32) {
     }
 }
 
+pub fn render_light_gizmo_system(world: &mut World, _dt: f32) {
+    let _span = span!("render light gizmos");
+    let mut render_queue = world.get_mut::<RenderQueue>();
+    let mut gpu = world.get_mut::<InternalGraphics>();
+    let assets = world.get_mut::<Assets>();
+
+    let archetype_ids = world.get_archetype_ids::<(PointLight, MeshComponent)>();
+    let archetypes = world.get_archetypes_by_id(archetype_ids.as_slice());
+    let items = world.get_all_entities_in_archetypes::<(PointLight, MeshComponent)>(&archetypes);
+
+    for (light, mesh) in items {
+        let mesh_meta_data = assets.mesh_manager.get_mesh_data(mesh.0.0);
+        let transform =
+            Transform::from_translation(light.position[0], light.position[1], light.position[2]);
+        render_queue.draw_items.push(DrawItem {
+            layer: crate::RenderLayer::Overlay,
+            pipeline: PipelineID::LIGHT,
+            material: get_or_create_default_light_material(&mut gpu),
+            transform: create_transform_bind_group(&transform, &mut gpu),
+            mesh: mesh.0,
+            index_count: mesh_meta_data.index_count,
+        });
+    }
+}
+
 pub fn execute_frame(
     graphics: &mut InternalGraphics,
     world: &mut World,
@@ -85,9 +110,9 @@ pub fn execute_frame(
                 resolve_target: None,
                 ops: wgpu::Operations {
                     load: wgpu::LoadOp::Clear(wgpu::Color {
-                        r: 0.1,
-                        g: 0.2,
-                        b: 0.3,
+                        r: 0.0,
+                        g: 0.0,
+                        b: 0.0,
                         a: 1.0,
                     }),
                     store: wgpu::StoreOp::Store,
@@ -170,5 +195,6 @@ pub fn graphics_window_event_system(
 pub fn system(system: &mut SystemAggregator) {
     system.insert_update_system(render_lights_system);
     system.insert_update_system(render_items_system);
+    system.insert_update_system(render_light_gizmo_system);
     system.insert_window_event_sytem(graphics_window_event_system);
 }

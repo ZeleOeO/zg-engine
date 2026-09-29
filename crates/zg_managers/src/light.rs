@@ -6,10 +6,12 @@ use zg_graphics::{
 };
 use zg_utils::math::Vec3;
 
+use crate::material::{MaterialManager, MaterialUniform};
+
 #[derive(Debug)]
 pub struct PointLight {
-    position: Vec3,
-    color: Vec3,
+    pub position: Vec3,
+    pub color: Vec3,
 }
 
 #[derive(Clone, Pod, Copy, Zeroable)]
@@ -52,6 +54,40 @@ pub fn create_light_bind_group(
                 buffer: light_buffer,
             },
         )],
+    };
+
+    gpu.get_or_create_bind_group(cache_key)
+}
+
+pub fn get_or_create_default_light_material(gpu: &mut InternalGraphics) -> BindGroupCacheHandle {
+    let buffer = gpu.device.create_buffer_init(&BufferInitDescriptor {
+        label: Some("Buffer Init Descriptor Matieral Color"),
+        contents: bytemuck::cast_slice(&[MaterialUniform {
+            color: [1.0, 1.0, 1.0],
+            has_texture: 0.0,
+        }]),
+        usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
+    });
+
+    let dummy_texture = MaterialManager::create_dummy_texture(gpu);
+
+    let cache_key = BindGroupCacheKey {
+        layout_num: 1,
+        entries: vec![
+            (2, BindGroupResourceType::Buffer { buffer }),
+            (
+                1,
+                BindGroupResourceType::Sampler {
+                    sampler: dummy_texture.sampler,
+                },
+            ),
+            (
+                0,
+                BindGroupResourceType::Texture {
+                    texture_view: dummy_texture.view,
+                },
+            ),
+        ],
     };
 
     gpu.get_or_create_bind_group(cache_key)

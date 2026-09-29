@@ -15,9 +15,9 @@ use zg_world::components::MaterialHandle;
 
 #[repr(C)]
 #[derive(Pod, Zeroable, Clone, Copy)]
-struct MaterialUniform {
-    color: Vec3,
-    has_texture: f32,
+pub(crate) struct MaterialUniform {
+    pub color: Vec3,
+    pub has_texture: f32,
 }
 
 #[derive(Clone, Debug)]
@@ -233,7 +233,7 @@ impl MaterialManager {
         })
     }
 
-    fn create_dummy_texture(gpu: &InternalGraphics) -> TextureData {
+    pub(crate) fn create_dummy_texture(gpu: &InternalGraphics) -> TextureData {
         let texture = gpu.device.create_texture(&wgpu::TextureDescriptor {
             label: Some("Dummy Texture"),
             size: wgpu::Extent3d {

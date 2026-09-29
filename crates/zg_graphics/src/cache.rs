@@ -16,7 +16,7 @@ pub struct Cache {
     pub(crate) layouts: Vec<BindGroupLayout>,
     // Hashmap for matching the bind group cachekey and the bind group cache handle
     pub bind_groups_cache_map: HashMap<BindGroupCacheKey, BindGroupCacheHandle>,
-    pub pipelines: [wgpu::RenderPipeline; 1],
+    pub pipelines: [wgpu::RenderPipeline; 2],
     // Dense Array of bind groups
     pub cached_bind_groups: Vec<BindGroup>,
 }
@@ -37,7 +37,7 @@ impl Cache {
 
         let pipelines = [
             main_pipeline(device, config, &bg_layouts).unwrap(),
-            // light_pipeline(device, config, &bg_layouts).unwrap(),
+            light_pipeline(device, config, &bg_layouts).unwrap(),
         ];
 
         let layouts = vec![
