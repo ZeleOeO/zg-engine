@@ -1,9 +1,8 @@
-use std::any::TypeId;
-
 use tracy_client::span;
 use wgpu::{CurrentSurfaceTexture, TextureView};
 use winit::{event::WindowEvent, event_loop::ActiveEventLoop};
 
+use zg_managers::{PointLight, create_light_bind_group};
 use zg_utils::time::Time;
 
 use crate::render_queue::RenderQueue;
@@ -14,22 +13,21 @@ use zg_systems::SystemAggregator;
 use zg_world::{ResourceMut, World, components::*};
 
 pub fn render_items_system(world: &mut World, _dt: f32) {
-    let components = vec![
-        TypeId::of::<MeshComponent>(),
-        TypeId::of::<MaterialComponent>(),
-        TypeId::of::<Transform>(),
-    ];
+    let span = span!("render items");
+    span.emit_color(0x3A9453);
 
     let mut render_queue = world.get_mut::<RenderQueue>();
     let assets = &world.get::<Assets>();
 
     let mut gpu = world.get_mut::<InternalGraphics>();
 
-    let archetype_id = &world.get_archetype_by_type_ids(components).unwrap();
-    let archetype = &world.archetypes[archetype_id.archetype_id.0 as usize];
+    let archetype_id = world.get_archetype_ids::<(MeshComponent, MaterialComponent, Transform)>();
+    let archetype = world.get_archetypes_by_id(archetype_id.as_slice());
 
     let item = world
-        .get_all_entities_in_archetype::<(MeshComponent, MaterialComponent, Transform)>(archetype);
+        .get_all_entities_in_archetypes::<(MeshComponent, MaterialComponent, Transform)>(
+            &archetype,
+        );
 
     for (mesh, material, transform) in item {
         let material_bind_group_handle = assets.material_manager.get_material(material.0);
@@ -53,6 +51,27 @@ pub fn render_items_system(world: &mut World, _dt: f32) {
         });
         render_queue.commands.push(RenderCommand::DrawIndexed {
             num_to_draw: mesh_meta_data.index_count,
+        });
+    }
+}
+
+pub fn render_lights_system(world: &mut World, _dt: f32) {
+    let _span = span!("render light");
+    let mut render_queue = world.get_mut::<RenderQueue>();
+    let mut gpu = world.get_mut::<InternalGraphics>();
+
+    let archetype_ids = world.get_archetype_ids::<(PointLight,)>();
+    let archetypes = world.get_archetypes_by_id(archetype_ids.as_slice());
+    let items = world.get_all_entities_in_archetypes::<(PointLight,)>(&archetypes);
+
+    for (light,) in items {
+        let light_bind_group_handle = create_light_bind_group(&mut gpu, light);
+        render_queue.commands.push(RenderCommand::SetPipeline {
+            pipeline_id: PipelineID::MAIN,
+        });
+
+        render_queue.commands.push(RenderCommand::SetBindGroup {
+            bind_group_handle: light_bind_group_handle,
         });
     }
 }
@@ -165,6 +184,7 @@ pub fn graphics_window_event_system(
 }
 
 pub fn system(system: &mut SystemAggregator) {
+    system.insert_update_system(render_lights_system);
     system.insert_update_system(render_items_system);
     system.insert_window_event_sytem(graphics_window_event_system);
 }

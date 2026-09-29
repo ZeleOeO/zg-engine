@@ -128,10 +128,11 @@ impl World {
         let mut archetype_ids: Vec<ArchetypeID> = Vec::new();
         let type_ids: HashSet<TypeId> = T::get_archetype();
         for archetype in self.archetypes.iter() {
-            if archetype.components == type_ids {
+            if type_ids.iter().all(|t| archetype.components.contains(t)) {
                 archetype_ids.push(archetype.archetype_id);
             }
         }
+
         if archetype_ids.len() <= 0 {
             panic!("No archetype found");
         }

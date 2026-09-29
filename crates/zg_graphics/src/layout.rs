@@ -8,7 +8,7 @@ pub fn create_camera_layout(device: &Device) -> BindGroupLayout {
         entries: &[BindGroupLayoutEntry {
             binding: 0,
             count: None,
-            visibility: ShaderStages::VERTEX,
+            visibility: ShaderStages::VERTEX_FRAGMENT,
             ty: wgpu::BindingType::Buffer {
                 ty: wgpu::BufferBindingType::Uniform,
                 has_dynamic_offset: false,

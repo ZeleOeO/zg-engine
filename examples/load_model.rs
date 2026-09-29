@@ -5,8 +5,9 @@ fn main() -> anyhow::Result<()> {
 }
 
 pub fn instantiate_mesh(world: &mut World) {
-    let chicken = Model::load_obj(world, "assets/obj/animals_obj/chicken_001.obj").unwrap();
-    println!("Spawned object as entities: {:?}", chicken);
+    let _chicken = Model::load_obj(world, "assets/obj/animals_obj/chicken_001.obj").unwrap();
+
+    world.spawn((PointLight::new([5.0, 2.0, 1.0], [1.0, 0.0, 0.0]),));
 }
 
 pub fn show_system(system: &mut SystemAggregator) {

@@ -7,9 +7,11 @@ use crate::{
 use zg_utils::ModelVertex;
 use zg_world::components::{MaterialComponent, MeshComponent};
 
-pub mod light;
+mod light;
 pub mod material;
 pub mod mesh;
+
+pub use light::{PointLight, create_light_bind_group};
 
 #[derive(Debug)]
 pub struct Assets {

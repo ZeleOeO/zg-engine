@@ -26,11 +26,13 @@ impl Cache {
         let camera_layout = create_camera_layout(&device);
         let material_layout = create_material_bg_layout(&device);
         let item_uniform_layout = create_item_uniform_layout(&device);
+        let light_layout = create_light_uniform_layout(&device);
 
         let bg_layouts = [
             Some(&camera_layout),
             Some(&material_layout),
             Some(&item_uniform_layout),
+            Some(&light_layout),
         ];
 
         let pipelines = [
@@ -38,7 +40,12 @@ impl Cache {
             // light_pipeline(device, config, &bg_layouts).unwrap(),
         ];
 
-        let layouts = vec![camera_layout, material_layout, item_uniform_layout];
+        let layouts = vec![
+            camera_layout,
+            material_layout,
+            item_uniform_layout,
+            light_layout,
+        ];
         Cache {
             layouts,
             bind_groups_cache_map: HashMap::default(),

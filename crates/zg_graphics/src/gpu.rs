@@ -118,7 +118,6 @@ impl InternalGraphics {
                 *occupied.get()
             }
             hash_map::Entry::Vacant(vacant) => {
-                // println!("Missed {:#?}", vacant);
                 let key_ref = vacant.key();
                 let layout = &self.cache.layouts[key_ref.layout_num as usize];
                 let entries = key_ref
