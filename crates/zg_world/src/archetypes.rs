@@ -1,11 +1,12 @@
 use std::{
     any::{Any, TypeId},
+    collections::HashSet,
     fmt::Debug,
 };
 
 use crate::{bundle::Bundle, components::ComponentColumn};
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, PartialOrd)]
 pub struct ArchetypeID(pub u32);
 
 #[derive(Clone, Copy, Debug)]
@@ -15,7 +16,7 @@ pub struct Entity(pub u32);
 pub struct Archetype {
     pub archetype_id: ArchetypeID,
     pub entities: Vec<Entity>,
-    pub components: Vec<TypeId>,
+    pub components: HashSet<TypeId>,
     pub columns: Vec<Column>,
 }
 
@@ -48,7 +49,7 @@ impl Archetype {
         }
     }
 
-    pub fn new_with_type_ids(type_ids: Vec<TypeId>, archetype_id: ArchetypeID) -> Self {
+    pub fn new_with_type_ids(type_ids: HashSet<TypeId>, archetype_id: ArchetypeID) -> Self {
         Self {
             archetype_id: archetype_id,
             entities: Vec::new(),

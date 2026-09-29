@@ -5,6 +5,7 @@ use std::{
     marker::PhantomData,
 };
 
+use std::collections::HashSet;
 use zg_utils::TypeIdMap;
 
 use crate::{
@@ -39,7 +40,7 @@ impl World {
 
     // Replacing the T with a trait Bundle
     pub fn spawn<T: Bundle + Debug + 'static>(&mut self, bundle: T) -> Entity {
-        let archetype_id = self.get_or_create_archetype_id_by_bundle::<T>();
+        let archetype_id = self.get_or_create_archetype_id::<T>();
         let archetype = &mut self.archetypes[archetype_id.0 as usize];
         bundle.insert_into(archetype);
 
@@ -98,38 +99,44 @@ impl World {
         self.resources.insert(TypeId::of::<R>(), item);
     }
 
-    // pub fn get_or_create_archetype_by_items<T: 'static>(&mut self, items: &Vec<T>) -> &Archetype {
-    //     let archetype_id = self.get_or_create_archetype_id_by_items(items);
-    //     let archetype = Self::get_archetype_by_id(self, archetype_id);
-    //     archetype
-    // }
+    pub fn get_or_create_archetype_id<T: Bundle + 'static>(&mut self) -> ArchetypeID {
+        let type_ids: HashSet<TypeId> = T::get_archetype();
 
-    pub fn get_or_create_archetype_id_by_bundle<T: Bundle + 'static>(&mut self) -> ArchetypeID {
-        let type_ids: Vec<TypeId> = T::get_archetype();
         for archetype in self.archetypes.iter() {
-            if archetype.components.iter().all(|c| type_ids.contains(c)) {
+            if archetype.components == type_ids {
                 return archetype.archetype_id;
             }
         }
-        let arch_id = ArchetypeID(self.archetypes.len() as u32);
 
+        let arch_id = ArchetypeID(self.archetypes.len() as u32);
         let archetype = Archetype::new::<T>(arch_id);
         self.archetypes.push(archetype);
         arch_id
     }
 
-    pub fn get_or_create_archetype_id_by_type_ids(&mut self, type_ids: Vec<TypeId>) -> ArchetypeID {
+    pub fn get_archetype_id<T: Bundle + 'static>(&self) -> Option<ArchetypeID> {
+        let type_ids: HashSet<TypeId> = T::get_archetype();
         for archetype in self.archetypes.iter() {
-            if archetype.components.iter().all(|c| type_ids.contains(c)) {
-                return archetype.archetype_id;
+            if archetype.components == type_ids {
+                return Some(archetype.archetype_id);
             }
         }
+        None
+    }
 
-        let arch_id = ArchetypeID(self.archetypes.len() as u32);
+    pub fn get_archetype_ids<T: Bundle + 'static>(&self) -> Vec<ArchetypeID> {
+        let mut archetype_ids: Vec<ArchetypeID> = Vec::new();
+        let type_ids: HashSet<TypeId> = T::get_archetype();
+        for archetype in self.archetypes.iter() {
+            if archetype.components == type_ids {
+                archetype_ids.push(archetype.archetype_id);
+            }
+        }
+        if archetype_ids.len() <= 0 {
+            panic!("No archetype found");
+        }
 
-        let archetype = Archetype::new_with_type_ids(type_ids, arch_id);
-        self.archetypes.push(archetype);
-        arch_id
+        archetype_ids
     }
 
     pub fn get_archetype_by_id(&self, archetype_id: ArchetypeID) -> &Archetype {
@@ -140,13 +147,11 @@ impl World {
         &mut self.archetypes[archetype_id.0 as usize]
     }
 
-    pub fn get_archetype_by_type_ids(&self, type_ids: Vec<TypeId>) -> Option<&Archetype> {
-        for archetype in self.archetypes.iter() {
-            if archetype.components.iter().all(|c| type_ids.contains(c)) {
-                return Some(self.get_archetype_by_id(archetype.archetype_id));
-            }
-        }
-        None
+    pub fn get_archetypes_by_id(&self, archetype_ids: &[ArchetypeID]) -> Vec<&Archetype> {
+        self.archetypes
+            .iter()
+            .filter(|arch| archetype_ids.contains(&arch.archetype_id))
+            .collect()
     }
 
     fn query<'w, D: QueryData<'w>>(&'w self) -> Query<'w, D> {
@@ -166,5 +171,15 @@ impl World {
     ) -> Vec<D::Output> {
         let query = self.query::<D>();
         query.iter(archetype).collect::<Vec<D::Output>>()
+    }
+
+    pub fn get_all_entities_in_archetypes<'w, D: QueryData<'w> + 'static>(
+        &'w self,
+        archetypes: &Vec<&Archetype>,
+    ) -> Vec<D::Output> {
+        let query = self.query::<D>();
+        query
+            .iter_all(archetypes.as_slice())
+            .collect::<Vec<D::Output>>()
     }
 }

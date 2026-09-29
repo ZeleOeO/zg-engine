@@ -46,14 +46,22 @@ pub struct Query<'w, D: QueryData<'w>> {
 }
 //
 impl<'w, D: QueryData<'w>> Query<'w, D> {
-    // fn iter(&self) -> impl Iterator<Item = D::Output> + '_ {}
-
     pub fn get(&self, row: u32) -> D::Output {
         D::get(self.world, row as usize)
     }
 
     pub fn iter(&self, archetype: &Archetype) -> impl Iterator<Item = D::Output> + '_ {
         let entities = archetype.entities.clone();
-        entities.into_iter().map(move |entity| D::get(self.world, entity.0 as usize))
+        let item = entities
+            .into_iter()
+            .map(move |entity| D::get(self.world, entity.0 as usize));
+        item
+    }
+
+    pub fn iter_all<'a>(
+        &'a self,
+        archetypes: &'a [&Archetype],
+    ) -> impl Iterator<Item = D::Output> + 'a {
+        archetypes.iter().flat_map(move |arch| self.iter(arch))
     }
 }

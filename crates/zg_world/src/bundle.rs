@@ -1,10 +1,10 @@
-use std::any::TypeId;
+use std::{any::TypeId, collections::HashSet};
 
 use crate::archetypes::{Archetype, Column};
 
 pub trait Bundle {
     fn insert_into(self, archetype: &mut Archetype);
-    fn get_archetype() -> Vec<TypeId>;
+    fn get_archetype() -> HashSet<TypeId>;
     fn empty_columns() -> Vec<Column>;
 }
 
@@ -20,8 +20,8 @@ macro_rules! impl_tuple_for_bundle {
                 ($(archetype.insert_component($T )), *);
 
             }
-            fn get_archetype() -> Vec<TypeId> {
-                vec![$(TypeId::of::<$T>()), *]
+            fn get_archetype() -> HashSet<TypeId> {
+                vec![$(TypeId::of::<$T>()), *].into_iter().collect()
             }
 
             fn empty_columns() -> Vec<Column> {
