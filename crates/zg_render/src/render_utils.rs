@@ -3,17 +3,18 @@ use wgpu::util::{BufferInitDescriptor, DeviceExt};
 use bytemuck::{Pod, Zeroable};
 use zg_graphics::*;
 use zg_utils::math::{
-    Mat4, Vec3, mat4_mul, mat4_transpose, vec3_general_rotation_matrix, vec3_scaling_matrix,
-    vec3_translation_matrix,
+    Mat4, Vec3, invert_mat3, mat4_mul, mat4_to_mat3, mat4_transpose, vec3_general_rotation_matrix,
+    vec3_scaling_matrix, vec3_translation_matrix,
 };
 use zg_world::components::Transform;
 
 use crate::WorldRenderer;
 
-#[derive(Clone, Pod, Copy, Zeroable)]
 #[repr(C)]
-pub(crate) struct ItemUniform {
-    transform: Mat4,
+#[derive(Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]
+struct ItemUniform {
+    transform: [[f32; 4]; 4],
+    normal: [[f32; 4]; 3],
 }
 
 pub fn create_transform_bind_group(
@@ -38,8 +39,15 @@ pub fn create_transform_bind_group(
 
         mat4_mul(translation_matrix, mat4_mul(rotation_matrix, scale_matrix))
     };
+
+    let normal = invert_mat3(mat4_to_mat3(matrix)).unwrap();
     let item_uniform = ItemUniform {
         transform: mat4_transpose(matrix),
+        normal: [
+            [normal[0][0], normal[0][1], normal[0][2], 0.0],
+            [normal[1][0], normal[1][1], normal[1][2], 0.0],
+            [normal[2][0], normal[2][1], normal[2][2], 0.0],
+        ],
     };
     let buffer = gpu.device.create_buffer_init(&BufferInitDescriptor {
         label: None,

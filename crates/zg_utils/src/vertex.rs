@@ -33,7 +33,8 @@ impl VertexTrait for ModelVertex {
                 },
                 VertexAttribute {
                     format: VertexFormat::Float32x3,
-                    offset: std::mem::size_of::<[f32; 2]>() as BufferAddress,
+                    offset: (std::mem::size_of::<[f32; 2]>() + std::mem::size_of::<[f32; 3]>())
+                        as BufferAddress,
                     shader_location: 2,
                 },
             ],

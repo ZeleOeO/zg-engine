@@ -28,7 +28,7 @@ pub fn instantiate_mesh(world: &mut World) {
 
     // I could get the vector of the typeId interestingly
 
-    world.spawn((cube_mesh, tree_material, Transform::IDENTITY));
+    world.spawn((prism_mesh, tree_material, Transform::IDENTITY));
     world.spawn((
         prism_mesh,
         color_mat,
@@ -38,11 +38,6 @@ pub fn instantiate_mesh(world: &mut World) {
         cube_mesh,
         color_mat,
         Transform::from_translation(8.0, 2.0, 3.0).with_uniform_scale(4.0),
-    ));
-
-    world.spawn((
-        PointLight::new([1.0, 0.5, -0.6], [1.0, 1.0, 1.0]),
-        cube_mesh,
     ));
 }
 

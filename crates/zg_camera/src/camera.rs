@@ -57,12 +57,7 @@ impl Camera {
         [
             [focal / aspect, 0.0, 0.0, 0.0],
             [0.0, -focal, 0.0, 0.0],
-            [
-                0.0,
-                0.0,
-                (zfar + znear) * depth,
-                (znear * zfar * 2.0 * depth),
-            ],
+            [0.0, 0.0, zfar * depth, znear * zfar * depth],
             [0.0, 0.0, -1.0, 0.0],
         ]
     }

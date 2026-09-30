@@ -16,7 +16,7 @@ pub fn instantiate_mesh(world: &mut World) {
     drop(assets);
 
     world.spawn((
-        PointLight::new([0.0, 0.5, -0.6], [1.0, 1.0, 1.0]),
+        PointLight::new([0.8, 0.5, -0.6], [1.0, 1.0, 1.0]),
         cube_mesh,
     ));
     println!("Spawned object as entities: {:?}", chicken);

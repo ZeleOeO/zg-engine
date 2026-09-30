@@ -39,7 +39,7 @@ pub fn main_pipeline(
             topology: wgpu::PrimitiveTopology::TriangleList,
             strip_index_format: None,
             front_face: FrontFace::Cw,
-            cull_mode: Some(Face::Back),
+            cull_mode: None,
             ..Default::default()
         },
         depth_stencil: Some(DepthStencilState {
