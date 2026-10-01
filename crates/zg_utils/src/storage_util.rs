@@ -1,6 +1,7 @@
+use std::any::Any;
 use std::any::TypeId;
 use std::collections::HashMap;
-use std::hash::{BuildHasherDefault, Hasher};
+use std::hash::{BuildHasherDefault, Hash, Hasher};
 
 #[derive(Default)]
 pub struct IdentityHasher(u64);
@@ -24,3 +25,41 @@ pub fn load_binary(location: &str) -> anyhow::Result<Vec<u8>> {
     let data = std::fs::read(location)?;
     Ok(data)
 }
+
+pub trait DynHash: Any {
+    fn as_any(&self) -> &dyn Any;
+    fn dyn_hash(&self, state: &mut dyn Hasher);
+    fn dyn_eq(&self, other: &dyn DynHash) -> bool;
+}
+
+impl<T> DynHash for T
+where
+    T: Hash + Eq + Any,
+{
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+    fn dyn_hash(&self, mut state: &mut dyn Hasher) {
+        self.hash(&mut state);
+    }
+    fn dyn_eq(&self, other: &dyn DynHash) -> bool {
+        other
+            .as_any()
+            .downcast_ref::<T>()
+            .map_or(false, |o| self == o)
+    }
+}
+
+impl Hash for dyn DynHash {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.dyn_hash(state);
+    }
+}
+
+impl PartialEq for dyn DynHash {
+    fn eq(&self, other: &Self) -> bool {
+        self.dyn_eq(other)
+    }
+}
+
+impl Eq for dyn DynHash {}

@@ -12,7 +12,7 @@ use crate::{
     archetypes::{Archetype, ArchetypeID, Entity},
     bundle::Bundle,
     query::{Query, QueryData},
-    resources::{Resource, ResourceMut, ResourceRef},
+    resources::{Res, ResMut, Resource},
 };
 
 pub struct World {
@@ -61,22 +61,22 @@ impl World {
         entity
     }
 
-    pub fn get<R: Resource + 'static>(&self) -> ResourceRef<'_, R> {
+    pub fn get<R: Resource + 'static>(&self) -> Res<'_, R> {
         let item = self.resources.get(&TypeId::of::<R>()).unwrap();
         let borrowed = item.try_borrow().unwrap();
         let resource = Ref::map(borrowed, |resource| {
             resource.as_ref().as_any().downcast_ref::<R>().unwrap()
         });
-        ResourceRef(resource)
+        Res(resource)
     }
 
-    pub fn get_mut<R: Resource + 'static>(&self) -> ResourceMut<'_, R> {
+    pub fn get_mut<R: Resource + 'static>(&self) -> ResMut<'_, R> {
         let item = self.resources.get(&TypeId::of::<R>()).unwrap();
         let borrow_mut = item.try_borrow_mut().unwrap();
         let resource = RefMut::map(borrow_mut, |resource| {
             resource.as_mut().as_any_mut().downcast_mut::<R>().unwrap()
         });
-        ResourceMut(resource)
+        ResMut(resource)
     }
 
     pub fn insert<R: Resource + 'static>(&mut self, resource: R) {
@@ -89,13 +89,13 @@ impl World {
         resource
     }
 
-    pub fn resource_scope<R: Resource>(&mut self, f: impl FnOnce(&mut World, ResourceMut<R>)) {
+    pub fn resource_scope<R: Resource>(&mut self, f: impl FnOnce(&mut World, ResMut<R>)) {
         let item = self.remove::<R>();
         let borrow_mut = item.try_borrow_mut().unwrap();
         let resource = RefMut::map(borrow_mut, |resource| {
             resource.as_mut().as_any_mut().downcast_mut::<R>().unwrap()
         });
-        f(self, ResourceMut(resource));
+        f(self, ResMut(resource));
         self.resources.insert(TypeId::of::<R>(), item);
     }
 

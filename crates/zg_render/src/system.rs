@@ -11,7 +11,7 @@ use crate::render_utils::create_transform_bind_group;
 use zg_graphics::*;
 use zg_managers::Assets;
 use zg_systems::SystemAggregator;
-use zg_world::{ResourceMut, World, components::*};
+use zg_world::{ResMut, World, components::*};
 
 pub fn render_items_system(world: &mut World, _dt: f32) {
     let span = span!("render items");
@@ -33,7 +33,7 @@ pub fn render_items_system(world: &mut World, _dt: f32) {
     for (mesh, material, transform) in item {
         let mesh_meta_data = assets.mesh_manager.get_mesh_data(mesh.0.0);
         render_queue.draw_items.push(DrawItem {
-            layer: crate::render_command::RenderLayer::Opaque,
+            layer: crate::RenderLayer::Opaque,
             pipeline: PipelineID::MAIN,
             material: assets.material_manager.get_material(material.0),
             transform: create_transform_bind_group(&transform, gpu.as_mut()),
@@ -177,7 +177,7 @@ pub fn graphics_window_event_system(
                     .texture
                     .create_view(&wgpu::TextureViewDescriptor::default())
             };
-            world.resource_scope(|world, mut gpu: ResourceMut<InternalGraphics>| {
+            world.resource_scope(|world, mut gpu: ResMut<InternalGraphics>| {
                 execute_frame(&mut gpu, world, &view);
             });
 

@@ -169,6 +169,7 @@ pub struct Update {}
 #[derive(Debug)]
 pub struct WindowSystemEvent {}
 
+#[derive(Debug)]
 pub struct DeviceSystemEvent {}
 
 impl SystemFunction for Setup {
