@@ -21,17 +21,6 @@ pub fn create_transform_bind_group(
     transform: &Transform,
     gpu: &mut InternalGraphics,
 ) -> BindGroupCacheHandle {
-    // so we want to get the mat 4 of the transform
-    // which we create with the components
-    // we can create a way to convert the stuff to a mat4 in here sha
-    // sort of like
-    // let matrix = scale(rotation(vec3_translation_matrix(transform.position)))
-    // or we do scalematrix and then rotation matrix and then translation
-    // and then matrix multiply
-    // and then transpose
-    // seems fair?
-    // maybe if we were to make it async, we would spawn threads for them wait for the results and
-    // then work
     let matrix = {
         let scale_matrix = vec3_scaling_matrix(transform.scale());
         let rotation_matrix = vec3_general_rotation_matrix(transform.rotation());

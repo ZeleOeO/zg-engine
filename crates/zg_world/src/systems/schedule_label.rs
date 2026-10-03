@@ -19,17 +19,17 @@ impl PartialEq for dyn ScheduleLabel {
 impl Eq for dyn ScheduleLabel {}
 
 #[derive(Clone, Copy, Hash, PartialEq, Eq, Debug)]
-pub struct Setup1 {}
-impl ScheduleLabel for Setup1 {}
+pub struct Setup;
+impl ScheduleLabel for Setup {}
 
 #[derive(Clone, Copy, Hash, PartialEq, Eq, Debug)]
-pub struct Update1 {}
-impl ScheduleLabel for Update1 {}
+pub struct Update;
+impl ScheduleLabel for Update {}
 
 #[derive(Clone, Copy, Hash, PartialEq, Eq, Debug)]
-pub struct WindowSystemEvent1 {}
-impl ScheduleLabel for WindowSystemEvent1 {}
+pub struct WindowSystemEvent;
+impl ScheduleLabel for WindowSystemEvent {}
 
 #[derive(Clone, Copy, Hash, PartialEq, Eq, Debug)]
-pub struct DeviceSystemEvent1 {}
-impl ScheduleLabel for DeviceSystemEvent1 {}
+pub struct DeviceSystemEvent;
+impl ScheduleLabel for DeviceSystemEvent {}

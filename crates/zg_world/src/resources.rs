@@ -5,7 +5,7 @@ use std::{
     ops::{Deref, DerefMut},
 };
 
-use crate::{World, systems::SystemParam};
+use crate::{SystemContext, systems::SystemParam};
 
 pub trait Resource: 'static + Debug {
     fn as_any(&self) -> &dyn Any;
@@ -68,14 +68,14 @@ impl<R: Resource> AsRef<R> for ResMut<'_, R> {
 
 impl<R: Resource> SystemParam for ResMut<'_, R> {
     type Item<'w> = ResMut<'w, R>;
-    fn extract_world_context<'w>(context: &'w World) -> Self::Item<'w> {
-        context.get_mut::<R>()
+    fn extract_world_context<'w>(context: &'w SystemContext) -> Self::Item<'w> {
+        context.world.get_mut::<R>()
     }
 }
 
 impl<R: Resource> SystemParam for Res<'_, R> {
     type Item<'w> = Res<'w, R>;
-    fn extract_world_context<'w>(context: &'w World) -> Self::Item<'w> {
-        context.get::<R>()
+    fn extract_world_context<'w>(context: &'w SystemContext) -> Self::Item<'w> {
+        context.world.get::<R>()
     }
 }

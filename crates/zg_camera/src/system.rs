@@ -8,17 +8,15 @@ use winit::{
     event::{KeyEvent, WindowEvent},
     keyboard::{KeyCode, PhysicalKey},
 };
+use zg_utils::time::Time;
 
 use crate::camera::Camera;
 use crate::camera_controller::{CameraController, handle_key_controller};
 
 use zg_graphics::*;
 use zg_render::{FrameBinding, RenderQueue, WorldRenderer, create_camera_bind_group};
-use zg_systems::SystemAggregator;
-use zg_world::World;
+use zg_world::{EngineEvents, EventRef, Res, ResMut, Scene, World};
 
-// This is cute, but this is not how a system looks like
-// It needs to get the active camera as a component?
 pub fn camera_controller_device_sytem(world: &mut World, event: &DeviceEvent) {
     let mut camera_controller = world.get_mut::<CameraController>();
     match event {
@@ -29,34 +27,23 @@ pub fn camera_controller_device_sytem(world: &mut World, event: &DeviceEvent) {
     }
 }
 
-// This spawns a camera
-// equates the entity to the renderer value
-// creates a bind group cache key
-// creates a bind group with that cache key
-// set's the bind group via the handle
-pub fn camera_init_system(world: &mut World) {
+pub fn camera_controller_system(mut renderer: ResMut<WorldRenderer>, mut scene: Scene) {
     let camera = Camera::default();
-    let entity = world.spawn((camera,));
-    let mut renderer = world.get_mut::<WorldRenderer>();
-    renderer.default_camera = Some(entity);
+    let entity = scene.spawn((camera,));
+    renderer.default_camera = Some(entity)
 }
 
-// This then updates the camera
-// Gets the camera entity from the renderer
-// the window for the aspect ratio
-// updates the ratio
-// updates the view projection matrix
-// writes to the buffer
-pub fn camera_update_system(world: &mut World, _dt: f32) {
-    let renderer = world.get::<WorldRenderer>();
-    let mut graphics = world.get_mut::<InternalGraphics>();
-    let mut render_queue = world.get_mut::<RenderQueue>();
-
-    let window = world.get::<Arc<Window>>();
+pub fn camera_update(
+    mut graphics: ResMut<InternalGraphics>,
+    mut render_queue: ResMut<RenderQueue>,
+    renderer: Res<WorldRenderer>,
+    window: Res<Arc<Window>>,
+    scene: Scene,
+) {
     if let Some(camera_entity) = renderer.default_camera {
         // This changes the aspect ratio for the camera
         let window_size = window.inner_size();
-        let camera = world.get_entity::<(Camera,)>(camera_entity).0;
+        let camera = scene.get_entity::<(Camera,)>(camera_entity).0;
         camera.aspect = (window_size.width as f32) / window_size.height as f32;
 
         let view_proj = camera.build_projection_matrix();
@@ -70,19 +57,36 @@ pub fn camera_update_system(world: &mut World, _dt: f32) {
     }
 }
 
-pub fn camera_controller_update_system(world: &mut World, dt: f32) {
-    //mt anem  is osose and o=im the best in the world i wrote
-    //this code
-    //
-
-    let renderer = world.get::<WorldRenderer>();
+pub fn camera_controller_sytem(
+    renderer: Res<WorldRenderer>,
+    scene: Scene,
+    time: Res<Time>,
+    camera_controller: Res<CameraController>,
+) {
     let camera_entity = renderer.default_camera.unwrap();
-    let camera = world.get_entity::<(Camera,)>(camera_entity).0;
-    let camera_controller = world.get::<CameraController>();
-    let delta = dt.min(0.1);
+    let camera = scene.get_entity::<(Camera,)>(camera_entity).0;
+    let delta = time.time_delta_secs().min(0.1);
     camera_controller.camera_update(camera, delta);
 }
 
+pub fn camera_input_system(event: EventRef, mut camera_controller: ResMut<CameraController>) {
+    if let EngineEvents(WindowEvent::KeyboardInput {
+        event:
+            KeyEvent {
+                physical_key: PhysicalKey::Code(code),
+                state: key_state,
+                ..
+            },
+        ..
+    }) = event.0
+    {
+        if *code == KeyCode::Escape && key_state.is_pressed() {
+            event_loop.exit();
+        } else {
+            handle_key_controller(&mut camera_controller, *code, key_state.is_pressed());
+        }
+    };
+}
 pub fn camera_window_event(
     world: &mut World,
     window_event: &WindowEvent,
@@ -107,12 +111,4 @@ pub fn camera_window_event(
         }
         _ => {}
     }
-}
-
-pub fn system(system: &mut SystemAggregator) {
-    system.insert_init_system(camera_init_system);
-    system.insert_update_system(camera_update_system);
-    system.insert_update_system(camera_controller_update_system);
-    system.insert_window_event_sytem(camera_window_event);
-    system.insert_device_event_sytem(camera_controller_device_sytem);
 }

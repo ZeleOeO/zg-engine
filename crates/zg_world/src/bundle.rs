@@ -2,7 +2,7 @@ use std::{any::TypeId, collections::HashSet};
 
 use crate::archetypes::{Archetype, Column};
 
-pub trait Bundle {
+pub trait Bundle: 'static {
     fn insert_into(self, archetype: &mut Archetype);
     fn get_archetype() -> HashSet<TypeId>;
     fn empty_columns() -> Vec<Column>;
@@ -41,6 +41,8 @@ impl_tuple_for_bundle!(A);
 impl_tuple_for_bundle!(A, B);
 impl_tuple_for_bundle!(A, B, C);
 impl_tuple_for_bundle!(A, B, C, D);
+impl_tuple_for_bundle!(A, B, C, D, E);
+impl_tuple_for_bundle!(A, B, C, D, E, F);
 
 // fn stuff() {
 //     Archetype

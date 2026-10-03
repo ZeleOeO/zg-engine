@@ -3596,7 +3596,6 @@ dependencies = [
  "zg_graphics",
  "zg_managers",
  "zg_render",
- "zg_systems",
  "zg_utils",
  "zg_world",
 ]
@@ -3609,7 +3608,6 @@ dependencies = [
  "winit",
  "zg_graphics",
  "zg_render",
- "zg_systems",
  "zg_utils",
  "zg_world",
 ]
@@ -3634,7 +3632,6 @@ dependencies = [
  "anyhow",
  "wgpu",
  "winit",
- "zg_systems",
  "zg_utils",
 ]
 
@@ -3661,7 +3658,6 @@ dependencies = [
  "winit",
  "zg_graphics",
  "zg_managers",
- "zg_systems",
  "zg_utils",
  "zg_world",
 ]

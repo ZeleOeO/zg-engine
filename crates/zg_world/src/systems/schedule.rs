@@ -2,13 +2,49 @@ use std::{any::TypeId, collections::HashMap};
 
 use zg_utils::sort_vector;
 
-use crate::{
-    World,
-    systems::{
-        schedule_label::ScheduleLabel,
-        system::{System, SystemFunction, SystemID},
-    },
+use crate::systems::{
+    schedule_label::ScheduleLabel,
+    system::{System, SystemContext, SystemFunction, SystemID},
+    system_set::SystemSet,
 };
+
+pub struct ScheduleSystems<'w> {
+    schedules: HashMap<Box<dyn ScheduleLabel>, Schedule>,
+    context: SystemContext<'w>,
+}
+
+impl ScheduleSystems<'_> {
+    fn entry(&mut self, label: impl ScheduleLabel) -> &mut Schedule {
+        self.schedules
+            .entry(Box::new(label))
+            .or_insert_with(|| Schedule::default())
+    }
+
+    pub fn add_system<'w, Args, F>(&mut self, label: impl ScheduleLabel, function: F)
+    where
+        F: SystemFunction<Args> + 'static,
+    {
+        self.entry(label).add(function);
+    }
+
+    pub fn execute(&mut self, label: impl ScheduleLabel) {
+        let schedule = self
+            .schedules
+            .entry(Box::new(label))
+            .or_insert_with(|| Schedule::default());
+
+        schedule.run(&self.context);
+    }
+    pub fn add_system_set(&mut self, system_set: &mut SystemSet) {
+        for (k, mut v) in system_set.schedules.drain() {
+            if let Some(schedule) = self.schedules.get_mut(&k) {
+                schedule.systems.append(&mut v.systems);
+            } else {
+                self.schedules.insert(k, v);
+            }
+        }
+    }
+}
 
 #[derive(Default)]
 pub struct Schedule {
@@ -16,7 +52,7 @@ pub struct Schedule {
 }
 
 impl Schedule {
-    fn add<'w, Args, F>(&mut self, function: F)
+    pub fn add<'w, Args, F>(&mut self, function: F)
     where
         F: SystemFunction<Args> + 'static,
     {
@@ -35,41 +71,9 @@ impl Schedule {
         };
     }
 
-    fn run(&self, context: &World) {
+    fn run(&self, context: &SystemContext) {
         for system in &self.systems {
             (system.system)(context)
         }
-    }
-}
-
-// This will be what app would take in, instead of Systems
-pub struct ScheduleSystems<'w> {
-    schedules: HashMap<Box<dyn ScheduleLabel>, Schedule>,
-    context: &'w World,
-}
-
-impl ScheduleSystems<'_> {
-    fn entry(&mut self, label: impl ScheduleLabel) -> &mut Schedule {
-        self.schedules
-            .entry(Box::new(label))
-            .or_insert_with(|| Schedule::default())
-    }
-
-    pub fn add_system<'w, Args, F>(&mut self, label: impl ScheduleLabel, function: F)
-    where
-        F: SystemFunction<Args> + 'static,
-    {
-        self.entry(label).add(function);
-    }
-
-    pub fn execute(&mut self, label: impl ScheduleLabel) {
-        // something something borrow checker
-        //  free me
-        let schedule = self
-            .schedules
-            .entry(Box::new(label))
-            .or_insert_with(|| Schedule::default());
-
-        schedule.run(&self.context);
     }
 }

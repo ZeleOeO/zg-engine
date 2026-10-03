@@ -39,7 +39,7 @@ impl World {
     }
 
     // Replacing the T with a trait Bundle
-    pub fn spawn<T: Bundle + Debug + 'static>(&mut self, bundle: T) -> Entity {
+    pub fn spawn<T: Bundle + Debug + 'static>(&mut self, bundle: T) {
         let archetype_id = self.get_or_create_archetype_id::<T>();
         let archetype = &mut self.archetypes[archetype_id.0 as usize];
         bundle.insert_into(archetype);
@@ -57,8 +57,6 @@ impl World {
             row,
         });
         self.entities.push(entity);
-
-        entity
     }
 
     pub fn get<R: Resource + 'static>(&self) -> Res<'_, R> {
@@ -155,21 +153,27 @@ impl World {
             .collect()
     }
 
-    fn query<'w, D: QueryData<'w>>(&'w self) -> Query<'w, D> {
+    pub fn query<'w, D>(&'w self) -> Query<'w, D>
+    where
+        D: QueryData<'w> + 'static,
+    {
         Query {
             world: self,
             _marker: PhantomData,
         }
     }
 
-    pub fn get_entity<'w, D: QueryData<'w>>(&'w self, entity: Entity) -> D::Output {
+    pub fn get_entity<'w, D>(&'w self, entity: Entity) -> D::Output
+    where
+        D: QueryData<'w> + 'static,
+    {
         self.query::<D>().get(entity.0)
     }
 
-    pub fn get_all_entities_in_archetype<'w, D: QueryData<'w> + 'w>(
-        &'w self,
-        archetype: &Archetype,
-    ) -> Vec<D::Output> {
+    pub fn get_all_entities_in_archetype<'w, D>(&'w self, archetype: &Archetype) -> Vec<D::Output>
+    where
+        D: QueryData<'w> + 'static,
+    {
         let query = self.query::<D>();
         query.iter(archetype).collect::<Vec<D::Output>>()
     }

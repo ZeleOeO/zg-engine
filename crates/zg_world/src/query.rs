@@ -1,51 +1,18 @@
-use crate::{archetypes::Archetype, world::World};
-
-// I need to get all components in an archetype
-// We'll get the archetype
-// We'll then have a vec of columns
-// if we iterate through them line by line
-// Then we can get the components line by line
-//
-// I also need to make it mut
+use crate::{SystemContext, SystemParam, archetypes::Archetype, bundle::Bundle, world::World};
 
 pub trait QueryData<'w> {
     type Output;
+    type Bundle: Bundle;
     fn get(world: &'w World, row: usize) -> Self::Output;
 }
-macro_rules! impl_query_for_tuples {
-    ($($T:ident),*) => {
-        impl<'w, $($T),*> $crate::query::QueryData<'w> for ($($T,)*)
-        where
-        $($T: 'static),*
-        {
-            type Output = ($(&'w mut $T,)*);
-            fn get(world: &'w  $crate::world::World, row: usize) -> Self::Output {
-                // this is where the problem is
-                let location = &world.object_locations[row];
-                let archetype = world.get_archetype_by_id(location.archetype_id);
-
-                // Takes pointer so I can mutate without worrying about multiple mutation borrows
-                unsafe {
-                   ($( (&mut *archetype.get_column_ptr_by_type::<$T>()).get_mut(location.row as usize).unwrap(),)*)
-                }
-            }
-
-        }
-    };
-}
-
-impl_query_for_tuples!(A);
-impl_query_for_tuples!(A, B);
-impl_query_for_tuples!(A, B, C);
-impl_query_for_tuples!(A, B, C, D);
-impl_query_for_tuples!(A, B, C, D, E);
-
 pub struct Query<'w, D: QueryData<'w>> {
     pub world: &'w World,
     pub _marker: std::marker::PhantomData<D>,
 }
-//
-impl<'w, D: QueryData<'w>> Query<'w, D> {
+impl<'w, D> Query<'w, D>
+where
+    D: QueryData<'w> + 'static,
+{
     pub fn get(&self, row: u32) -> D::Output {
         D::get(self.world, row as usize)
     }
@@ -64,4 +31,48 @@ impl<'w, D: QueryData<'w>> Query<'w, D> {
     ) -> impl Iterator<Item = D::Output> + 'a {
         archetypes.iter().flat_map(move |arch| self.iter(arch))
     }
+
+    pub fn get_all_entities(&self) -> Vec<D::Output> {
+        let archetype_id = self.world.get_archetype_ids::<D::Bundle>();
+        let archetype = self.world.get_archetypes_by_id(archetype_id.as_slice());
+        self.world.get_all_entities_in_archetypes::<D>(&archetype)
+    }
 }
+
+impl<D> SystemParam for Query<'_, D>
+where
+    for<'w> D: QueryData<'w> + 'static,
+{
+    type Item<'w> = Query<'w, D>;
+    fn extract_world_context<'w>(context: &'w SystemContext) -> Self::Item<'w> {
+        context.world.query()
+    }
+}
+
+macro_rules! impl_query_for_tuples {
+    ($($T:ident),*) => {
+        impl<'w, $($T),*> $crate::query::QueryData<'w> for ($($T,)*)
+        where
+        $($T: 'static + std::fmt::Debug ),*
+        {
+            type Output = ($(&'w mut $T,)*);
+            type Bundle = ($($T, ) *);
+            fn get(world: &'w  $crate::world::World, row: usize) -> Self::Output {
+                let location = &world.object_locations[row];
+                let archetype = world.get_archetype_by_id(location.archetype_id);
+
+                unsafe {
+                   ($( (&mut *archetype.get_column_ptr_by_type::<$T>()).get_mut(location.row as usize).unwrap(),)*)
+                }
+            }
+
+        }
+    };
+}
+
+impl_query_for_tuples!(A);
+impl_query_for_tuples!(A, B);
+impl_query_for_tuples!(A, B, C);
+impl_query_for_tuples!(A, B, C, D);
+impl_query_for_tuples!(A, B, C, D, E);
+impl_query_for_tuples!(A, B, C, D, E, F);
