@@ -1,11 +1,11 @@
 use zg_managers::Assets;
 
 use zg_graphics::{BindGroupCacheHandle, InternalGraphics, PipelineID};
-use zg_world::components::MeshHandle;
+use zg_world::{Resource, components::MeshHandle};
 
 use crate::render_command::{DrawItem, FrameBinding};
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Resource)]
 pub struct RenderQueue {
     pub frame_binding: Vec<FrameBinding>,
     pub draw_items: Vec<DrawItem>,

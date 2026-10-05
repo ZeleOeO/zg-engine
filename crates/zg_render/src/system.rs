@@ -3,7 +3,7 @@ use wgpu::{CurrentSurfaceTexture, TextureView};
 use winit::event::WindowEvent;
 
 use zg_managers::{PointLight, create_light_bind_group, get_or_create_default_light_material};
-use zg_utils::time::Time;
+use zg_time::Time;
 
 use crate::RenderQueue;
 use crate::render_command::{DrawItem, FrameBinding};
@@ -27,7 +27,7 @@ pub fn render_items_system(
             layer: crate::RenderLayer::Opaque,
             pipeline: PipelineID::MAIN,
             material: assets.material_manager.get_material(material.0),
-            transform: create_transform_bind_group(&transform, &mut graphics),
+            transform: create_transform_bind_group(&transform, &mut graphics.0),
             mesh: mesh.0,
             index_count: mesh_meta_data.index_count,
         });
@@ -42,7 +42,7 @@ pub fn render_lights_system(
     let _span = span!("render light");
     for (light,) in query.get_all_entities() {
         render_queue.frame_binding.push(FrameBinding {
-            bind_group: create_light_bind_group(&mut graphics, light),
+            bind_group: create_light_bind_group(&mut graphics.0, light),
         });
     }
 }

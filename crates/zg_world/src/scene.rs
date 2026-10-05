@@ -2,11 +2,11 @@ use std::{cell::RefCell, fmt::Debug};
 
 use crate::{Entity, SystemParam, World, bundle::Bundle, query::QueryData};
 
-pub type Command = Box<dyn FnOnce(&mut World)>;
+pub type MutWorldCommand = Box<dyn FnOnce(&mut World)>;
 
 pub struct Scene<'c> {
     pub world: &'c World,
-    pub command_queue: &'c RefCell<Vec<Command>>,
+    pub command_queue: &'c RefCell<Vec<MutWorldCommand>>,
     pub ids: u32,
 }
 

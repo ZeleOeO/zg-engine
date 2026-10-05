@@ -5,7 +5,10 @@ use crate::{
     mesh::{MeshData, MeshManager},
 };
 use zg_utils::ModelVertex;
-use zg_world::components::{MaterialComponent, MeshComponent};
+use zg_world::{
+    Resource,
+    components::{MaterialComponent, MeshComponent},
+};
 
 mod light;
 pub mod material;
@@ -13,7 +16,7 @@ pub mod mesh;
 
 pub use light::{PointLight, create_light_bind_group, get_or_create_default_light_material};
 
-#[derive(Debug)]
+#[derive(Debug, Resource)]
 pub struct Assets {
     pub mesh_manager: MeshManager,
     pub material_manager: MaterialManager,

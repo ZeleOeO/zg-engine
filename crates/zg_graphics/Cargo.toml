@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 zg_utils = {path = "../zg_utils"}
+zg_world = {path = "../zg_world"}
 
 wgpu = {workspace = true}
 winit = {workspace = true}

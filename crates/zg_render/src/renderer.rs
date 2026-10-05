@@ -1,11 +1,11 @@
 use wgpu::{Buffer, BufferUsages, wgt::BufferDescriptor};
 
 use zg_graphics::InternalGraphics;
-use zg_world::Entity;
+use zg_world::{Entity, Resource};
 
 use crate::render_utils::CameraUniform;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Resource)]
 pub struct WorldRenderer {
     pub default_camera: Option<Entity>,
     pub camera_buffer: Buffer,

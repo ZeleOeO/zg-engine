@@ -2,9 +2,13 @@ use std::sync::Arc;
 
 use anyhow::Ok;
 use winit::{
-    application::ApplicationHandler, event::DeviceEvent, event_loop::EventLoop, window::Window,
+    application::ApplicationHandler,
+    event::{DeviceEvent, KeyEvent, WindowEvent},
+    event_loop::EventLoop,
+    window::Window,
 };
 use zg_utils::time::Time;
+use zg_world::{EngineEvents, KeyboardInput};
 
 use crate::engine_app::EngineApp;
 use zg_camera::system as camera_system;
@@ -79,6 +83,8 @@ impl ApplicationHandler for App {
             return;
         };
 
+        // TODO: make the window resource here
+
         app.add_window(window.clone());
         app.insert_default_resources(window.clone());
         app.systems.setups.execute(&mut app.world);
@@ -99,6 +105,42 @@ impl ApplicationHandler for App {
         app.systems.device_events.execute((world, &event));
     }
 
+    fn window_event(
+        &mut self,
+        event_loop: &winit::event_loop::ActiveEventLoop,
+        _window_id: winit::window::WindowId,
+        event: winit::event::WindowEvent,
+    ) {
+        let Some(app) = &mut self.engine_app else {
+            return;
+        };
+        match event {
+            WindowEvent::KeyboardInput {
+                event:
+                    KeyEvent {
+                        physical_key: PhysicalKey::Code(code),
+                        state,
+                        ..
+                    },
+                ..
+            } => {
+                app.systems
+                    .context
+                    .event_queue
+                    .push(EngineEvents::KeyboardInput(KeyboardInput {
+                        code: code,
+                        key_status: state.is_pressed(),
+                    }));
+            }
+            _ => {}
+        }
+
+        let world = &mut app.world;
+        app.systems
+            .window_events
+            .execute((world, &event, event_loop));
+    }
+
     fn about_to_wait(&mut self, _event_loop: &winit::event_loop::ActiveEventLoop) {
         let Some(app) = &mut self.engine_app else {
             return;
@@ -113,21 +155,5 @@ impl ApplicationHandler for App {
             return;
         };
         window.request_redraw();
-    }
-
-    fn window_event(
-        &mut self,
-        event_loop: &winit::event_loop::ActiveEventLoop,
-        _window_id: winit::window::WindowId,
-        event: winit::event::WindowEvent,
-    ) {
-        let Some(app) = &mut self.engine_app else {
-            return;
-        };
-
-        let world = &mut app.world;
-        app.systems
-            .window_events
-            .execute((world, &event, event_loop));
     }
 }

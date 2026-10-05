@@ -16,17 +16,17 @@ impl<T: Debug + 'static> ComponentColumn for Vec<T> {
         self
     }
 
-    fn get_entity(&self, row: u32) -> &dyn Any {
-        let ans = &self[row as usize];
-        ans.as_any()
-    }
+    // fn get_entity(&self, row: u32) -> &dyn Any {
+    //     let ans = &self[row as usize];
+    //     ans.as_any()
+    // }
 }
 
 pub trait ComponentColumn: Any + Debug {
     fn len(&self) -> usize;
     fn as_any(&self) -> &dyn Any;
     fn as_any_mut(&mut self) -> &mut dyn Any;
-    fn get_entity(&self, row: u32) -> &dyn Any;
+    // fn get_entity(&self, row: u32) -> &dyn Any;
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]

@@ -1,15 +1,12 @@
 use std::{any::TypeId, cell::RefCell};
-use winit::event_loop::ActiveEventLoop;
 use zg_utils::NodeTrait;
 
-use crate::{World, events::EngineEvents, scene::Command, systems::system_sort::SystemSort};
+use crate::{EngineEvents, World, scene::MutWorldCommand, systems::system_sort::SystemSort};
 
 pub struct SystemContext<'s> {
     pub world: &'s World,
-    pub mut_world: &'s mut World,
-    pub event_loop: Option<&'s ActiveEventLoop>,
-    pub event: &'s EngineEvents,
-    pub queue: RefCell<Vec<Command>>,
+    pub queue: RefCell<Vec<MutWorldCommand>>,
+    pub event_queue: Vec<EngineEvents>,
 }
 
 #[derive(Debug)]

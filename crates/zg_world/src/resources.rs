@@ -12,15 +12,15 @@ pub trait Resource: 'static + Debug {
     fn as_any_mut(&mut self) -> &mut dyn Any;
 }
 
-impl<T: 'static + Debug> Resource for T {
-    fn as_any(&self) -> &dyn Any {
-        self
-    }
-
-    fn as_any_mut(&mut self) -> &mut dyn Any {
-        self
-    }
-}
+// impl<T: 'static + Debug> Resource for T {
+//     fn as_any(&self) -> &dyn Any {
+//         self
+//     }
+//
+//     fn as_any_mut(&mut self) -> &mut dyn Any {
+//         self
+//     }
+// }
 
 #[derive(Debug)]
 pub struct Res<'a, R: Resource>(pub Ref<'a, R>);

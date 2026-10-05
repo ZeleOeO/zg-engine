@@ -187,4 +187,6 @@ impl World {
             .iter_all(archetypes.as_slice())
             .collect::<Vec<D::Output>>()
     }
+
+    // TODO: : make add_events for resources
 }

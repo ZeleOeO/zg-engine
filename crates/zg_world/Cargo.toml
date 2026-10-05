@@ -9,3 +9,4 @@ zg_utils = {path = "../zg_utils"}
 
 winit = {workspace = true}
 pollster = {workspace = true}
+zg_world_macros = { path = "macros" }

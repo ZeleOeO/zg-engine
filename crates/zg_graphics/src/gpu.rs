@@ -7,12 +7,13 @@ use wgpu::{
 };
 use wgpu::{Queue, TextureView};
 use winit::window::Window;
+use zg_world::Resource;
 
 use crate::buffer::{BindGroupCacheKey, BindGroupResourceType};
 use crate::cache::*;
 use crate::pipeline::PipelineID;
 
-#[derive(Debug)]
+#[derive(Debug, Resource)]
 pub struct InternalGraphics {
     pub surface: Surface<'static>,
     pub device: Device,

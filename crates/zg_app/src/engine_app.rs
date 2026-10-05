@@ -8,19 +8,23 @@ use zg_systems::Systems;
 
 use zg_managers::Assets;
 use zg_utils::time::Time;
-use zg_world::World;
+use zg_world::{SystemsSchedule, World};
+
+use crate::window::WindowRes;
 
 pub(crate) struct EngineApp {
     pub world: World,
-    pub systems: Systems,
+    pub systems: SystemsSchedule,
     pub window: Option<Arc<Window>>,
 }
 
 impl EngineApp {
     pub(crate) async fn new() -> Self {
+        let world = World::new();
+        let systems = SystemsSchedule::new(&world);
         Self {
-            world: World::new(),
-            systems: Systems::default(),
+            world,
+            systems,
             window: None,
         }
     }
@@ -41,8 +45,9 @@ impl EngineApp {
         let render_queue = RenderQueue::default();
         let renderer = WorldRenderer::new(&internal_graphics);
         let time = Time::new();
+        let window_res = WindowRes::new(window);
 
-        self.world.insert(window);
+        self.world.insert(window_res);
         self.world.insert(internal_graphics);
         self.world.insert(assets);
         self.world.insert(camera_controller);

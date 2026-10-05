@@ -1,19 +1,33 @@
-use std::{any::TypeId, collections::HashMap};
+use std::{any::TypeId, cell::RefCell, collections::HashMap};
 
 use zg_utils::sort_vector;
 
-use crate::systems::{
-    schedule_label::ScheduleLabel,
-    system::{System, SystemContext, SystemFunction, SystemID},
-    system_set::SystemSet,
+use crate::{
+    World,
+    systems::{
+        schedule_label::ScheduleLabel,
+        system::{System, SystemContext, SystemFunction, SystemID},
+        system_set::SystemSet,
+    },
 };
 
-pub struct ScheduleSystems<'w> {
+pub struct SystemsSchedule<'w> {
     schedules: HashMap<Box<dyn ScheduleLabel>, Schedule>,
-    context: SystemContext<'w>,
+    pub context: SystemContext<'w>,
 }
 
-impl ScheduleSystems<'_> {
+impl SystemsSchedule<'_> {
+    pub fn new<'w>(world: &'w World) -> SystemsSchedule<'w> {
+        let schedules: HashMap<Box<dyn ScheduleLabel>, Schedule> = HashMap::new();
+        let context = SystemContext {
+            world,
+            queue: RefCell::new(Vec::new()),
+            event_queue: Vec::new(),
+        };
+
+        SystemsSchedule { schedules, context }
+    }
+
     fn entry(&mut self, label: impl ScheduleLabel) -> &mut Schedule {
         self.schedules
             .entry(Box::new(label))

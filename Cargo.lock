@@ -3578,7 +3578,6 @@ dependencies = [
  "zg_graphics",
  "zg_managers",
  "zg_render",
- "zg_systems",
  "zg_utils",
  "zg_world",
 ]
@@ -3633,7 +3632,12 @@ dependencies = [
  "wgpu",
  "winit",
  "zg_utils",
+ "zg_world",
 ]
+
+[[package]]
+name = "zg_input"
+version = "0.1.0"
 
 [[package]]
 name = "zg_managers"
@@ -3658,17 +3662,14 @@ dependencies = [
  "winit",
  "zg_graphics",
  "zg_managers",
+ "zg_time",
  "zg_utils",
  "zg_world",
 ]
 
 [[package]]
-name = "zg_systems"
+name = "zg_time"
 version = "0.1.0"
-dependencies = [
- "winit",
- "zg_utils",
-]
 
 [[package]]
 name = "zg_utils"
@@ -3686,6 +3687,15 @@ dependencies = [
  "pollster",
  "winit",
  "zg_utils",
+ "zg_world_macros",
+]
+
+[[package]]
+name = "zg_world_macros"
+version = "0.1.0"
+dependencies = [
+ "quote",
+ "syn 3.0.5",
 ]
 
 [[package]]

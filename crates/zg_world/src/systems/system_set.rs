@@ -26,13 +26,3 @@ impl SystemSet {
     }
 }
 
-//DefaultSet()
-// SystemAggregator
-// which can contain a reference to the ScheduleSystems class
-// SystemSet contain hashmap
-// can create a system set and put it in the app itself
-//
-// app.add_system_set(SystemSet)
-// add_system_set
-// self.schedules.add_system_set
-// self.systems
