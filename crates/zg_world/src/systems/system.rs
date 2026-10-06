@@ -14,20 +14,7 @@ pub struct SystemID(pub TypeId);
 pub struct System {
     pub id: SystemID,
     pub sorts: Vec<SystemSort>,
-    pub system: Box<dyn FnMut(&World)>,
-}
-
-pub struct SystemDummy {
-    pub id: SystemID,
-    pub sorts: Vec<SystemSort>,
     pub system: Box<dyn ErasedExecFunction>,
-}
-
-impl SystemDummy {
-    pub fn run(&mut self, mut world: &mut World) {
-        self.system.call(&world);
-        self.system.reset(&mut world);
-    }
 }
 
 pub trait ErasedExecFunction {
@@ -35,13 +22,13 @@ pub trait ErasedExecFunction {
     fn reset(&mut self, world: &mut World);
 }
 
-pub struct ExecFunction<F, Args>
+pub(crate) struct ExecFunction<F, Args>
 where
     F: SystemFunction<Args>,
 {
-    function: F,
-    state: F::State,
-    _phantom_data: PhantomData<Args>,
+    pub(crate) function: F,
+    pub(crate) state: F::State,
+    pub(crate) _phantom_data: PhantomData<Args>,
 }
 
 impl<F, Args> ErasedExecFunction for ExecFunction<F, Args>
@@ -55,10 +42,9 @@ where
 }
 
 impl System {
-    pub fn run(&mut self, world: &World) {
-        // self.system.call()
-        // self.system.reset()
-        (self.system)(world)
+    pub fn run(&mut self, mut world: &mut World) {
+        self.system.call(&world);
+        self.system.reset(&mut world);
     }
 }
 

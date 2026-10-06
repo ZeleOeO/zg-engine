@@ -1,4 +1,4 @@
-use std::{any::TypeId, collections::HashMap};
+use std::{any::TypeId, collections::HashMap, marker::PhantomData};
 
 use zg_utils::sort_vector;
 
@@ -6,7 +6,7 @@ use crate::{
     World,
     systems::{
         schedule_label::ScheduleLabel,
-        system::{System, SystemFunction, SystemID},
+        system::{ExecFunction, System, SystemFunction, SystemID},
         system_set::SystemSet,
     },
 };
@@ -32,17 +32,18 @@ impl SystemsSchedule {
     where
         F: SystemFunction<Args, State = S> + 'static,
         S: 'static,
+        Args: 'static,
     {
         self.entry(label).add(function);
     }
 
-    pub fn execute(&mut self, label: impl ScheduleLabel, world: &World) {
+    pub fn execute(&mut self, label: impl ScheduleLabel, world: &mut World) {
         let schedule = self
             .schedules
             .entry(Box::new(label))
             .or_insert_with(|| Schedule::default());
 
-        schedule.run(&world);
+        schedule.run(world);
         // like here
     }
     pub fn add_system_set(&mut self, system_set: &mut SystemSet) {
@@ -66,12 +67,16 @@ impl Schedule {
     where
         F: SystemFunction<Args, State = S> + 'static,
         S: 'static,
+        Args: 'static,
     {
-        let mut state = F::init();
         let system = System {
             id: SystemID(TypeId::of::<F>()),
             sorts: Vec::new(),
-            system: Box::new(move |world| function.call(world, &mut state)),
+            system: Box::new(ExecFunction {
+                function,
+                state: F::init(),
+                _phantom_data: PhantomData,
+            }),
         };
         self.systems.push(system);
     }
@@ -83,7 +88,7 @@ impl Schedule {
         };
     }
 
-    fn run(&mut self, world: &World) {
+    fn run(&mut self, world: &mut World) {
         for system in &mut self.systems {
             system.run(world);
         }
