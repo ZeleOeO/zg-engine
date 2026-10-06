@@ -7,7 +7,7 @@ use crate::{
     systems::{
         schedule_label::ScheduleLabel,
         system::{ExecFunction, System, SystemFunction, SystemID},
-        system_set::SystemSet,
+        // system_set::SystemSet,
     },
 };
 
@@ -46,15 +46,15 @@ impl SystemsSchedule {
         schedule.run(world);
         // like here
     }
-    pub fn add_system_set(&mut self, system_set: &mut SystemSet) {
-        for (k, mut v) in system_set.schedules.drain() {
-            if let Some(schedule) = self.schedules.get_mut(&k) {
-                schedule.systems.append(&mut v.systems);
-            } else {
-                self.schedules.insert(k, v);
-            }
-        }
-    }
+    // pub fn add_system_set(&mut self, system_set: &mut SystemSet) {
+    //     for (k, mut v) in system_set.schedules.drain() {
+    //         if let Some(schedule) = self.schedules.get_mut(&k) {
+    //             schedule.systems.append(&mut v.systems);
+    //         } else {
+    //             self.schedules.insert(k, v);
+    //         }
+    //     }
+    // }
 }
 
 #[derive(Default)]

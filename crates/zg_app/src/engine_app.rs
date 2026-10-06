@@ -55,7 +55,7 @@ impl EngineApp {
     }
 
     pub(crate) fn execute_schedule(&mut self, label: impl ScheduleLabel) {
-        self.systems.execute(label, &self.world);
+        self.systems.execute(label, &mut self.world);
     }
 
     pub(crate) fn send_window_events(&mut self) {
