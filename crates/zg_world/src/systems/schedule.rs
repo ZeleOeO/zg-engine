@@ -43,6 +43,7 @@ impl SystemsSchedule {
             .entry(Box::new(label))
             .or_insert_with(|| Schedule::default());
 
+        schedule.sort();
         schedule.run(world);
         // like here
     }

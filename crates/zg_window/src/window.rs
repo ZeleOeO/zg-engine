@@ -1,9 +1,7 @@
 use std::sync::Arc;
 
 use winit::window::Window;
-use zg_world::Resource;
-
-use crate::events::EngineWindowEvents;
+use zg_world::{EngineWindowEvents, Resource};
 
 #[derive(Debug, Resource)]
 pub struct WindowRes {

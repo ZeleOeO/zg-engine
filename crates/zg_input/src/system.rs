@@ -1,11 +1,11 @@
 use winit::keyboard::KeyCode;
-use zg_world::{EventReader, ResMut};
+use zg_world::{EventReader, KeyboardInputEvent, MouseMotionEvent, ResMut};
 
-use crate::{Input, KeyboardInput, MouseMotion, MouseMotionEvent};
+use crate::{Input, mouse::MouseMotion};
 
 // NOTE: keyboard input runs preupdate
 pub fn keyboard_send_event_system(
-    input_reader: EventReader<KeyboardInput>,
+    input_reader: EventReader<KeyboardInputEvent>,
     mut keyboard_input: ResMut<Input<KeyCode>>,
 ) {
     for event in input_reader.read() {

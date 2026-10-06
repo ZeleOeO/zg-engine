@@ -1,4 +1,4 @@
-use crate::{SystemContext, SystemParam, archetypes::Archetype, bundle::Bundle, world::World};
+use crate::{SystemParam, archetypes::Archetype, bundle::Bundle, world::World};
 
 pub trait QueryData<'w> {
     type Output;

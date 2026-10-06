@@ -189,8 +189,6 @@ impl World {
             .collect::<Vec<D::Output>>()
     }
 
-    // TODO: : make add_events for resources
-
     pub fn add_event<E: Debug + Clone + 'static>(&mut self) {
         let events = Events::<E>::new();
         self.insert(events);

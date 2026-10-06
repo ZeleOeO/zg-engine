@@ -1,6 +1,4 @@
-use zg_world::EventReader;
-
-use crate::events::EngineWindowEvents;
+use zg_world::{EngineWindowEvents, EventReader};
 
 // NOTE: this should be pre update
 pub fn send_engine_events(event_reader: EventReader<'static, EngineWindowEvents>) {

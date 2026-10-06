@@ -1,12 +1,11 @@
-use std::{any::TypeId, cell::RefCell, fmt::Debug, marker::PhantomData};
+use std::{
+    any::{Any, TypeId},
+    fmt::Debug,
+    marker::PhantomData,
+};
 use zg_utils::NodeTrait;
 
-use crate::{MutWorldCommand, World, systems::system_sort::SystemSort};
-
-pub struct SystemContext<'s> {
-    pub world: &'s World,
-    pub queue: RefCell<Vec<MutWorldCommand>>,
-}
+use crate::{World, systems::system_sort::SystemSort};
 
 #[derive(Debug)]
 pub struct SystemID(pub TypeId);
@@ -15,6 +14,31 @@ pub struct System {
     pub id: SystemID,
     pub sorts: Vec<SystemSort>,
     pub system: Box<dyn ErasedExecFunction>,
+}
+
+impl System {
+    pub fn run(&mut self, mut world: &mut World) {
+        self.system.call(&world);
+        self.system.reset(&mut world);
+    }
+
+    pub fn before<F, Args>(&mut self, function: F)
+    where
+        F: SystemFunction<Args> + 'static,
+        Args: 'static,
+    {
+        self.sorts
+            .push(SystemSort::Before(SystemID(function.type_id())));
+    }
+
+    pub fn after<F, Args>(&mut self, function: F)
+    where
+        F: SystemFunction<Args> + 'static,
+        Args: 'static,
+    {
+        self.sorts
+            .push(SystemSort::After(SystemID(function.type_id())));
+    }
 }
 
 pub trait ErasedExecFunction {
@@ -39,13 +63,6 @@ where
         self.function.call(world, &mut self.state);
     }
     fn reset(&mut self, world: &mut World) {}
-}
-
-impl System {
-    pub fn run(&mut self, mut world: &mut World) {
-        self.system.call(&world);
-        self.system.reset(&mut world);
-    }
 }
 
 impl NodeTrait for System {

@@ -8,10 +8,8 @@ use winit::{
     keyboard::PhysicalKey,
     window::Window,
 };
-use zg_input::{KeyboardInput, MouseMotionEvent};
-use zg_time::Time;
-use zg_window::{EngineWindowEvents, WindowRes};
-use zg_world::{Setup, Update};
+use zg_window::WindowRes;
+use zg_world::{EngineWindowEvents, KeyboardInputEvent, MouseMotionEvent, Setup, Update};
 
 use crate::engine_app::EngineApp;
 
@@ -108,7 +106,7 @@ impl ApplicationHandler for App {
             } => {
                 window_res
                     .events
-                    .push(EngineWindowEvents::KeyboardInput(KeyboardInput {
+                    .push(EngineWindowEvents::KeyboardInput(KeyboardInputEvent {
                         code: code,
                         key_pressed: state.is_pressed(),
                     }));
@@ -130,7 +128,8 @@ impl ApplicationHandler for App {
         // let delta = time.time_delta_secs();
         // drop(time);
 
-        // app.systems.updates.execute((world, delta));
+        // this sends the windows events to the events resource in the world
+        // which will then be read by an event reader
         app.send_window_events();
         app.execute_schedule(Update);
         let Some(window) = &mut app.window else {

@@ -5,7 +5,7 @@ use std::{
     ops::{Deref, DerefMut},
 };
 
-use crate::{SystemContext, systems::SystemParam};
+use crate::systems::SystemParam;
 
 pub trait Resource: 'static + Debug {
     fn as_any(&self) -> &dyn Any;

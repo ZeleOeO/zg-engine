@@ -3591,13 +3591,8 @@ dependencies = [
  "pollster",
  "tracy-client",
  "winit",
- "zg_camera",
- "zg_graphics",
  "zg_input",
- "zg_managers",
- "zg_render",
  "zg_time",
- "zg_utils",
  "zg_window",
  "zg_world",
 ]
@@ -3699,7 +3694,6 @@ name = "zg_window"
 version = "0.1.0"
 dependencies = [
  "winit",
- "zg_input",
  "zg_world",
 ]
 

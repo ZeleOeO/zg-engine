@@ -7,5 +7,4 @@ edition = "2024"
 winit = {workspace = true}
 
 zg_world = {path = "../zg_world"}
-zg_input = {path = "../zg_input"}
 
