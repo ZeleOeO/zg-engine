@@ -27,8 +27,8 @@ pub struct Update;
 impl ScheduleLabel for Update {}
 
 #[derive(Clone, Copy, Hash, PartialEq, Eq, Debug)]
-pub struct WindowSystemEvent;
-impl ScheduleLabel for WindowSystemEvent {}
+pub struct PreUpdate;
+impl ScheduleLabel for PreUpdate {}
 
 #[derive(Clone, Copy, Hash, PartialEq, Eq, Debug)]
 pub struct DeviceSystemEvent;

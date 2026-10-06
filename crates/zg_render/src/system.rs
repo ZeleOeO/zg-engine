@@ -10,7 +10,7 @@ use crate::render_command::{DrawItem, FrameBinding};
 use crate::render_utils::create_transform_bind_group;
 use zg_graphics::*;
 use zg_managers::Assets;
-use zg_world::{EngineEvents, EventRef, Query, Res, ResMut, components::*};
+use zg_world::{Query, Res, ResMut, components::*};
 
 pub fn render_items_system(
     query: Query<(MeshComponent, MaterialComponent, Transform)>,
@@ -125,46 +125,54 @@ pub fn execute_frame(
     }
 }
 
-pub fn graphics_draw_system(
-    event: EventRef,
+// NOTE: run this un updates
+pub fn graphics_render_system(
     mut time: ResMut<Time>,
     mut graphics: ResMut<InternalGraphics>,
     mut render_queue: ResMut<RenderQueue>,
     assets: Res<Assets>,
 ) {
-    if let EngineEvents::Window(WindowEvent::RedrawRequested) = event.0 {
-        span!("redraw request");
-        time.update();
-        let frame = {
-            span!("retrieve current texture");
-            match graphics.surface.get_current_texture() {
-                CurrentSurfaceTexture::Success(texture)
-                | CurrentSurfaceTexture::Suboptimal(texture) => texture,
-                CurrentSurfaceTexture::Timeout | CurrentSurfaceTexture::Occluded => return,
-                CurrentSurfaceTexture::Outdated | CurrentSurfaceTexture::Lost => {
-                    println!("Error");
-                    graphics
-                        .surface
-                        .configure(&graphics.device, &graphics.config);
-                    return;
-                }
-                CurrentSurfaceTexture::Validation => return,
+    span!("redraw request");
+    time.update();
+    let frame = {
+        span!("retrieve current texture");
+        match graphics.surface.get_current_texture() {
+            CurrentSurfaceTexture::Success(texture)
+            | CurrentSurfaceTexture::Suboptimal(texture) => texture,
+            CurrentSurfaceTexture::Timeout | CurrentSurfaceTexture::Occluded => return,
+            CurrentSurfaceTexture::Outdated | CurrentSurfaceTexture::Lost => {
+                println!("Error");
+                graphics
+                    .surface
+                    .configure(&graphics.device, &graphics.config);
+                return;
             }
-        };
-
-        let surface_view = {
-            span!("create view");
-            frame
-                .texture
-                .create_view(&wgpu::TextureViewDescriptor::default())
-        };
-
-        execute_frame(&mut graphics, &mut render_queue, &assets, &surface_view);
-
-        {
-            let _ = span!("present frame");
-            frame.present();
-            tracy_client::frame_mark();
+            CurrentSurfaceTexture::Validation => return,
         }
+    };
+
+    let surface_view = {
+        span!("create view");
+        frame
+            .texture
+            .create_view(&wgpu::TextureViewDescriptor::default())
+    };
+
+    execute_frame(&mut graphics, &mut render_queue, &assets, &surface_view);
+
+    {
+        let _ = span!("present frame");
+        frame.present();
+        tracy_client::frame_mark();
     }
 }
+
+// pub fn graphics_draw_system(
+//     event: EventRef,
+//     mut time: ResMut<Time>,
+//     mut graphics: ResMut<InternalGraphics>,
+//     mut render_queue: ResMut<RenderQueue>,
+//     assets: Res<Assets>,
+// ) {
+//     if let EngineEvents::Window(WindowEvent::RedrawRequested) = event.0 {}
+// }

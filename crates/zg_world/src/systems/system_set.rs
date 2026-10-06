@@ -12,9 +12,10 @@ impl SystemSet {
             schedules: HashMap::new(),
         }
     }
-    pub fn add_system<'w, Args, F>(mut self, label: impl ScheduleLabel, function: F) -> Self
+    pub fn add_system<'w, Args, F, S>(mut self, label: impl ScheduleLabel, function: F) -> Self
     where
-        F: SystemFunction<Args> + 'static,
+        F: SystemFunction<Args, State = S> + 'static,
+        S: 'static,
     {
         let schedule = self
             .schedules
@@ -25,4 +26,3 @@ impl SystemSet {
         self
     }
 }
-

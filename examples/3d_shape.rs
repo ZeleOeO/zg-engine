@@ -5,8 +5,8 @@ fn main() -> anyhow::Result<()> {
 }
 
 pub fn instantiate_mesh(world: &mut World) {
-    let mut graphics = world.get_mut::<InternalGraphics>();
-    let mut assets = world.get_mut::<Assets>();
+    let mut graphics = world.get_resource_mut::<InternalGraphics>();
+    let mut assets = world.get_resource_mut::<Assets>();
 
     let cube_mesh = assets.create_cube(&graphics);
     let prism_mesh = assets.create_prism(&graphics);

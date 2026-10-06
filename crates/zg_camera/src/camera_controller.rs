@@ -10,10 +10,10 @@ pub struct CameraController {
     pub sensitivity: f32,
     pub yaw: f32,
     pub pitch: f32,
-    is_forward_key_pressed: bool,
-    is_backward_key_pressed: bool,
-    is_left_key_pressed: bool,
-    is_right_key_pressed: bool,
+    pub(crate) is_forward_key_pressed: bool,
+    pub(crate) is_backward_key_pressed: bool,
+    pub(crate) is_left_key_pressed: bool,
+    pub(crate) is_right_key_pressed: bool,
 }
 
 impl CameraController {

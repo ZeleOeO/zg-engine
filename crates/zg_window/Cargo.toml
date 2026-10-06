@@ -1,5 +1,5 @@
 [package]
-name = "zg_input"
+name = "zg_window"
 version = "0.1.0"
 edition = "2024"
 
@@ -7,4 +7,5 @@ edition = "2024"
 winit = {workspace = true}
 
 zg_world = {path = "../zg_world"}
-zg_utils = {path = "../zg_utils"}
+zg_input = {path = "../zg_input"}
+

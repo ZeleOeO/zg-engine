@@ -11,8 +11,9 @@ use zg_utils::TypeIdMap;
 use crate::{
     archetypes::{Archetype, ArchetypeID, Entity},
     bundle::Bundle,
+    events::Events,
     query::{Query, QueryData},
-    resources::{Res, ResMut, Resource},
+    resources::{ResMut, Resource},
 };
 
 pub struct World {
@@ -59,22 +60,22 @@ impl World {
         self.entities.push(entity);
     }
 
-    pub fn get<R: Resource + 'static>(&self) -> Res<'_, R> {
+    pub fn get_resource<R: Resource + 'static>(&self) -> Ref<R> {
         let item = self.resources.get(&TypeId::of::<R>()).unwrap();
         let borrowed = item.try_borrow().unwrap();
         let resource = Ref::map(borrowed, |resource| {
             resource.as_ref().as_any().downcast_ref::<R>().unwrap()
         });
-        Res(resource)
+        resource
     }
 
-    pub fn get_mut<R: Resource + 'static>(&self) -> ResMut<'_, R> {
+    pub fn get_resource_mut<R: Resource + 'static>(&self) -> RefMut<R> {
         let item = self.resources.get(&TypeId::of::<R>()).unwrap();
         let borrow_mut = item.try_borrow_mut().unwrap();
         let resource = RefMut::map(borrow_mut, |resource| {
             resource.as_mut().as_any_mut().downcast_mut::<R>().unwrap()
         });
-        ResMut(resource)
+        resource
     }
 
     pub fn insert<R: Resource + 'static>(&mut self, resource: R) {
@@ -189,4 +190,14 @@ impl World {
     }
 
     // TODO: : make add_events for resources
+
+    pub fn add_event<E: Debug + Clone + 'static>(&mut self) {
+        let events = Events::<E>::new();
+        self.insert(events);
+    }
+
+    pub fn write_events<E: Debug + Clone + 'static>(&mut self, event: E) {
+        let mut events = self.get_resource_mut::<Events<E>>();
+        events.write(event);
+    }
 }

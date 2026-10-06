@@ -7,8 +7,8 @@ fn main() -> anyhow::Result<()> {
 pub fn instantiate_mesh(world: &mut World) {
     let chicken = Model::load_obj(world, "assets/obj/animals_obj/chicken_001.obj").unwrap();
 
-    let graphics = world.get_mut::<InternalGraphics>();
-    let mut assets = world.get_mut::<Assets>();
+    let graphics = world.get_resource_mut::<InternalGraphics>();
+    let mut assets = world.get_resource_mut::<Assets>();
 
     let cube_mesh = assets.create_cube(&graphics);
 

@@ -1,12 +1,11 @@
-use std::{any::TypeId, cell::RefCell};
+use std::{any::TypeId, cell::RefCell, fmt::Debug, marker::PhantomData};
 use zg_utils::NodeTrait;
 
-use crate::{EngineEvents, World, scene::MutWorldCommand, systems::system_sort::SystemSort};
+use crate::{MutWorldCommand, World, systems::system_sort::SystemSort};
 
 pub struct SystemContext<'s> {
     pub world: &'s World,
     pub queue: RefCell<Vec<MutWorldCommand>>,
-    pub event_queue: Vec<EngineEvents>,
 }
 
 #[derive(Debug)]
@@ -15,7 +14,52 @@ pub struct SystemID(pub TypeId);
 pub struct System {
     pub id: SystemID,
     pub sorts: Vec<SystemSort>,
-    pub system: Box<dyn Fn(&SystemContext)>,
+    pub system: Box<dyn FnMut(&World)>,
+}
+
+pub struct SystemDummy {
+    pub id: SystemID,
+    pub sorts: Vec<SystemSort>,
+    pub system: Box<dyn ErasedExecFunction>,
+}
+
+impl SystemDummy {
+    pub fn run(&mut self, mut world: &mut World) {
+        self.system.call(&world);
+        self.system.reset(&mut world);
+    }
+}
+
+pub trait ErasedExecFunction {
+    fn call(&mut self, world: &World);
+    fn reset(&mut self, world: &mut World);
+}
+
+pub struct ExecFunction<F, Args>
+where
+    F: SystemFunction<Args>,
+{
+    function: F,
+    state: F::State,
+    _phantom_data: PhantomData<Args>,
+}
+
+impl<F, Args> ErasedExecFunction for ExecFunction<F, Args>
+where
+    F: SystemFunction<Args>,
+{
+    fn call(&mut self, world: &World) {
+        self.function.call(world, &mut self.state);
+    }
+    fn reset(&mut self, world: &mut World) {}
+}
+
+impl System {
+    pub fn run(&mut self, world: &World) {
+        // self.system.call()
+        // self.system.reset()
+        (self.system)(world)
+    }
 }
 
 impl NodeTrait for System {
@@ -47,25 +91,46 @@ impl NodeTrait for System {
 }
 
 pub trait SystemFunction<Args> {
-    fn call<'w>(&self, context: &'w SystemContext);
+    type State;
+
+    fn init() -> Self::State;
+    fn call<'w>(&self, world: &'w World, state: &'w mut Self::State);
+    fn reset(&self, world: &mut World, state: &mut Self::State);
 }
 
 pub trait SystemParam {
-    type Item<'w>;
-    fn extract_world_context<'w>(context: &'w SystemContext) -> Self::Item<'w>;
+    type State;
+    type Param<'w>;
+    fn init_state() -> Self::State;
+    fn extract_params<'w>(world: &'w World, state: &'w mut Self::State) -> Self::Param<'w>;
+    fn reset(world: &mut World, state: &mut Self::State);
 }
 
 macro_rules! impl_for_system_function {
     ($($param:ident),*) => {
         impl<T, $($param),*> $crate::systems::system::SystemFunction<($($param),*)> for T
         where
-            T: Fn($($param),*),
-            T: for<'w> Fn($(<$param as $crate::systems::system::SystemParam>::Item<'w>),*),
+            T: for<'w> Fn($(<$param as $crate::systems::system::SystemParam>::Param<'w>),*),
             $($param: $crate::systems::system::SystemParam),*
         {
-            fn call<'w>(&self, context: &'w $crate::systems::system::SystemContext) {
-                (self)($($param::extract_world_context(context)),*)
+
+            type State = ($($param::State, )*);
+
+            fn init() -> Self::State {
+                ($($param::init_state(), )*)
             }
+
+            fn call<'w>(&self, world: &'w $crate::World, state: &'w mut Self::State) {
+                let ($($param,)*) = state;
+                (self)($($param::extract_params(world, $param)),*)
+            }
+
+
+            fn reset(&self,  world: &mut World,  state: &mut Self::State) {
+                let ($($param,)*) = state;
+                $($param::reset(world, $param); )*
+            }
+
         }
     };
 }

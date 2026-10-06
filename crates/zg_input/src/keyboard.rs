@@ -1,7 +1,9 @@
-use std::{collections::HashSet, hash::Hash};
+use std::fmt::Debug;
 
-pub struct Input<I: Hash + Clone + Eq + 'static> {
-    hel: HashSet<I>,
-    just_pressed: HashSet<I>,
-    just_release: HashSet<I>
+use winit::keyboard::KeyCode;
+
+#[derive(Debug, Clone)]
+pub struct KeyboardInput {
+    pub code: KeyCode,
+    pub key_pressed: bool,
 }

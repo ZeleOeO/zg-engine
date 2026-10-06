@@ -1,4 +1,4 @@
-use std::{any::TypeId, cell::RefCell, collections::HashMap};
+use std::{any::TypeId, collections::HashMap};
 
 use zg_utils::sort_vector;
 
@@ -6,26 +6,20 @@ use crate::{
     World,
     systems::{
         schedule_label::ScheduleLabel,
-        system::{System, SystemContext, SystemFunction, SystemID},
+        system::{System, SystemFunction, SystemID},
         system_set::SystemSet,
     },
 };
 
-pub struct SystemsSchedule<'w> {
+pub struct SystemsSchedule {
     schedules: HashMap<Box<dyn ScheduleLabel>, Schedule>,
-    pub context: SystemContext<'w>,
 }
 
-impl SystemsSchedule<'_> {
-    pub fn new<'w>(world: &'w World) -> SystemsSchedule<'w> {
+impl SystemsSchedule {
+    pub fn new() -> SystemsSchedule {
         let schedules: HashMap<Box<dyn ScheduleLabel>, Schedule> = HashMap::new();
-        let context = SystemContext {
-            world,
-            queue: RefCell::new(Vec::new()),
-            event_queue: Vec::new(),
-        };
 
-        SystemsSchedule { schedules, context }
+        SystemsSchedule { schedules }
     }
 
     fn entry(&mut self, label: impl ScheduleLabel) -> &mut Schedule {
@@ -34,20 +28,22 @@ impl SystemsSchedule<'_> {
             .or_insert_with(|| Schedule::default())
     }
 
-    pub fn add_system<'w, Args, F>(&mut self, label: impl ScheduleLabel, function: F)
+    pub fn add_system<'w, Args, F, S>(&mut self, label: impl ScheduleLabel, function: F)
     where
-        F: SystemFunction<Args> + 'static,
+        F: SystemFunction<Args, State = S> + 'static,
+        S: 'static,
     {
         self.entry(label).add(function);
     }
 
-    pub fn execute(&mut self, label: impl ScheduleLabel) {
+    pub fn execute(&mut self, label: impl ScheduleLabel, world: &World) {
         let schedule = self
             .schedules
             .entry(Box::new(label))
             .or_insert_with(|| Schedule::default());
 
-        schedule.run(&self.context);
+        schedule.run(&world);
+        // like here
     }
     pub fn add_system_set(&mut self, system_set: &mut SystemSet) {
         for (k, mut v) in system_set.schedules.drain() {
@@ -66,14 +62,16 @@ pub struct Schedule {
 }
 
 impl Schedule {
-    pub fn add<'w, Args, F>(&mut self, function: F)
+    pub fn add<'w, Args, F, S>(&mut self, function: F)
     where
-        F: SystemFunction<Args> + 'static,
+        F: SystemFunction<Args, State = S> + 'static,
+        S: 'static,
     {
+        let mut state = F::init();
         let system = System {
             id: SystemID(TypeId::of::<F>()),
             sorts: Vec::new(),
-            system: Box::new(move |ctx| function.call(ctx)),
+            system: Box::new(move |world| function.call(world, &mut state)),
         };
         self.systems.push(system);
     }
@@ -85,9 +83,9 @@ impl Schedule {
         };
     }
 
-    fn run(&self, context: &SystemContext) {
-        for system in &self.systems {
-            (system.system)(context)
+    fn run(&mut self, world: &World) {
+        for system in &mut self.systems {
+            system.run(world);
         }
     }
 }

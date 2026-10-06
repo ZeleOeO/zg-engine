@@ -43,10 +43,18 @@ impl<D> SystemParam for Query<'_, D>
 where
     for<'w> D: QueryData<'w> + 'static,
 {
-    type Item<'w> = Query<'w, D>;
-    fn extract_world_context<'w>(context: &'w SystemContext) -> Self::Item<'w> {
-        context.world.query()
+    type Param<'w> = Query<'w, D>;
+    type State = ();
+
+    fn extract_params<'w>(world: &'w World, _state: &'w mut Self::State) -> Self::Param<'w> {
+        world.query()
     }
+
+    fn init_state() -> Self::State {
+        ()
+    }
+
+    fn reset(_world: &mut crate::World, _state: &mut Self::State) {}
 }
 
 macro_rules! impl_query_for_tuples {

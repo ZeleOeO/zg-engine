@@ -3593,9 +3593,12 @@ dependencies = [
  "winit",
  "zg_camera",
  "zg_graphics",
+ "zg_input",
  "zg_managers",
  "zg_render",
+ "zg_time",
  "zg_utils",
+ "zg_window",
  "zg_world",
 ]
 
@@ -3606,8 +3609,11 @@ dependencies = [
  "bytemuck",
  "winit",
  "zg_graphics",
+ "zg_input",
  "zg_render",
+ "zg_time",
  "zg_utils",
+ "zg_window",
  "zg_world",
 ]
 
@@ -3638,6 +3644,11 @@ dependencies = [
 [[package]]
 name = "zg_input"
 version = "0.1.0"
+dependencies = [
+ "winit",
+ "zg_utils",
+ "zg_world",
+]
 
 [[package]]
 name = "zg_managers"
@@ -3670,6 +3681,9 @@ dependencies = [
 [[package]]
 name = "zg_time"
 version = "0.1.0"
+dependencies = [
+ "zg_world",
+]
 
 [[package]]
 name = "zg_utils"
@@ -3678,6 +3692,15 @@ dependencies = [
  "anyhow",
  "bytemuck",
  "wgpu",
+]
+
+[[package]]
+name = "zg_window"
+version = "0.1.0"
+dependencies = [
+ "winit",
+ "zg_input",
+ "zg_world",
 ]
 
 [[package]]

@@ -11,4 +11,6 @@ zg_render = {path = "../zg_render"}
 zg_utils = {path = "../zg_utils"}
 zg_world = {path = "../zg_world"}
 zg_graphics = {path = "../zg_graphics"}
-
+zg_window = {path = "../zg_window"}
+zg_input = {path = "../zg_input"}
+zg_time = {path = "../zg_time"}

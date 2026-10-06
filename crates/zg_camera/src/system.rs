@@ -1,33 +1,23 @@
-use std::sync::Arc;
-
-use winit::event::DeviceEvent;
-
-use winit::event_loop::ActiveEventLoop;
-use winit::window::Window;
-use winit::{
-    event::{KeyEvent, WindowEvent},
-    keyboard::{KeyCode, PhysicalKey},
-};
-use zg_utils::time::Time;
+use winit::keyboard::KeyCode;
+use zg_input::{Input, MouseMotion};
+use zg_time::Time;
+use zg_window::WindowRes;
 
 use crate::camera::Camera;
-use crate::camera_controller::{CameraController, handle_key_controller};
+use crate::camera_controller::CameraController;
 
 use zg_graphics::*;
 use zg_render::{FrameBinding, RenderQueue, WorldRenderer, create_camera_bind_group};
-use zg_world::{EngineEvents, EventRef, Res, ResMut, Scene, World};
+use zg_world::{Commands, Res, ResMut};
 
-pub fn camera_controller_device_sytem(world: &mut World, event: &DeviceEvent) {
-    let mut camera_controller = world.get_mut::<CameraController>();
-    match event {
-        DeviceEvent::MouseMotion { delta } => {
-            camera_controller.handle_mouse(delta.0 as f32, delta.1 as f32);
-        }
-        _ => {}
-    }
+pub fn camera_controller_mouse_system(
+    mouse_motion: ResMut<MouseMotion>,
+    mut camera_controller: ResMut<CameraController>,
+) {
+    camera_controller.handle_mouse(mouse_motion.delta[0], mouse_motion.delta[1]);
 }
 
-pub fn camera_controller_system(mut renderer: ResMut<WorldRenderer>, mut scene: Scene) {
+pub fn camera_controller_system(mut renderer: ResMut<WorldRenderer>, mut scene: Commands) {
     let camera = Camera::default();
     let entity = scene.spawn((camera,));
     renderer.default_camera = Some(entity)
@@ -37,19 +27,19 @@ pub fn camera_update(
     mut graphics: ResMut<InternalGraphics>,
     mut render_queue: ResMut<RenderQueue>,
     renderer: Res<WorldRenderer>,
-    window: Res<Arc<Window>>,
-    scene: Scene,
+    window: Res<WindowRes>,
+    scene: Commands,
 ) {
     if let Some(camera_entity) = renderer.default_camera {
         // This changes the aspect ratio for the camera
-        let window_size = window.inner_size();
+        let window_size = window.0.window.inner_size();
         let camera = scene.get_entity::<(Camera,)>(camera_entity).0;
         camera.aspect = (window_size.width as f32) / window_size.height as f32;
 
         let view_proj = camera.build_projection_matrix();
 
         let camera_bind_group_cache_handle =
-            create_camera_bind_group(view_proj, camera.eye, &mut graphics, &renderer);
+            create_camera_bind_group(view_proj, camera.eye, &mut graphics.0, &renderer.0);
 
         render_queue.frame_binding.push(FrameBinding {
             bind_group: camera_bind_group_cache_handle,
@@ -59,7 +49,7 @@ pub fn camera_update(
 
 pub fn camera_controller_sytem(
     renderer: Res<WorldRenderer>,
-    scene: Scene,
+    scene: Commands,
     time: Res<Time>,
     camera_controller: Res<CameraController>,
 ) {
@@ -69,46 +59,13 @@ pub fn camera_controller_sytem(
     camera_controller.camera_update(camera, delta);
 }
 
-pub fn camera_input_system(event: EventRef, mut camera_controller: ResMut<CameraController>) {
-    if let EngineEvents(WindowEvent::KeyboardInput {
-        event:
-            KeyEvent {
-                physical_key: PhysicalKey::Code(code),
-                state: key_state,
-                ..
-            },
-        ..
-    }) = event.0
-    {
-        if *code == KeyCode::Escape && key_state.is_pressed() {
-            event_loop.exit();
-        } else {
-            handle_key_controller(&mut camera_controller, *code, key_state.is_pressed());
-        }
-    };
-}
-pub fn camera_window_event(
-    world: &mut World,
-    window_event: &WindowEvent,
-    event_loop: &ActiveEventLoop,
-) {
-    let controller = &mut world.get_mut::<CameraController>();
-    match window_event {
-        WindowEvent::KeyboardInput {
-            event:
-                KeyEvent {
-                    physical_key: PhysicalKey::Code(code),
-                    state: key_state,
-                    ..
-                },
-            ..
-        } => {
-            if *code == KeyCode::Escape && key_state.is_pressed() {
-                event_loop.exit();
-            } else {
-                handle_key_controller(controller, *code, key_state.is_pressed());
-            }
-        }
-        _ => {}
-    }
+pub fn camera_input_system(mut camera_controller: ResMut<CameraController>, input: Input<KeyCode>) {
+    camera_controller.is_forward_key_pressed =
+        input.is_pressed(KeyCode::ArrowUp) || input.is_pressed(KeyCode::KeyW);
+    camera_controller.is_backward_key_pressed =
+        input.is_pressed(KeyCode::ArrowDown) || input.is_pressed(KeyCode::KeyS);
+    camera_controller.is_left_key_pressed =
+        input.is_pressed(KeyCode::ArrowLeft) || input.is_pressed(KeyCode::KeyA);
+    camera_controller.is_right_key_pressed =
+        input.is_pressed(KeyCode::ArrowRight) || input.is_pressed(KeyCode::KeyD);
 }

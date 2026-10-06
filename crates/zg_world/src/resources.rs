@@ -67,15 +67,26 @@ impl<R: Resource> AsRef<R> for ResMut<'_, R> {
 }
 
 impl<R: Resource> SystemParam for ResMut<'_, R> {
-    type Item<'w> = ResMut<'w, R>;
-    fn extract_world_context<'w>(context: &'w SystemContext) -> Self::Item<'w> {
-        context.world.get_mut::<R>()
+    type Param<'w> = ResMut<'w, R>;
+    type State = ();
+    fn init_state() -> Self::State {
+        ()
     }
+    fn extract_params<'w>(world: &'w crate::World, _state: &'w mut Self::State) -> Self::Param<'w> {
+        ResMut(world.get_resource_mut::<R>())
+    }
+
+    fn reset(_world: &mut crate::World, _state: &mut Self::State) {}
 }
 
 impl<R: Resource> SystemParam for Res<'_, R> {
-    type Item<'w> = Res<'w, R>;
-    fn extract_world_context<'w>(context: &'w SystemContext) -> Self::Item<'w> {
-        context.world.get::<R>()
+    type Param<'w> = Res<'w, R>;
+    type State = ();
+    fn init_state() -> Self::State {
+        ()
     }
+    fn extract_params<'w>(world: &'w crate::World, _state: &'w mut Self::State) -> Self::Param<'w> {
+        Res(world.get_resource::<R>())
+    }
+    fn reset(_world: &mut crate::World, _state: &mut Self::State) {}
 }

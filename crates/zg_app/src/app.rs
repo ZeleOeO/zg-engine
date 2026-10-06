@@ -5,15 +5,15 @@ use winit::{
     application::ApplicationHandler,
     event::{DeviceEvent, KeyEvent, WindowEvent},
     event_loop::EventLoop,
+    keyboard::PhysicalKey,
     window::Window,
 };
-use zg_utils::time::Time;
-use zg_world::{EngineEvents, KeyboardInput};
+use zg_input::{KeyboardInput, MouseMotionEvent};
+use zg_time::Time;
+use zg_window::{EngineWindowEvents, WindowRes};
+use zg_world::{Setup, Update};
 
 use crate::engine_app::EngineApp;
-use zg_camera::system as camera_system;
-use zg_render::system as render_system;
-use zg_systems::SystemAggregator;
 
 pub struct App {
     engine_app: Option<EngineApp>,
@@ -35,39 +35,9 @@ impl App {
         tracy_client::Client::start();
         let event_loop = EventLoop::new()?;
         event_loop.set_control_flow(winit::event_loop::ControlFlow::Poll);
-        self.insert_default_systems();
+        // self.insert_default_systems();
         event_loop.run_app(self)?;
         Ok(())
-    }
-
-    pub fn insert_system<F: FnOnce(&mut SystemAggregator)>(mut self, callback: F) -> Self {
-        self.engine_app
-            .as_mut()
-            .unwrap()
-            .systems
-            .add_system(callback);
-        self
-    }
-
-    pub fn insert_default_systems(&mut self) {
-        self.engine_app
-            .as_mut()
-            .unwrap()
-            .systems
-            .add_system(camera_system);
-        self.engine_app
-            .as_mut()
-            .unwrap()
-            .systems
-            .add_system(render_system);
-    }
-
-    pub fn sort_all_systems(&mut self) {
-        let item = &mut self.engine_app.as_mut().unwrap().systems;
-        item.setups.sort();
-        item.updates.sort();
-        item.window_events.sort();
-        item.device_events.sort();
     }
 }
 
@@ -83,11 +53,9 @@ impl ApplicationHandler for App {
             return;
         };
 
-        // TODO: make the window resource here
-
         app.add_window(window.clone());
-        app.insert_default_resources(window.clone());
-        app.systems.setups.execute(&mut app.world);
+
+        app.execute_schedule(Setup);
         window.request_redraw();
     }
 
@@ -100,20 +68,34 @@ impl ApplicationHandler for App {
         let Some(app) = &mut self.engine_app else {
             return;
         };
-        let world = &mut app.world;
-
-        app.systems.device_events.execute((world, &event));
+        let world = &app.world;
+        let mut window_res = world.get_resource_mut::<WindowRes>();
+        match event {
+            DeviceEvent::MouseMotion { delta } => {
+                let motion_delta = [delta.0 as f32, delta.1 as f32];
+                window_res
+                    .events
+                    .push(EngineWindowEvents::MouseMotion(MouseMotionEvent {
+                        delta: motion_delta,
+                    }));
+            }
+            _ => {}
+        }
     }
 
     fn window_event(
         &mut self,
-        event_loop: &winit::event_loop::ActiveEventLoop,
+        _event_loop: &winit::event_loop::ActiveEventLoop,
         _window_id: winit::window::WindowId,
         event: winit::event::WindowEvent,
     ) {
         let Some(app) = &mut self.engine_app else {
             return;
         };
+
+        let world = &app.world;
+        let mut window_res = world.get_resource_mut::<WindowRes>();
+
         match event {
             WindowEvent::KeyboardInput {
                 event:
@@ -124,33 +106,33 @@ impl ApplicationHandler for App {
                     },
                 ..
             } => {
-                app.systems
-                    .context
-                    .event_queue
-                    .push(EngineEvents::KeyboardInput(KeyboardInput {
+                window_res
+                    .events
+                    .push(EngineWindowEvents::KeyboardInput(KeyboardInput {
                         code: code,
-                        key_status: state.is_pressed(),
+                        key_pressed: state.is_pressed(),
                     }));
             }
             _ => {}
         }
-
-        let world = &mut app.world;
-        app.systems
-            .window_events
-            .execute((world, &event, event_loop));
     }
 
     fn about_to_wait(&mut self, _event_loop: &winit::event_loop::ActiveEventLoop) {
         let Some(app) = &mut self.engine_app else {
             return;
         };
-        let world = &mut app.world;
-        let time = world.get_mut::<Time>();
-        let delta = time.time_delta_secs();
-        drop(time);
 
-        app.systems.updates.execute((world, delta));
+        // i want to update
+        // send the events to the world
+        // then run preupdate and update
+        // let world = &mut app.world;
+        // let time = world.get_resource_mut::<Time>();
+        // let delta = time.time_delta_secs();
+        // drop(time);
+
+        // app.systems.updates.execute((world, delta));
+        app.send_window_events();
+        app.execute_schedule(Update);
         let Some(window) = &mut app.window else {
             return;
         };

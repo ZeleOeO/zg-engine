@@ -1,3 +1,5 @@
+extern crate self as zg_world;
+
 mod archetypes;
 mod bundle;
 pub mod components;
@@ -12,7 +14,7 @@ pub use archetypes::Entity;
 pub use events::*;
 pub use query::Query;
 pub use resources::{Res, ResMut, Resource};
-pub use scene::Scene;
+pub use scene::{Commands, MutWorldCommand};
 pub use systems::*;
 pub use world::*;
 pub use zg_world_macros::Resource;

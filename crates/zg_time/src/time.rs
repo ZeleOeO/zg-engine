@@ -1,6 +1,8 @@
 use std::time::Instant;
 
-#[derive(Debug)]
+use zg_world::Resource;
+
+#[derive(Debug, Resource)]
 pub struct Time {
     time_delta: f32,
     last_frame: Instant,

@@ -3,13 +3,19 @@ use std::sync::Arc;
 use winit::window::Window;
 use zg_world::Resource;
 
+use crate::events::EngineWindowEvents;
+
 #[derive(Debug, Resource)]
 pub struct WindowRes {
-    window: Arc<Window>,
+    pub window: Arc<Window>,
+    pub events: Vec<EngineWindowEvents>,
 }
 
 impl WindowRes {
     pub fn new(window: Arc<Window>) -> Self {
-        Self { window }
+        Self {
+            window,
+            events: Vec::new(),
+        }
     }
 }

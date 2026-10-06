@@ -11,8 +11,8 @@ pub struct Model;
 impl Model {
     pub fn load_obj(world: &mut World, location: &str) -> anyhow::Result<Vec<Entity>> {
         let components_to_spawn = {
-            let mut graphics = world.get_mut::<InternalGraphics>();
-            let mut assets = world.get_mut::<Assets>();
+            let mut graphics = world.get_resource_mut::<InternalGraphics>();
+            let mut assets = world.get_resource_mut::<Assets>();
 
             let (models, material_res) = tobj::load_obj(
                 location,

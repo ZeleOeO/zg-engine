@@ -4,13 +4,11 @@ use winit::window::{CursorGrabMode, Window};
 use zg_camera::CameraController;
 use zg_graphics::InternalGraphics;
 use zg_render::{RenderQueue, WorldRenderer};
-use zg_systems::Systems;
 
 use zg_managers::Assets;
-use zg_utils::time::Time;
-use zg_world::{SystemsSchedule, World};
-
-use crate::window::WindowRes;
+use zg_time::Time;
+use zg_window::{EngineWindowEvents, WindowRes};
+use zg_world::{Events, ScheduleLabel, SystemsSchedule, Update, World};
 
 pub(crate) struct EngineApp {
     pub world: World,
@@ -21,7 +19,7 @@ pub(crate) struct EngineApp {
 impl EngineApp {
     pub(crate) async fn new() -> Self {
         let world = World::new();
-        let systems = SystemsSchedule::new(&world);
+        let systems = SystemsSchedule::new();
         Self {
             world,
             systems,
@@ -54,5 +52,18 @@ impl EngineApp {
         self.world.insert(render_queue);
         self.world.insert(renderer);
         self.world.insert(time);
+    }
+
+    pub(crate) fn execute_schedule(&mut self, label: impl ScheduleLabel) {
+        self.systems.execute(label, &self.world);
+    }
+
+    pub(crate) fn send_window_events(&mut self) {
+        // forward events
+        let world = &self.world;
+        let mut window_res = world.get_resource_mut::<WindowRes>();
+        let window_events = window_res.events.drain(..).collect::<Vec<_>>();
+        let mut window_event_res = world.get_resource_mut::<Events<EngineWindowEvents>>();
+        window_event_res.write_batch(window_events);
     }
 }
