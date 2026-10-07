@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use crate::{Entity, SystemParam, World, bundle::Bundle, systems::query::QueryData};
+use crate::{Entity, Resource, SystemParam, World, bundle::Bundle, systems::query::QueryData};
 
 pub type MutWorldCommand = Box<dyn FnOnce(&mut World)>;
 
@@ -25,6 +25,11 @@ impl Commands<'_> {
         D: QueryData<'w> + 'static,
     {
         self.world.get_entity::<D>(entity)
+    }
+
+    pub fn insert_resource<R: Resource + 'static>(&mut self, resource: R) {
+        self.command_queue
+            .push(Box::new(move |world| world.insert(resource)));
     }
 }
 

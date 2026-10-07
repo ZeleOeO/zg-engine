@@ -14,7 +14,10 @@ use zg_world::{
     schedule_label::{PreUpdate, ScheduleLabel, Setup, Update},
 };
 
-use crate::{addons::Addon, engine_app::EngineApp};
+use crate::{
+    addons::{Addon, WindowHandle},
+    engine_app::EngineApp,
+};
 
 pub struct App {
     engine_app: Option<EngineApp>,
@@ -114,7 +117,12 @@ impl ApplicationHandler for App {
             return;
         };
 
+        if app.window.is_some() {
+            return;
+        }
+
         app.add_window(window.clone());
+        app.add_resource(WindowHandle(window.clone()));
 
         app.execute_schedule(Setup);
         window.request_redraw();

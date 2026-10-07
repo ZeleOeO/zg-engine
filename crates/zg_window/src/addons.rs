@@ -1,7 +1,10 @@
 use zg_app::Addon;
-use zg_world::{EngineWindowEvents, SystemFunctionExt, SystemSet, schedule_label::PreUpdate};
+use zg_world::{
+    EngineWindowEvents, SystemFunctionExt, SystemSet,
+    schedule_label::{PreUpdate, Setup},
+};
 
-use crate::{WindowRes, system::send_engine_events};
+use crate::{system::send_engine_events, window::create_window_resoure};
 
 pub struct WindowAddon;
 
@@ -12,9 +15,8 @@ pub enum WindowSet {
 
 impl Addon for WindowAddon {
     fn build(&self, app: &mut zg_app::App) {
-        let window = app.window();
-        app.add_resource(WindowRes::new(window))
-            .add_event::<EngineWindowEvents>()
-            .add_system(PreUpdate, send_engine_events.in_set(WindowSet::PreUpdate));
+        app.add_event::<EngineWindowEvents>()
+            .add_system(PreUpdate, send_engine_events.in_set(WindowSet::PreUpdate))
+            .add_system(Setup, create_window_resoure);
     }
 }

@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 zg_app = {path = "../zg_app"}
+zg_world = {path = "../zg_world"}
 zg_window = {path = "../zg_window"}
 zg_camera = {path = "../zg_camera"}
 zg_render = {path = "../zg_render"}

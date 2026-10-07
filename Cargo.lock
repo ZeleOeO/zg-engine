@@ -3595,6 +3595,7 @@ dependencies = [
  "zg_render",
  "zg_time",
  "zg_window",
+ "zg_world",
 ]
 
 [[package]]
