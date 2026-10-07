@@ -59,7 +59,7 @@ where
 
 macro_rules! impl_query_for_tuples {
     ($($T:ident),*) => {
-        impl<'w, $($T),*> $crate::query::QueryData<'w> for ($($T,)*)
+        impl<'w, $($T),*> $crate::systems::query::QueryData<'w> for ($($T,)*)
         where
         $($T: 'static + std::fmt::Debug ),*
         {

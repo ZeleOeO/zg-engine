@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use crate::{Entity, SystemParam, World, bundle::Bundle, query::QueryData};
+use crate::{Entity, SystemParam, World, bundle::Bundle, systems::query::QueryData};
 
 pub type MutWorldCommand = Box<dyn FnOnce(&mut World)>;
 

@@ -9,11 +9,12 @@ use std::collections::HashSet;
 use zg_utils::TypeIdMap;
 
 use crate::{
+    QueryData,
     archetypes::{Archetype, ArchetypeID, Entity},
     bundle::Bundle,
     events::Events,
-    query::{Query, QueryData},
     resources::{ResMut, Resource},
+    systems::Query,
 };
 
 pub struct World {

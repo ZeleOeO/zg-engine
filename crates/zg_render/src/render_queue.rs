@@ -12,6 +12,13 @@ pub struct RenderQueue {
 }
 
 impl RenderQueue {
+    pub fn new() -> Self {
+        Self {
+            frame_binding: Vec::new(),
+            draw_items: Vec::new(),
+        }
+    }
+
     pub fn flush(
         &mut self,
         render_pass: &mut wgpu::RenderPass,

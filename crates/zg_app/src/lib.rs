@@ -1,4 +1,6 @@
+mod addons;
 mod app;
 mod engine_app;
-mod event;
 pub use app::*;
+
+pub use addons::Addon;

@@ -1,6 +1,5 @@
 use tracy_client::span;
 use wgpu::{CurrentSurfaceTexture, TextureView};
-use winit::event::WindowEvent;
 
 use zg_managers::{PointLight, create_light_bind_group, get_or_create_default_light_material};
 use zg_time::Time;

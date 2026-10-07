@@ -11,6 +11,3 @@ pollster = {workspace=true}
 tracy-client = {workspace=true}
 
 zg_world = {path = "../zg_world"}
-zg_window = {path = "../zg_window"}
-zg_input = {path = "../zg_input"}
-zg_time = {path = "../zg_time"}

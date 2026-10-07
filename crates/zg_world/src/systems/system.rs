@@ -5,7 +5,13 @@ use std::{
 };
 use zg_utils::NodeTrait;
 
-use crate::{World, systems::system_sort::SystemSort};
+use crate::{
+    SystemSet, World,
+    systems::{
+        system_set::{DefaultSet, SetID},
+        system_sort::SystemSort,
+    },
+};
 
 #[derive(Debug)]
 pub struct SystemID(pub TypeId);
@@ -20,24 +26,6 @@ impl System {
     pub fn run(&mut self, mut world: &mut World) {
         self.system.call(&world);
         self.system.reset(&mut world);
-    }
-
-    pub fn before<F, Args>(&mut self, function: F)
-    where
-        F: SystemFunction<Args> + 'static,
-        Args: 'static,
-    {
-        self.sorts
-            .push(SystemSort::Before(SystemID(function.type_id())));
-    }
-
-    pub fn after<F, Args>(&mut self, function: F)
-    where
-        F: SystemFunction<Args> + 'static,
-        Args: 'static,
-    {
-        self.sorts
-            .push(SystemSort::After(SystemID(function.type_id())));
     }
 }
 
@@ -62,6 +50,7 @@ where
     fn call(&mut self, world: &World) {
         self.function.call(world, &mut self.state);
     }
+    // TODO: implement reset for function
     fn reset(&mut self, world: &mut World) {}
 }
 
@@ -109,11 +98,73 @@ pub trait SystemParam {
     fn reset(world: &mut World, state: &mut Self::State);
 }
 
+pub struct InSet<F> {
+    function: F,
+    set_id: SetID,
+}
+
+pub trait IntoSystemConfig<Marker> {
+    type Args;
+    type Func: SystemFunction<Self::Args>;
+    fn into_config(self) -> (Self::Func, SetID);
+}
+
+// these are so the implementations are different
+pub struct InsetMarker;
+pub struct FunctionMarker;
+
+impl<F, Args> IntoSystemConfig<(InsetMarker, Args)> for InSet<F>
+where
+    F: SystemFunction<Args>,
+{
+    type Args = Args;
+    type Func = F;
+    fn into_config(self) -> (Self::Func, SetID) {
+        (self.function, self.set_id)
+    }
+}
+
+impl<F, Args> IntoSystemConfig<(FunctionMarker, Args)> for F
+where
+    F: SystemFunction<Args>,
+{
+    type Args = Args;
+    type Func = F;
+    fn into_config(self) -> (F, SetID) {
+        (self, SetID(DefaultSet.type_id()))
+    }
+}
+
+pub trait SystemFunctionExt<Args>: SystemFunction<Args> + Sized {
+    fn in_set(self, system_set: impl SystemSet) -> InSet<Self> {
+        InSet {
+            function: self,
+            set_id: SetID(system_set.type_id()),
+        }
+    }
+}
+
+impl<F, Args> SystemFunctionExt<Args> for F where F: SystemFunction<Args> {}
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
 macro_rules! impl_for_system_function {
     ($($param:ident),*) => {
-        impl<T, $($param),*> $crate::systems::system::SystemFunction<($($param),*)> for T
+        impl<T, $($param),*> $crate::systems::system::SystemFunction<($($param,)*)> for T
         where
-            T: for<'w> Fn($(<$param as $crate::systems::system::SystemParam>::Param<'w>),*),
+            T: Fn($($param),*)
+                + for<'w> Fn($(<$param as $crate::systems::system::SystemParam>::Param<'w>),*),
             $($param: $crate::systems::system::SystemParam),*
         {
 

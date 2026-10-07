@@ -3,6 +3,7 @@ mod render_queue;
 mod render_utils;
 mod renderer;
 mod system;
+mod addon;
 
 pub use render_command::*;
 pub use render_queue::RenderQueue;

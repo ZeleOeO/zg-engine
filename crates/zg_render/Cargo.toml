@@ -10,6 +10,7 @@ zg_managers = {path = "../zg_managers"}
 zg_world = {path = "../zg_world"}
 zg_utils = {path = "../zg_utils"}
 zg_time = {path = "../zg_time"}
+zg_app = {path = "../zg_app"}
 
 wgpu = {workspace = true}
 winit = {workspace = true}
