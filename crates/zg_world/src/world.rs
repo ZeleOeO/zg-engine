@@ -62,7 +62,10 @@ impl World {
     }
 
     pub fn get_resource<R: Resource + 'static>(&self) -> Ref<R> {
-        let item = self.resources.get(&TypeId::of::<R>()).unwrap();
+        let item = self
+            .resources
+            .get(&TypeId::of::<R>())
+            .unwrap_or_else(|| panic!("Resource not found: {}", std::any::type_name::<R>()));
         let borrowed = item.try_borrow().unwrap();
         let resource = Ref::map(borrowed, |resource| {
             resource.as_ref().as_any().downcast_ref::<R>().unwrap()
@@ -71,7 +74,10 @@ impl World {
     }
 
     pub fn get_resource_mut<R: Resource + 'static>(&self) -> RefMut<R> {
-        let item = self.resources.get(&TypeId::of::<R>()).unwrap();
+        let item = self
+            .resources
+            .get(&TypeId::of::<R>())
+            .unwrap_or_else(|| panic!("Resource not found (mut): {}", std::any::type_name::<R>()));
         let borrow_mut = item.try_borrow_mut().unwrap();
         let resource = RefMut::map(borrow_mut, |resource| {
             resource.as_mut().as_any_mut().downcast_mut::<R>().unwrap()

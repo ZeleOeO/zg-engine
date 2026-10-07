@@ -107,6 +107,7 @@ impl App {
 
 impl ApplicationHandler for App {
     fn resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
+        println!("This runs");
         let window = Arc::new(
             event_loop
                 .create_window(Window::default_attributes().with_title("Graphics Engine"))
@@ -122,9 +123,12 @@ impl ApplicationHandler for App {
         }
 
         app.add_window(window.clone());
+
         app.add_resource(WindowHandle(window.clone()));
 
+        println!("Resources: {:#?}", app.world.resources);
         app.execute_schedule(Setup);
+        println!("Hello");
         window.request_redraw();
     }
 

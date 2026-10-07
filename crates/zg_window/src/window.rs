@@ -19,7 +19,7 @@ impl WindowRes {
     }
 }
 
-pub fn create_window_resoure(window: Res<WindowHandle>, mut commands: Commands) {
+pub fn create_window_resource(window: Res<WindowHandle>, mut commands: Commands) {
     let window_res = WindowRes::new(window.0.0.clone());
     commands.insert_resource(window_res);
 }

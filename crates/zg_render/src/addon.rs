@@ -12,16 +12,19 @@ use crate::{
 pub struct RenderAddon;
 
 #[derive(SystemSet)]
-pub struct RenderSet;
+pub enum RenderSet {
+    Setup,
+    Update,
+}
 
 impl Addon for RenderAddon {
     fn build(&self, app: &mut zg_app::App) {
         app.add_resource(RenderQueue::new())
             .add_resource(WorldRenderer::new())
-            .add_system(Setup, setup_world_renderer.in_set(RenderSet))
-            .add_system(Update, render_items_system.in_set(RenderSet))
-            .add_system(Update, render_lights_system.in_set(RenderSet))
-            .add_system(Update, render_light_gizmo_system.in_set(RenderSet))
-            .add_system(Update, graphics_render_system.in_set(RenderSet));
+            .add_system(Setup, setup_world_renderer.in_set(RenderSet::Setup))
+            .add_system(Update, render_items_system.in_set(RenderSet::Update))
+            .add_system(Update, render_lights_system.in_set(RenderSet::Update))
+            .add_system(Update, render_light_gizmo_system.in_set(RenderSet::Update))
+            .add_system(Update, graphics_render_system.in_set(RenderSet::Update));
     }
 }

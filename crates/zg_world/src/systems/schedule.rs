@@ -56,7 +56,7 @@ impl SystemsSchedule {
                 _phantom_data: PhantomData,
             }),
         };
-        let set_id = SetID(set.type_id());
+        let set_id = set;
         self.set_mut(set_id)
             .systems
             .entry(Box::new(label))

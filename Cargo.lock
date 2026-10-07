@@ -3592,6 +3592,7 @@ dependencies = [
  "zg_camera",
  "zg_graphics",
  "zg_input",
+ "zg_managers",
  "zg_render",
  "zg_time",
  "zg_window",
