@@ -5,7 +5,7 @@ edition = "2024"
 
 [workspace]
 resolver = "2"
-members = ["crates/*", "crates/*/macros"]
+members = ["crates/*", "crates/*/macros" ]
 
 [workspace.dependencies]
 anyhow = "1.0.102"
@@ -27,4 +27,5 @@ zg_render = { path = "crates/zg_render" }
 zg_utils = { path = "crates/zg_utils" }
 zg_world = { path = "crates/zg_world" }
 zg_gltf = { path = "crates/zg_gltf" }
+zg_addons = {path = "crates/zg_addons"}
 anyhow = { workspace = true }

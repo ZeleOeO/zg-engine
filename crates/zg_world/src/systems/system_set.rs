@@ -4,6 +4,7 @@ use std::{
 };
 
 use zg_utils::NodeTrait;
+use zg_world_macros::SystemSet;
 
 use crate::{System, schedule_label::ScheduleLabel};
 
@@ -47,5 +48,5 @@ impl SystemSetNode {
     }
 }
 
+#[derive(SystemSet)]
 pub struct DefaultSet;
-impl SystemSet for DefaultSet {}

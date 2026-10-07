@@ -72,7 +72,7 @@ pub fn create_camera_bind_group(
     };
 
     gpu.queue.write_buffer(
-        &renderer.camera_buffer,
+        renderer.camera_buffer(),
         0,
         bytemuck::cast_slice(&[camera_uniform]),
     );
@@ -82,7 +82,7 @@ pub fn create_camera_bind_group(
         entries: vec![(
             0,
             BindGroupResourceType::Buffer {
-                buffer: renderer.camera_buffer.clone(),
+                buffer: renderer.camera_buffer().clone(),
             },
         )],
     };

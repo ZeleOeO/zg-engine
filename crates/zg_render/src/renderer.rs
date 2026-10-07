@@ -1,27 +1,22 @@
-use wgpu::{Buffer, BufferUsages, wgt::BufferDescriptor};
+use wgpu::Buffer;
 
-use zg_graphics::InternalGraphics;
 use zg_world::{Entity, Resource};
-
-use crate::render_utils::CameraUniform;
 
 #[derive(Clone, Debug, Resource)]
 pub struct WorldRenderer {
     pub default_camera: Option<Entity>,
-    pub camera_buffer: Buffer,
+    pub camera_buffer: Option<Buffer>,
 }
 
 impl WorldRenderer {
-    pub fn new(graphics: &InternalGraphics) -> Self {
-        let buffer = graphics.device.create_buffer(&BufferDescriptor {
-            label: None,
-            size: std::mem::size_of::<CameraUniform>() as u64,
-            usage: BufferUsages::COPY_DST | BufferUsages::UNIFORM,
-            mapped_at_creation: false,
-        });
+    pub fn new() -> Self {
         Self {
             default_camera: None,
-            camera_buffer: buffer,
+            camera_buffer: None,
         }
+    }
+
+    pub fn camera_buffer(&self) -> &Buffer {
+        self.camera_buffer.as_ref().unwrap()
     }
 }

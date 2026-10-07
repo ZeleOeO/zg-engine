@@ -4,12 +4,22 @@ use wgpu::{CurrentSurfaceTexture, TextureView};
 use zg_managers::{PointLight, create_light_bind_group, get_or_create_default_light_material};
 use zg_time::Time;
 
-use crate::RenderQueue;
 use crate::render_command::{DrawItem, FrameBinding};
-use crate::render_utils::create_transform_bind_group;
+use crate::render_utils::{CameraUniform, create_transform_bind_group};
+use crate::{RenderQueue, WorldRenderer};
 use zg_graphics::*;
 use zg_managers::Assets;
 use zg_world::{Query, Res, ResMut, components::*};
+
+pub fn setup_world_renderer(graphics: Res<InternalGraphics>, mut renderer: ResMut<WorldRenderer>) {
+    let buffer = graphics.device.create_buffer(&wgpu::BufferDescriptor {
+        label: None,
+        size: std::mem::size_of::<CameraUniform>() as u64,
+        usage: wgpu::BufferUsages::COPY_DST | wgpu::BufferUsages::UNIFORM,
+        mapped_at_creation: false,
+    });
+    renderer.camera_buffer = Some(buffer);
+}
 
 pub fn render_items_system(
     query: Query<(MeshComponent, MaterialComponent, Transform)>,
@@ -124,7 +134,6 @@ pub fn execute_frame(
     }
 }
 
-// NOTE: run this un updates
 pub fn graphics_render_system(
     mut time: ResMut<Time>,
     mut graphics: ResMut<InternalGraphics>,
@@ -165,13 +174,3 @@ pub fn graphics_render_system(
         tracy_client::frame_mark();
     }
 }
-
-// pub fn graphics_draw_system(
-//     event: EventRef,
-//     mut time: ResMut<Time>,
-//     mut graphics: ResMut<InternalGraphics>,
-//     mut render_queue: ResMut<RenderQueue>,
-//     assets: Res<Assets>,
-// ) {
-//     if let EngineEvents::Window(WindowEvent::RedrawRequested) = event.0 {}
-// }

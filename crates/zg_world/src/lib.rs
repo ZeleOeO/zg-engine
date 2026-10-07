@@ -13,4 +13,4 @@ pub use events::*;
 pub use resources::{Res, ResMut, Resource};
 pub use systems::*;
 pub use world::*;
-pub use zg_world_macros::Resource;
+pub use zg_world_macros::{Resource, SystemSet};

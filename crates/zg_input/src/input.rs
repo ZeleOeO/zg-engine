@@ -31,4 +31,12 @@ impl<I: Hash + Debug + Clone + Eq + 'static> Input<I> {
     pub fn is_pressed(&self, input: I) -> bool {
         self.held.contains(&input)
     }
+
+    pub fn new() -> Input<I> {
+        Input {
+            held: HashSet::new(),
+            just_pressed: HashSet::new(),
+            just_released: HashSet::new(),
+        }
+    }
 }

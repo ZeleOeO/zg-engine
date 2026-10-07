@@ -1,0 +1,15 @@
+[package]
+name = "zg_addons"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+zg_app = {path = "../zg_app"}
+zg_window = {path = "../zg_window"}
+zg_camera = {path = "../zg_camera"}
+zg_render = {path = "../zg_render"}
+zg_input = {path = "../zg_input"}
+zg_time = {path = "../zg_time"}
+zg_graphics = {path = "../zg_graphics"}
+
+pollster = {workspace = true}

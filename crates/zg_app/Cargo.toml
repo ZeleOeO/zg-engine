@@ -11,3 +11,4 @@ pollster = {workspace=true}
 tracy-client = {workspace=true}
 
 zg_world = {path = "../zg_world"}
+zg_graphics = {path = "../zg_graphics"}

@@ -10,20 +10,20 @@ use zg_graphics::*;
 use zg_render::{FrameBinding, RenderQueue, WorldRenderer, create_camera_bind_group};
 use zg_world::{Commands, Res, ResMut};
 
-pub fn camera_controller_mouse_system(
+pub fn camera_controller_mouse_input_system(
     mouse_motion: ResMut<MouseMotion>,
     mut camera_controller: ResMut<CameraController>,
 ) {
     camera_controller.handle_mouse(mouse_motion.delta[0], mouse_motion.delta[1]);
 }
 
-pub fn camera_controller_system(mut renderer: ResMut<WorldRenderer>, mut scene: Commands) {
+pub fn camera_setup_system(mut renderer: ResMut<WorldRenderer>, mut scene: Commands) {
     let camera = Camera::default();
     let entity = scene.spawn((camera,));
     renderer.default_camera = Some(entity)
 }
 
-pub fn camera_update(
+pub fn camera_update_system(
     mut graphics: ResMut<InternalGraphics>,
     mut render_queue: ResMut<RenderQueue>,
     renderer: Res<WorldRenderer>,
@@ -47,7 +47,7 @@ pub fn camera_update(
     }
 }
 
-pub fn camera_controller_sytem(
+pub fn camera_controller_udpate_sytem(
     renderer: Res<WorldRenderer>,
     scene: Commands,
     time: Res<Time>,
@@ -59,7 +59,10 @@ pub fn camera_controller_sytem(
     camera_controller.camera_update(camera, delta);
 }
 
-pub fn camera_input_system(mut camera_controller: ResMut<CameraController>, input: Input<KeyCode>) {
+pub fn camera_controller_keyboard_system(
+    mut camera_controller: ResMut<CameraController>,
+    input: Res<Input<KeyCode>>,
+) {
     camera_controller.is_forward_key_pressed =
         input.is_pressed(KeyCode::ArrowUp) || input.is_pressed(KeyCode::KeyW);
     camera_controller.is_backward_key_pressed =

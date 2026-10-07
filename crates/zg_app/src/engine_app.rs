@@ -1,9 +1,9 @@
-use std::sync::Arc;
+use std::{fmt::Debug, sync::Arc};
 use winit::window::{CursorGrabMode, Window};
 
 use zg_world::{
-    EngineWindowEvents, Events, IntoSystemConfig, Resource, System, SystemFunction, SystemSet,
-    SystemsSchedule, World, schedule_label::ScheduleLabel,
+    EngineWindowEvents, Events, IntoSystemConfig, Resource, SystemSet, SystemsSchedule, World,
+    schedule_label::ScheduleLabel,
 };
 
 pub(crate) struct EngineApp {
@@ -56,5 +56,30 @@ impl EngineApp {
 
     pub fn add_resource<R: Resource + 'static>(&mut self, resource: R) {
         self.world.insert::<R>(resource);
+    }
+
+    pub fn set_order(&mut self, system_set_a: impl SystemSet, system_set_b: impl SystemSet) {
+        self.schedules.set_order(system_set_a, system_set_b);
+    }
+
+    pub fn add_event<E: Debug + Clone + 'static>(&mut self) {
+        self.world.add_event::<E>();
+    }
+
+    pub(crate) fn sort_schedules(&mut self) {
+        self.schedules.sort();
+    }
+
+    pub(crate) fn should_exit(&self) -> bool {
+        let exit = self.world.get_resource::<AppExit>();
+        exit.0
+    }
+}
+
+#[derive(Debug, Resource)]
+pub struct AppExit(pub bool);
+impl AppExit {
+    pub fn new() -> Self {
+        Self(false)
     }
 }

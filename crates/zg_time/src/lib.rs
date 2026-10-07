@@ -1,3 +1,3 @@
 mod time;
 
-pub use time::Time;
+pub use time::{Time, TimeAddon};

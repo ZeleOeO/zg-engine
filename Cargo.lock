@@ -3572,6 +3572,7 @@ name = "zg-engine"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "zg_addons",
  "zg_app",
  "zg_camera",
  "zg_gltf",
@@ -3583,6 +3584,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "zg_addons"
+version = "0.1.0"
+dependencies = [
+ "pollster",
+ "zg_app",
+ "zg_camera",
+ "zg_graphics",
+ "zg_input",
+ "zg_render",
+ "zg_time",
+ "zg_window",
+]
+
+[[package]]
 name = "zg_app"
 version = "0.1.0"
 dependencies = [
@@ -3591,6 +3606,7 @@ dependencies = [
  "pollster",
  "tracy-client",
  "winit",
+ "zg_graphics",
  "zg_world",
 ]
 
@@ -3600,6 +3616,7 @@ version = "0.1.0"
 dependencies = [
  "bytemuck",
  "winit",
+ "zg_app",
  "zg_graphics",
  "zg_input",
  "zg_render",
@@ -3638,7 +3655,9 @@ name = "zg_input"
 version = "0.1.0"
 dependencies = [
  "winit",
+ "zg_app",
  "zg_utils",
+ "zg_window",
  "zg_world",
 ]
 
@@ -3675,6 +3694,7 @@ dependencies = [
 name = "zg_time"
 version = "0.1.0"
 dependencies = [
+ "zg_app",
  "zg_world",
 ]
 
@@ -3692,6 +3712,7 @@ name = "zg_window"
 version = "0.1.0"
 dependencies = [
  "winit",
+ "zg_app",
  "zg_world",
 ]
 

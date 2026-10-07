@@ -1,5 +1,6 @@
 use std::time::Instant;
 
+use zg_app::Addon;
 use zg_world::Resource;
 
 #[derive(Debug, Resource)]
@@ -23,6 +24,8 @@ impl Time {
     }
 
     // This checks between the last time and now
+    // This is called once within the render kini, so when somethinng renders, hence it's udpated
+    // or something like that
     pub fn update(&mut self) {
         self.frames += 1;
         let now = Instant::now();
@@ -33,7 +36,7 @@ impl Time {
         // This should be accurate regardless of what the time_delta says
         if self.elapsed >= 1.0 {
             self.fps = self.frames as f32 / self.elapsed;
-            println!("FPS: {:#?}", self.fps().floor());
+            // println!("FPS: {:#?}", self.fps().floor());
             self.elapsed = 0.0;
             self.frames = 0;
         }
@@ -49,5 +52,12 @@ impl Time {
 
     pub fn fps(&self) -> f32 {
         self.fps
+    }
+}
+
+pub struct TimeAddon;
+impl Addon for TimeAddon {
+    fn build(&self, app: &mut zg_app::App) {
+        app.add_resource(Time::new());
     }
 }

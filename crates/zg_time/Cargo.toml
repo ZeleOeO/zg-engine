@@ -5,3 +5,4 @@ edition = "2024"
 
 [dependencies]
 zg_world = {path = "../zg_world"}
+zg_app =  {path = "../zg_app"}

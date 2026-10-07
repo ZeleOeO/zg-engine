@@ -14,3 +14,4 @@ zg_graphics = {path = "../zg_graphics"}
 zg_window = {path = "../zg_window"}
 zg_input = {path = "../zg_input"}
 zg_time = {path = "../zg_time"}
+zg_app = {path = "../zg_app"}

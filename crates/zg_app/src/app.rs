@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{fmt::Debug, sync::Arc};
 
 use anyhow::Ok;
 use winit::{
@@ -10,6 +10,7 @@ use winit::{
 };
 use zg_world::{
     EngineWindowEvents, IntoSystemConfig, KeyboardInputEvent, MouseMotionEvent, Resource,
+    SystemSet,
     schedule_label::{PreUpdate, ScheduleLabel, Setup, Update},
 };
 
@@ -35,8 +36,23 @@ impl App {
         tracy_client::Client::start();
         let event_loop = EventLoop::new()?;
         event_loop.set_control_flow(winit::event_loop::ControlFlow::Poll);
+        self.sort_schedules();
         event_loop.run_app(self)?;
         Ok(())
+    }
+
+    pub(crate) fn sort_schedules(&mut self) {
+        let Some(app) = &mut self.engine_app else {
+            panic!("No engine app found");
+        };
+        app.sort_schedules();
+    }
+
+    pub fn window(&self) -> Arc<Window> {
+        let Some(app) = &self.engine_app else {
+            panic!("No engine app found");
+        };
+        app.window.clone().unwrap()
     }
 
     pub fn add_addons(&mut self, add_on: impl Addon) -> &mut Self {
@@ -62,6 +78,26 @@ impl App {
             panic!("No engine app found");
         };
         app.add_resource::<R>(resource);
+        self
+    }
+
+    pub fn set_order(
+        &mut self,
+        system_set_a: impl SystemSet,
+        system_set_b: impl SystemSet,
+    ) -> &mut Self {
+        let Some(app) = &mut self.engine_app else {
+            panic!("No engine app found");
+        };
+        app.set_order(system_set_a, system_set_b);
+        self
+    }
+
+    pub fn add_event<E: Debug + Clone + 'static>(&mut self) -> &mut Self {
+        let Some(app) = &mut self.engine_app else {
+            panic!("No engine app found");
+        };
+        app.add_event::<E>();
         self
     }
 }
@@ -135,7 +171,7 @@ impl ApplicationHandler for App {
         }
     }
 
-    fn about_to_wait(&mut self, _event_loop: &winit::event_loop::ActiveEventLoop) {
+    fn about_to_wait(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
         let Some(app) = &mut self.engine_app else {
             return;
         };
@@ -143,6 +179,12 @@ impl ApplicationHandler for App {
         app.send_window_events();
         app.execute_schedule(PreUpdate);
         app.execute_schedule(Update);
+
+        if app.should_exit() {
+            event_loop.exit();
+            return;
+        }
+
         let Some(window) = &mut app.window else {
             return;
         };

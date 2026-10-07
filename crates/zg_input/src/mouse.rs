@@ -5,3 +5,9 @@ use zg_world::Resource;
 pub struct MouseMotion {
     pub delta: Vec2,
 }
+
+impl MouseMotion {
+    pub(crate) fn new() -> Self {
+        Self { delta: [0.0, 0.0] }
+    }
+}

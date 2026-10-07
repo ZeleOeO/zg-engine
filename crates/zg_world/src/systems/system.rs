@@ -50,8 +50,9 @@ where
     fn call(&mut self, world: &World) {
         self.function.call(world, &mut self.state);
     }
-    // TODO: implement reset for function
-    fn reset(&mut self, world: &mut World) {}
+    fn reset(&mut self, world: &mut World) {
+        self.function.reset(world, &mut self.state);
+    }
 }
 
 impl NodeTrait for System {
@@ -103,6 +104,8 @@ pub struct InSet<F> {
     set_id: SetID,
 }
 
+// INTO SYSTEM CONFIG
+
 pub trait IntoSystemConfig<Marker> {
     type Args;
     type Func: SystemFunction<Self::Args>;
@@ -135,6 +138,7 @@ where
     }
 }
 
+// System Function Extras
 pub trait SystemFunctionExt<Args>: SystemFunction<Args> + Sized {
     fn in_set(self, system_set: impl SystemSet) -> InSet<Self> {
         InSet {
@@ -143,28 +147,13 @@ pub trait SystemFunctionExt<Args>: SystemFunction<Args> + Sized {
         }
     }
 }
-
 impl<F, Args> SystemFunctionExt<Args> for F where F: SystemFunction<Args> {}
-
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 macro_rules! impl_for_system_function {
     ($($param:ident),*) => {
         impl<T, $($param),*> $crate::systems::system::SystemFunction<($($param,)*)> for T
         where
-            T: Fn($($param),*)
-                + for<'w> Fn($(<$param as $crate::systems::system::SystemParam>::Param<'w>),*),
+            T: Fn($($param),*) + for<'w> Fn($(<$param as $crate::systems::system::SystemParam>::Param<'w>),*),
             $($param: $crate::systems::system::SystemParam),*
         {
 

@@ -39,16 +39,6 @@ impl SystemsSchedule {
         self.set_mut(id);
     }
 
-    // pub fn add_system<'w, Args, F, S>(
-    //     &mut self,
-    //     label: impl ScheduleLabel,
-    //     function: F,
-    // ) -> &mut Self
-    // where
-    //     F: SystemFunction<Args, State = S> + 'static,
-    //     S: 'static,
-    //     Args: 'static,
-
     pub fn add_system<C, M>(&mut self, label: impl ScheduleLabel, config: C)
     where
         C: IntoSystemConfig<M> + 'static,
@@ -74,36 +64,11 @@ impl SystemsSchedule {
             .push(system);
     }
 
-    // pub fn add_system<Args, F, S>(
-    //     &mut self,
-    //     label: impl ScheduleLabel,
-    //     set: impl SystemSet,
-    //     function: F,
-    // ) where
-    //     F: SystemFunction<Args, State = S> + 'static,
-    //     S: 'static,
-    //     Args: 'static,
-    // {
-    //     let system = System {
-    //         id: SystemID(TypeId::of::<F>()),
-    //         sorts: Vec::new(),
-    //         system: Box::new(ExecFunction {
-    //             function,
-    //             state: F::init(),
-    //             _phantom_data: PhantomData,
-    //         }),
-    //     };
-    //     let set_id = SetID(set.type_id());
-    //     self.set_mut(set_id)
-    //         .systems
-    //         .entry(Box::new(label))
-    //         .or_default()
-    //         .push(system);
-    // }
-
-    pub fn set_before(&mut self, a: SetID, b: SetID) {
-        self.set_mut(a).next_ids.push(b);
-        self.set_mut(b).prev_ids.push(a);
+    pub fn set_order(&mut self, system_set_a: impl SystemSet, system_set_b: impl SystemSet) {
+        let a_set_id = SetID(system_set_a.type_id());
+        let b_set_id = SetID(system_set_b.type_id());
+        self.set_mut(a_set_id).next_ids.push(b_set_id);
+        self.set_mut(b_set_id).prev_ids.push(a_set_id);
     }
 
     pub fn sort(&mut self) {
@@ -133,40 +98,3 @@ impl SystemsSchedule {
         }
     }
 }
-//
-// #[derive(Default)]
-// pub struct Schedule {
-//     systems: Vec<System>,
-// }
-//
-// impl Schedule {
-//     // pub fn add<'w, Args, F, S>(&mut self, function: F) -> &mut System
-//     // where
-//     //     F: SystemFunction<Args, State = S> + 'static,
-//     //     S: 'static,
-//     //     Args: 'static,
-//     // {
-//     //     let system = System {
-//     //         id: SystemID(TypeId::of::<F>()),
-//     //         sorts: Vec::new(),
-//     //         system: Box::new(ExecFunction {
-//     //             function,
-//     //             state: F::init(),
-//     //             _phantom_data: PhantomData,
-//     //         }),
-//     //     };
-//     //     self.systems.push_mut(system)
-//     // }
-//     //
-//     // pub fn sort(&mut self) {
-//     //     if !sort_vector(&mut self.systems) {
-//     //         panic!("Cyclic dependency")
-//     //     };
-//     // }
-//
-//     fn run(&mut self, world: &mut World) {
-//         for system in &mut self.systems {
-//             system.run(world);
-//         }
-//     }
-// }
