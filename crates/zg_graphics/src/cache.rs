@@ -19,6 +19,14 @@ pub struct Cache {
     pub pipelines: [wgpu::RenderPipeline; 2],
     // Dense Array of bind groups
     pub cached_bind_groups: Vec<BindGroup>,
+    
+    pub cached_transform_bind_groups: Vec<(wgpu::Buffer, BindGroupCacheHandle)>,
+    pub transform_bind_groups_index: usize,
+    
+    pub cached_light_bind_groups: Vec<(wgpu::Buffer, BindGroupCacheHandle)>,
+    pub light_bind_groups_index: usize,
+    
+    pub default_light_material: Option<BindGroupCacheHandle>,
 }
 
 impl Cache {
@@ -51,6 +59,11 @@ impl Cache {
             bind_groups_cache_map: HashMap::default(),
             cached_bind_groups: Vec::default(),
             pipelines,
+            cached_transform_bind_groups: Vec::default(),
+            transform_bind_groups_index: 0,
+            cached_light_bind_groups: Vec::default(),
+            light_bind_groups_index: 0,
+            default_light_material: None,
         }
     }
 }

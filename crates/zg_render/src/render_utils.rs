@@ -38,17 +38,28 @@ pub fn create_transform_bind_group(
             [normal[2][0], normal[2][1], normal[2][2], 0.0],
         ],
     };
-    let buffer = gpu.device.create_buffer_init(&BufferInitDescriptor {
-        label: None,
-        contents: bytemuck::cast_slice(&[item_uniform]),
-        usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
-    });
+    if gpu.cache.transform_bind_groups_index < gpu.cache.cached_transform_bind_groups.len() {
+        let (buffer, handle) = &gpu.cache.cached_transform_bind_groups[gpu.cache.transform_bind_groups_index];
+        gpu.queue.write_buffer(buffer, 0, bytemuck::cast_slice(&[item_uniform]));
+        let handle_copy = *handle;
+        gpu.cache.transform_bind_groups_index += 1;
+        handle_copy
+    } else {
+        let buffer = gpu.device.create_buffer_init(&BufferInitDescriptor {
+            label: None,
+            contents: bytemuck::cast_slice(&[item_uniform]),
+            usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
+        });
 
-    let cache_key = BindGroupCacheKey {
-        layout_num: 2,
-        entries: vec![(0, BindGroupResourceType::Buffer { buffer })],
-    };
-    gpu.get_or_create_bind_group(cache_key)
+        let cache_key = BindGroupCacheKey {
+            layout_num: 2,
+            entries: vec![(0, BindGroupResourceType::Buffer { buffer: buffer.clone() })],
+        };
+        let handle = gpu.get_or_create_bind_group(cache_key);
+        gpu.cache.cached_transform_bind_groups.push((buffer, handle));
+        gpu.cache.transform_bind_groups_index += 1;
+        handle
+    }
 }
 
 #[repr(C)]

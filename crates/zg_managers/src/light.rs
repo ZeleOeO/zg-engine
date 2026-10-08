@@ -40,26 +40,41 @@ pub fn create_light_bind_group(
         _padding2: 0.0,
     };
 
-    let light_buffer = gpu.device.create_buffer_init(&BufferInitDescriptor {
-        label: None,
-        contents: bytemuck::cast_slice(&[light_uniform]),
-        usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
-    });
+    if gpu.cache.light_bind_groups_index < gpu.cache.cached_light_bind_groups.len() {
+        let (buffer, handle) = &gpu.cache.cached_light_bind_groups[gpu.cache.light_bind_groups_index];
+        gpu.queue.write_buffer(buffer, 0, bytemuck::cast_slice(&[light_uniform]));
+        let handle_copy = *handle;
+        gpu.cache.light_bind_groups_index += 1;
+        handle_copy
+    } else {
+        let light_buffer = gpu.device.create_buffer_init(&BufferInitDescriptor {
+            label: None,
+            contents: bytemuck::cast_slice(&[light_uniform]),
+            usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
+        });
 
-    let cache_key = BindGroupCacheKey {
-        layout_num: 3,
-        entries: vec![(
-            0,
-            BindGroupResourceType::Buffer {
-                buffer: light_buffer,
-            },
-        )],
-    };
+        let cache_key = BindGroupCacheKey {
+            layout_num: 3,
+            entries: vec![(
+                0,
+                BindGroupResourceType::Buffer {
+                    buffer: light_buffer.clone(),
+                },
+            )],
+        };
 
-    gpu.get_or_create_bind_group(cache_key)
+        let handle = gpu.get_or_create_bind_group(cache_key);
+        gpu.cache.cached_light_bind_groups.push((light_buffer, handle));
+        gpu.cache.light_bind_groups_index += 1;
+        handle
+    }
 }
 
 pub fn get_or_create_default_light_material(gpu: &mut InternalGraphics) -> BindGroupCacheHandle {
+    if let Some(handle) = gpu.cache.default_light_material {
+        return handle;
+    }
+
     let buffer = gpu.device.create_buffer_init(&BufferInitDescriptor {
         label: Some("Buffer Init Descriptor Matieral Color"),
         contents: bytemuck::cast_slice(&[MaterialUniform {
@@ -90,5 +105,7 @@ pub fn get_or_create_default_light_material(gpu: &mut InternalGraphics) -> BindG
         ],
     };
 
-    gpu.get_or_create_bind_group(cache_key)
+    let handle = gpu.get_or_create_bind_group(cache_key);
+    gpu.cache.default_light_material = Some(handle);
+    handle
 }

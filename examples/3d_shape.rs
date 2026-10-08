@@ -1,10 +1,10 @@
 use zg_engine::prelude::*;
-use zg_world::{components::Transform, schedule_label::Update};
+use zg_world::{components::Transform, schedule_label::Setup};
 
 fn main() -> anyhow::Result<()> {
     App::new()?
         .add_addons(DefaultAddon)
-        .add_system(Update, create_mesh)
+        .add_system(Setup, create_mesh)
         .run()
 }
 

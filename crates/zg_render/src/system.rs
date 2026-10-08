@@ -30,6 +30,8 @@ pub fn render_items_system(
     let span = span!("render items");
     span.emit_color(0x3A9453);
 
+    graphics.cache.transform_bind_groups_index = 0;
+
     for (mesh, material, transform) in query.get_all_entities() {
         let mesh_meta_data = assets.mesh_manager.get_mesh_data(mesh.0.0);
         render_queue.draw_items.push(DrawItem {
@@ -49,6 +51,7 @@ pub fn render_lights_system(
     query: Query<(PointLight,)>,
 ) {
     let _span = span!("render light");
+    graphics.cache.light_bind_groups_index = 0;
     for (light,) in query.get_all_entities() {
         render_queue.frame_binding.push(FrameBinding {
             bind_group: create_light_bind_group(&mut graphics.0, light),
