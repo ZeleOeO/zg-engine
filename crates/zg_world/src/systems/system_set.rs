@@ -8,14 +8,18 @@ use zg_world_macros::SystemSet;
 
 use crate::{System, schedule_label::ScheduleLabel};
 
-pub trait SystemSet: Sized + 'static {
-    fn id(&self) -> SetID {
-        SetID(self.type_id())
+pub trait SystemSet: 'static {
+    fn variant(&self) -> usize {
+        0
+    }
+
+    fn set_id(&self) -> SetID {
+        SetID(TypeId::of::<Self>(), self.variant())
     }
 }
 
 #[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
-pub struct SetID(pub TypeId);
+pub struct SetID(pub TypeId, pub usize);
 
 pub struct SystemSetNode {
     pub id: SetID,
@@ -25,15 +29,15 @@ pub struct SystemSetNode {
 }
 
 impl NodeTrait for SystemSetNode {
-    type ID = TypeId;
+    type ID = SetID;
     fn node_id(&self) -> &Self::ID {
-        &self.id.0
+        &self.id
     }
     fn prev_ids(&self) -> Vec<Self::ID> {
-        self.prev_ids.iter().map(|id| id.0).collect()
+        self.prev_ids.clone()
     }
     fn next_ids(&self) -> Vec<Self::ID> {
-        self.next_ids.iter().map(|id| id.0).collect()
+        self.next_ids.clone()
     }
 }
 

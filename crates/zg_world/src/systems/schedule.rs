@@ -1,8 +1,4 @@
-use std::{
-    any::{Any, TypeId},
-    collections::HashMap,
-    marker::PhantomData,
-};
+use std::{any::TypeId, collections::HashMap, marker::PhantomData};
 
 use zg_utils::sort_vector;
 
@@ -35,7 +31,7 @@ impl SystemsSchedule {
     }
 
     pub fn add_system_set(&mut self, system_set: impl SystemSet) {
-        let id = SetID(system_set.type_id());
+        let id = system_set.set_id();
         self.set_mut(id);
     }
 
@@ -65,8 +61,8 @@ impl SystemsSchedule {
     }
 
     pub fn set_order(&mut self, system_set_a: impl SystemSet, system_set_b: impl SystemSet) {
-        let a_set_id = SetID(system_set_a.type_id());
-        let b_set_id = SetID(system_set_b.type_id());
+        let a_set_id = system_set_a.set_id();
+        let b_set_id = system_set_b.set_id();
         self.set_mut(a_set_id).next_ids.push(b_set_id);
         self.set_mut(b_set_id).prev_ids.push(a_set_id);
     }

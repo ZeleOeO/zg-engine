@@ -18,6 +18,7 @@ impl Addon for DefaultAddon {
             .set_order(GraphicsSystemSet, DefaultSet)
             .set_order(CameraSet::Setup, RenderSet::Setup)
             .set_order(DefaultSet, RenderSet::Setup)
+            .set_order(DefaultSet, RenderSet::Update)
             .add_addons(WindowAddon)
             .add_resource(AppExit::new())
             .add_resource(Assets::new())

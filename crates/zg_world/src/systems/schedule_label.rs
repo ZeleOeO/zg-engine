@@ -31,5 +31,5 @@ pub struct PreUpdate;
 impl ScheduleLabel for PreUpdate {}
 
 #[derive(Clone, Copy, Hash, PartialEq, Eq, Debug)]
-pub struct DeviceSystemEvent;
-impl ScheduleLabel for DeviceSystemEvent {}
+pub struct PostUpdate;
+impl ScheduleLabel for PostUpdate {}

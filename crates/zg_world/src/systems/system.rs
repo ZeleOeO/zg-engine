@@ -134,7 +134,7 @@ where
     type Args = Args;
     type Func = F;
     fn into_config(self) -> (F, SetID) {
-        (self, SetID(DefaultSet.type_id()))
+        (self, DefaultSet.set_id())
     }
 }
 
@@ -143,7 +143,7 @@ pub trait SystemFunctionExt<Args>: SystemFunction<Args> + Sized {
     fn in_set(self, system_set: impl SystemSet) -> InSet<Self> {
         InSet {
             function: self,
-            set_id: SetID(system_set.type_id()),
+            set_id: system_set.set_id(),
         }
     }
 }
