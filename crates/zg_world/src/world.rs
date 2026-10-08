@@ -139,9 +139,6 @@ impl World {
             }
         }
 
-        if archetype_ids.len() <= 0 {
-            panic!("No archetype found");
-        }
 
         archetype_ids
     }

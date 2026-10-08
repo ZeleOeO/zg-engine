@@ -34,7 +34,9 @@ pub fn camera_update_system(
         // This changes the aspect ratio for the camera
         let window_size = window.0.window.inner_size();
         let camera = scene.get_entity::<(Camera,)>(camera_entity).0;
-        camera.aspect = (window_size.width as f32) / window_size.height as f32;
+        if window_size.height > 0 {
+            camera.aspect = (window_size.width as f32) / window_size.height as f32;
+        }
 
         let view_proj = camera.build_projection_matrix();
 

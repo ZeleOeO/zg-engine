@@ -29,10 +29,10 @@ pub fn create_mesh(
         },
     );
 
-    commands.spawn((
-        PointLight::new([0.8, 0.5, -0.6], [1.0, 1.0, 1.0]),
-        cube_mesh,
-    ));
+    // commands.spawn((
+    //     PointLight::new([0.8, 0.5, -0.6], [1.0, 1.0, 1.0]),
+    //     cube_mesh,
+    // ));
 
     commands.spawn((
         prism_mesh,
