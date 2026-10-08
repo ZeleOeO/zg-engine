@@ -52,10 +52,19 @@ pub fn render_lights_system(
 ) {
     let _span = span!("render light");
     graphics.cache.light_bind_groups_index = 0;
-    for (light,) in query.get_all_entities() {
+    
+    let entities = query.get_all_entities();
+    if entities.is_empty() {
+        let default_light = PointLight::new([0.0, 0.0, 0.0], [0.0, 0.0, 0.0]);
         render_queue.frame_binding.push(FrameBinding {
-            bind_group: create_light_bind_group(&mut graphics.0, light),
+            bind_group: create_light_bind_group(&mut graphics.0, &default_light),
         });
+    } else {
+        for (light,) in entities {
+            render_queue.frame_binding.push(FrameBinding {
+                bind_group: create_light_bind_group(&mut graphics.0, light),
+            });
+        }
     }
 }
 

@@ -43,7 +43,7 @@ impl SystemParam for Commands<'_> {
         Commands {
             world: world,
             command_queue: state,
-            ids: 0,
+            ids: world.entities.len() as u32,
         }
     }
     fn reset(world: &mut crate::World, state: &mut Self::State) {

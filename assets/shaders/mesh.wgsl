@@ -59,6 +59,10 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
         material_uniform.has_texture == 1.0
     );
 
+    if all(light_uniform.color == vec3<f32>(0.0, 0.0, 0.0)) {
+        return vec4<f32>(base_color, 1.0);
+    }
+
     let light_dir = normalize(light_uniform.position - in.world_position);
     let view = normalize(camera.position - in.world_position);
     let normal = normalize(in.normal);

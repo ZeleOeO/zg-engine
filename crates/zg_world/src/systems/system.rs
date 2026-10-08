@@ -159,16 +159,19 @@ macro_rules! impl_for_system_function {
 
             type State = ($($param::State, )*);
 
+            #[allow(non_snake_case)]
             fn init() -> Self::State {
                 ($($param::init_state(), )*)
             }
 
+            #[allow(non_snake_case)]
             fn call<'w>(&self, world: &'w $crate::World, state: &'w mut Self::State) {
                 let ($($param,)*) = state;
                 (self)($($param::extract_params(world, $param)),*)
             }
 
 
+            #[allow(non_snake_case)]
             fn reset(&self,  world: &mut World,  state: &mut Self::State) {
                 let ($($param,)*) = state;
                 $($param::reset(world, $param); )*
