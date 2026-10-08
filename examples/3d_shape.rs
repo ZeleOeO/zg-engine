@@ -22,14 +22,32 @@ pub fn create_mesh(
         },
     );
 
-    println!("Run this command");
+    let color_mat = assets.create_material(
+        &mut graphics,
+        zg_managers::material::MaterialType::NonTexture {
+            color: [0.0, 0.0, 1.0],
+        },
+    );
+
     commands.spawn((
         PointLight::new([0.8, 0.5, -0.6], [1.0, 1.0, 1.0]),
         cube_mesh,
     ));
+
     commands.spawn((
         prism_mesh,
         tree_material,
         Transform::from_translation(3.0, 1.0, 3.0),
+    ));
+
+    commands.spawn((
+        prism_mesh,
+        color_mat,
+        Transform::from_translation(1.0, 2.0, 3.0),
+    ));
+    commands.spawn((
+        cube_mesh,
+        color_mat,
+        Transform::from_translation(8.0, 2.0, 3.0).with_uniform_scale(3.0),
     ));
 }

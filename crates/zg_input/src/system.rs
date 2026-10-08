@@ -9,7 +9,7 @@ use zg_world::{
 use crate::{Input, mouse::MouseMotion};
 
 pub fn keyboard_send_event_system(
-    input_reader: EventReader<KeyboardInputEvent>,
+    mut input_reader: EventReader<KeyboardInputEvent>,
     mut keyboard_input: ResMut<Input<KeyCode>>,
 ) {
     for event in input_reader.read() {
@@ -23,7 +23,7 @@ pub fn keyboard_send_event_system(
 }
 
 pub fn add_mouse_motion_event(
-    mouse_reader: EventReader<MouseMotionEvent>,
+    mut mouse_reader: EventReader<MouseMotionEvent>,
     mut mouse_motion: ResMut<MouseMotion>,
 ) {
     let mut delta: [f32; 2] = [0.0, 0.0];

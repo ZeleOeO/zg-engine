@@ -16,8 +16,8 @@ impl<E: Debug + Clone> Events<E> {
         self.events.push(event);
     }
 
-    pub fn read(&self) -> Vec<E> {
-        self.events.clone()
+    pub fn read(&mut self) -> Vec<E> {
+        self.events.drain(..).collect()
     }
 
     pub fn write_batch(&mut self, events: Vec<E>) {
