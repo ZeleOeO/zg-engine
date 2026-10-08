@@ -11,5 +11,5 @@ pub use query::Query;
 pub(crate) use query::QueryData;
 pub use schedule::SystemsSchedule;
 pub use system::{IntoSystemConfig, System, SystemFunction, SystemFunctionExt, SystemParam};
-pub use system_set::SystemSet;
+pub use system_set::{DefaultSet, SystemSet};
 // pub use system_set::SystemSet;

@@ -5,8 +5,8 @@ use zg_input::InputAddon;
 use zg_managers::Assets;
 use zg_render::{RenderAddon, RenderSet};
 use zg_time::TimeAddon;
-use zg_window::{WindowAddon, WindowRes, WindowSet};
-use zg_world::{Commands, Res, SystemFunctionExt, SystemSet, schedule_label::Setup};
+use zg_window::{WindowAddon, WindowSet};
+use zg_world::{Commands, DefaultSet, Res, SystemFunctionExt, SystemSet, schedule_label::Setup};
 
 pub struct DefaultAddon;
 
@@ -15,6 +15,7 @@ impl Addon for DefaultAddon {
         app.set_order(GraphicsSystemSet, CameraSet::Setup)
             .set_order(GraphicsSystemSet, RenderSet::Setup)
             .set_order(GraphicsSystemSet, WindowSet::PreUpdate)
+            .set_order(DefaultSet, RenderSet::Update)
             .add_addons(WindowAddon)
             .add_resource(AppExit::new())
             .add_resource(Assets::new())

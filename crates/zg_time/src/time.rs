@@ -36,7 +36,7 @@ impl Time {
         // This should be accurate regardless of what the time_delta says
         if self.elapsed >= 1.0 {
             self.fps = self.frames as f32 / self.elapsed;
-            // println!("FPS: {:#?}", self.fps().floor());
+            println!("FPS: {:#?}", self.fps().floor());
             self.elapsed = 0.0;
             self.frames = 0;
         }
