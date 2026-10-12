@@ -52,7 +52,7 @@ pub fn render_lights_system(
 ) {
     let _span = span!("render light");
     graphics.cache.light_bind_groups_index = 0;
-    
+
     let entities = query.get_all_entities();
     if entities.is_empty() {
         let default_light = PointLight::new([0.0, 0.0, 0.0], [0.0, 0.0, 0.0]);
@@ -182,7 +182,7 @@ pub fn graphics_render_system(
 
     {
         let _ = span!("present frame");
-        frame.present();
+        graphics.queue.present(frame);
         tracy_client::frame_mark();
     }
 }

@@ -33,7 +33,7 @@ pub fn main_pipeline(
             module: &shader,
             entry_point: Some("vs_main"),
             compilation_options: PipelineCompilationOptions::default(),
-            buffers: &[ModelVertex::desc()],
+            buffers: &[Some(ModelVertex::desc())],
         },
         primitive: wgpu::PrimitiveState {
             topology: wgpu::PrimitiveTopology::TriangleList,
@@ -92,7 +92,7 @@ pub fn light_pipeline(
             module: &shader,
             entry_point: Some("vs_main"),
             compilation_options: PipelineCompilationOptions::default(),
-            buffers: &[ModelVertex::desc()],
+            buffers: &[Some(ModelVertex::desc())],
         },
         primitive: wgpu::PrimitiveState {
             topology: wgpu::PrimitiveTopology::TriangleList,
