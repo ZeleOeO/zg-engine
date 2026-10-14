@@ -4,3 +4,13 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+egui =  {workspace = true}
+egui-wgpu = {workspace = true}
+egui-winit = {workspace = true}
+winit = {workspace = true}
+wgpu = {workspace = true}
+
+zg_graphics = {path = "../zg_graphics"}
+zg_world= {path = "../zg_world"}
+zg_window = {path = "../zg_window"}
+zg_app = {path = "../zg_app" }

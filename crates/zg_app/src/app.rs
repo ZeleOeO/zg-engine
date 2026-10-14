@@ -9,8 +9,8 @@ use winit::{
     window::Window,
 };
 use zg_world::{
-    EngineWindowEvents, IntoSystemConfig, KeyboardInputEvent, MouseMotionEvent, Resource,
-    SystemSet,
+    EngineWindowEvents, IntoSystemConfig, KeyboardInputEvent, MouseMotionEvent,
+    RawWinitWindowEvents, Resource, SystemSet,
     schedule_label::{PreUpdate, ScheduleLabel, Setup, Update},
 };
 
@@ -138,6 +138,11 @@ impl ApplicationHandler for App {
         let Some(app) = &mut self.engine_app else {
             return;
         };
+
+        app.raw_window_events.push(RawWinitWindowEvents {
+            // this is probably a bit expensive
+            event: event.clone(),
+        });
 
         match event {
             WindowEvent::KeyboardInput {

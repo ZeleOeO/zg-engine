@@ -2,8 +2,8 @@ use std::{fmt::Debug, sync::Arc};
 use winit::window::{CursorGrabMode, Window};
 
 use zg_world::{
-    EngineWindowEvents, Events, IntoSystemConfig, Resource, SystemSet, SystemsSchedule, World,
-    schedule_label::ScheduleLabel,
+    EngineWindowEvents, Events, IntoSystemConfig, RawWinitWindowEvents, Resource, SystemSet,
+    SystemsSchedule, World, schedule_label::ScheduleLabel,
 };
 
 pub(crate) struct EngineApp {
@@ -11,6 +11,7 @@ pub(crate) struct EngineApp {
     pub schedules: SystemsSchedule,
     pub window: Option<Arc<Window>>,
     pub(crate) window_events: Vec<EngineWindowEvents>,
+    pub(crate) raw_window_events: Vec<RawWinitWindowEvents>,
 }
 
 impl EngineApp {
@@ -22,6 +23,7 @@ impl EngineApp {
             schedules: systems,
             window: None,
             window_events: Vec::new(),
+            raw_window_events: Vec::new(),
         }
     }
 
@@ -41,8 +43,11 @@ impl EngineApp {
     pub(crate) fn send_window_events(&mut self) {
         let world = &self.world;
         let window_events = self.window_events.drain(..).collect::<Vec<_>>();
+        let raw_window_events = self.raw_window_events.drain(..).collect::<Vec<_>>();
         let mut window_event_res = world.get_resource_mut::<Events<EngineWindowEvents>>();
+        let mut raw_window_events_res = world.get_resource_mut::<Events<RawWinitWindowEvents>>();
         window_event_res.write_batch(window_events);
+        raw_window_events_res.write_batch(raw_window_events);
     }
 
     pub fn add_system<C, M>(&mut self, label: impl ScheduleLabel, config: C)

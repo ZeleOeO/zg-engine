@@ -20,6 +20,10 @@ impl<E: Debug + Clone> Events<E> {
         self.events.drain(..).collect()
     }
 
+    pub fn view(&self) -> &Vec<E> {
+        &self.events
+    }
+
     pub fn write_batch(&mut self, events: Vec<E>) {
         for event in events {
             self.write(event);

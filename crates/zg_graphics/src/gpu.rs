@@ -4,6 +4,7 @@ use std::sync::Arc;
 use wgpu::{
     Backends, BindGroup, BindingResource, Device, DeviceDescriptor, ExperimentalFeatures, Features,
     Instance, Limits, RenderPipeline, RequestAdapterOptions, Surface, SurfaceConfiguration,
+    TextureFormat,
 };
 use wgpu::{Queue, TextureView};
 use winit::window::Window;
@@ -20,6 +21,7 @@ pub struct InternalGraphics {
     pub queue: Queue,
     pub config: SurfaceConfiguration,
     pub depth_texture_view: TextureView,
+    pub surface_format: TextureFormat,
     pub cache: Cache,
 }
 
@@ -109,6 +111,7 @@ impl InternalGraphics {
             queue,
             config,
             depth_texture_view,
+            surface_format,
             cache,
         };
         Ok(graphics)

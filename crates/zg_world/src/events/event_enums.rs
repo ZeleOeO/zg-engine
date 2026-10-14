@@ -17,3 +17,8 @@ pub enum EngineWindowEvents {
     KeyboardInput(KeyboardInputEvent),
     MouseMotion(MouseMotionEvent),
 }
+
+#[derive(Debug, Clone)]
+pub struct RawWinitWindowEvents {
+    pub event: winit::event::WindowEvent,
+}

@@ -1,13 +1,15 @@
 use winit::keyboard::KeyCode;
 use zg_input::{Input, MouseMotion};
 use zg_time::Time;
-use zg_window::WindowRes;
+use zg_ui::InputFocus;
 
 use crate::camera::Camera;
 use crate::camera_controller::CameraController;
 
 use zg_graphics::*;
-use zg_render::{FrameBinding, RenderQueue, WorldRenderer, create_camera_bind_group};
+use zg_render::{
+    FrameBinding, RenderQueue, SceneTargetSize, WorldRenderer, create_camera_bind_group,
+};
 use zg_world::{Commands, Res, ResMut};
 
 pub fn camera_controller_mouse_input_system(
@@ -27,16 +29,13 @@ pub fn camera_update_system(
     mut graphics: ResMut<InternalGraphics>,
     mut render_queue: ResMut<RenderQueue>,
     renderer: Res<WorldRenderer>,
-    window: Res<WindowRes>,
+    scene_size: Res<SceneTargetSize>,
     scene: Commands,
 ) {
     if let Some(camera_entity) = renderer.default_camera {
-        // This changes the aspect ratio for the camera
-        let window_size = window.0.window.inner_size();
         let camera = scene.get_entity::<(Camera,)>(camera_entity).0;
-        if window_size.height > 0 {
-            camera.aspect = (window_size.width as f32) / window_size.height as f32;
-        }
+        let [width, height] = scene_size.0.0;
+        camera.aspect = (width as f32) / height as f32;
 
         let view_proj = camera.build_projection_matrix();
 
@@ -64,13 +63,21 @@ pub fn camera_controller_udpate_sytem(
 pub fn camera_controller_keyboard_system(
     mut camera_controller: ResMut<CameraController>,
     input: Res<Input<KeyCode>>,
+    input_focus: Res<InputFocus>,
 ) {
-    camera_controller.is_forward_key_pressed =
-        input.is_pressed(KeyCode::ArrowUp) || input.is_pressed(KeyCode::KeyW);
-    camera_controller.is_backward_key_pressed =
-        input.is_pressed(KeyCode::ArrowDown) || input.is_pressed(KeyCode::KeyS);
-    camera_controller.is_left_key_pressed =
-        input.is_pressed(KeyCode::ArrowLeft) || input.is_pressed(KeyCode::KeyA);
-    camera_controller.is_right_key_pressed =
-        input.is_pressed(KeyCode::ArrowRight) || input.is_pressed(KeyCode::KeyD);
+    if input_focus.game_keyboard {
+        camera_controller.is_forward_key_pressed =
+            input.is_pressed(KeyCode::ArrowUp) || input.is_pressed(KeyCode::KeyW);
+        camera_controller.is_backward_key_pressed =
+            input.is_pressed(KeyCode::ArrowDown) || input.is_pressed(KeyCode::KeyS);
+        camera_controller.is_left_key_pressed =
+            input.is_pressed(KeyCode::ArrowLeft) || input.is_pressed(KeyCode::KeyA);
+        camera_controller.is_right_key_pressed =
+            input.is_pressed(KeyCode::ArrowRight) || input.is_pressed(KeyCode::KeyD);
+    } else {
+        camera_controller.is_forward_key_pressed = false;
+        camera_controller.is_backward_key_pressed = false;
+        camera_controller.is_left_key_pressed = false;
+        camera_controller.is_right_key_pressed = false;
+    }
 }

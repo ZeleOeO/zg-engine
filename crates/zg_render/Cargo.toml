@@ -11,8 +11,10 @@ zg_world = {path = "../zg_world"}
 zg_utils = {path = "../zg_utils"}
 zg_time = {path = "../zg_time"}
 zg_app = {path = "../zg_app"}
+zg_ui = {path = "../zg_ui"}
 
 wgpu = {workspace = true}
 winit = {workspace = true}
 bytemuck = {workspace = true}
 tracy-client = {workspace = true}
+egui-wgpu = {workspace = true}

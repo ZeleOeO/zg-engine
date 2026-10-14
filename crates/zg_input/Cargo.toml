@@ -10,3 +10,4 @@ zg_world = {path = "../zg_world"}
 zg_utils = {path = "../zg_utils"}
 zg_app = {path = "../zg_app"}
 zg_window = {path = "../zg_window"}
+zg_ui = {path = "../zg_ui"}

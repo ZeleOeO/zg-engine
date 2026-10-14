@@ -1,12 +1,12 @@
 use zg_app::Addon;
 use zg_world::{
     SystemFunctionExt, SystemSet,
-    schedule_label::{Setup, Update},
+    schedule_label::{PreUpdate, Setup, Update},
 };
 
 use crate::{
-    RenderQueue, WorldRenderer, graphics_render_system, render_items_system,
-    render_light_gizmo_system, render_lights_system, setup_world_renderer,
+    RenderQueue, SceneTargetSize, WorldRenderer, graphics_render_system, render_items_system,
+    render_light_gizmo_system, render_lights_system, setup_world_renderer, viewport_resize_system,
 };
 
 pub struct RenderAddon;
@@ -14,6 +14,7 @@ pub struct RenderAddon;
 #[derive(SystemSet)]
 pub enum RenderSet {
     Setup,
+    PreUpdate,
     Update,
 }
 
@@ -21,7 +22,9 @@ impl Addon for RenderAddon {
     fn build(&self, app: &mut zg_app::App) {
         app.add_resource(RenderQueue::new())
             .add_resource(WorldRenderer::new())
+            .add_resource(SceneTargetSize::new())
             .add_system(Setup, setup_world_renderer.in_set(RenderSet::Setup))
+            .add_system(PreUpdate, viewport_resize_system)
             .add_system(Update, render_items_system.in_set(RenderSet::Update))
             .add_system(Update, render_lights_system.in_set(RenderSet::Update))
             .add_system(Update, render_light_gizmo_system.in_set(RenderSet::Update))

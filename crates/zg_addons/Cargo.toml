@@ -13,5 +13,6 @@ zg_input = {path = "../zg_input"}
 zg_time = {path = "../zg_time"}
 zg_graphics = {path = "../zg_graphics"}
 zg_managers = {path = "../zg_managers"}
+zg_ui = {path = "../zg_ui"}
 
 pollster = {workspace = true}

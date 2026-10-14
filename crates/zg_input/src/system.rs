@@ -1,5 +1,6 @@
 use winit::keyboard::KeyCode;
 use zg_app::{Addon, AppExit};
+use zg_ui::EditorState;
 use zg_window::WindowSet;
 use zg_world::{
     EventReader, KeyboardInputEvent, MouseMotionEvent, Res, ResMut, SystemFunctionExt, SystemSet,
@@ -25,13 +26,16 @@ pub fn keyboard_send_event_system(
 pub fn add_mouse_motion_event(
     mut mouse_reader: EventReader<MouseMotionEvent>,
     mut mouse_motion: ResMut<MouseMotion>,
+    editor_state: Res<EditorState>,
 ) {
-    let mut delta: [f32; 2] = [0.0, 0.0];
-    for event in mouse_reader.read() {
-        delta[0] += event.delta[0];
-        delta[1] += event.delta[1];
+    if editor_state.camera_look_active {
+        let mut delta: [f32; 2] = [0.0, 0.0];
+        for event in mouse_reader.read() {
+            delta[0] += event.delta[0];
+            delta[1] += event.delta[1];
+        }
+        mouse_motion.delta = delta;
     }
-    mouse_motion.delta = delta;
 }
 
 pub fn check_for_quit(input: Res<Input<KeyCode>>, mut exit: ResMut<AppExit>) {

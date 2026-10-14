@@ -30,4 +30,8 @@ impl<'e, E: Debug + Clone> EventReader<'e, E> {
     pub fn read(&mut self) -> Vec<E> {
         self.events.read()
     }
+
+    pub fn view(&self) -> &Vec<E> {
+        self.events.view()
+    }
 }

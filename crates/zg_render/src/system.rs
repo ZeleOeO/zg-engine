@@ -3,9 +3,11 @@ use wgpu::{CurrentSurfaceTexture, TextureView};
 
 use zg_managers::{PointLight, create_light_bind_group, get_or_create_default_light_material};
 use zg_time::Time;
+use zg_ui::{EditorState, EngineUI, UiFrame, create_viewport_target};
 
 use crate::render_command::{DrawItem, FrameBinding};
 use crate::render_utils::{CameraUniform, create_transform_bind_group};
+use crate::renderer::SceneTargetSize;
 use crate::{RenderQueue, WorldRenderer};
 use zg_graphics::*;
 use zg_managers::Assets;
@@ -96,6 +98,7 @@ pub fn execute_frame(
     render_queue: &mut RenderQueue,
     assets: &Assets,
     surface_view: &TextureView,
+    depth_view: &TextureView,
 ) {
     span!("execute frame");
     let mut encoder = {
@@ -125,7 +128,7 @@ pub fn execute_frame(
                 },
             })],
             depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
-                view: &graphics.depth_texture_view,
+                view: depth_view,
                 depth_ops: Some(wgpu::Operations {
                     load: wgpu::LoadOp::Clear(1.0),
                     store: wgpu::StoreOp::Store,
@@ -151,6 +154,8 @@ pub fn graphics_render_system(
     mut graphics: ResMut<InternalGraphics>,
     mut render_queue: ResMut<RenderQueue>,
     assets: Res<Assets>,
+    mut engine_ui: ResMut<EngineUI>,
+    ui_frame: Res<UiFrame>,
 ) {
     span!("redraw request");
     time.update();
@@ -171,18 +176,104 @@ pub fn graphics_render_system(
         }
     };
 
-    let surface_view = {
+    let swap_view = {
         span!("create view");
         frame
             .texture
             .create_view(&wgpu::TextureViewDescriptor::default())
     };
 
-    execute_frame(&mut graphics, &mut render_queue, &assets, &surface_view);
+    execute_frame(
+        &mut graphics,
+        &mut render_queue,
+        &assets,
+        &engine_ui.viewport_target.view,
+        &engine_ui.viewport_target.depth_view,
+    );
+
+    let mut encoder = graphics.device.create_command_encoder(&Default::default());
+
+    for (id, deltas) in &ui_frame.textures_delta.set {
+        for delta in deltas {
+            engine_ui
+                .renderer
+                .update_texture(&graphics.device, &graphics.queue, *id, delta);
+        }
+    }
+
+    let screen = egui_wgpu::ScreenDescriptor {
+        size_in_pixels: [graphics.config.width, graphics.config.height],
+        pixels_per_point: ui_frame.pixels_per_point,
+    };
+    let extra = engine_ui.renderer.update_buffers(
+        &graphics.device,
+        &graphics.queue,
+        &mut encoder,
+        &ui_frame.triangle_mesh,
+        &screen,
+    );
 
     {
-        let _ = span!("present frame");
+        let rpass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+            label: Some("egui pass"),
+            color_attachments: &[Some(wgpu::RenderPassColorAttachment {
+                view: &swap_view,
+                depth_slice: None,
+                resolve_target: None,
+                ops: wgpu::Operations {
+                    load: wgpu::LoadOp::Clear(wgpu::Color::BLACK),
+                    store: wgpu::StoreOp::Store,
+                },
+            })],
+            depth_stencil_attachment: None,
+            timestamp_writes: None,
+            occlusion_query_set: None,
+            multiview_mask: None,
+        });
+        engine_ui.renderer.render(
+            &mut rpass.forget_lifetime(),
+            &ui_frame.triangle_mesh,
+            &screen,
+        );
+    }
+
+    for id in &ui_frame.textures_delta.free {
+        engine_ui.renderer.free_texture(id);
+    }
+
+    graphics
+        .queue
+        .submit(extra.into_iter().chain([encoder.finish()]));
+
+    {
+        let _span = span!("present frame");
         graphics.queue.present(frame);
         tracy_client::frame_mark();
     }
+}
+
+pub fn viewport_resize_system(
+    graphics: Res<InternalGraphics>,
+    editor: Res<EditorState>,
+    mut engine_ui: ResMut<EngineUI>,
+    mut scene_size: ResMut<SceneTargetSize>,
+) {
+    let wanted = editor.viewport_wanted_px;
+    if wanted[0] == 0 || wanted[1] == 0 {
+        return;
+    }
+
+    let ui = &mut *engine_ui;
+
+    if wanted != ui.viewport_target.size_ppx {
+        ui.viewport_target = create_viewport_target(&graphics, wanted);
+        ui.renderer.update_egui_texture_from_wgpu_texture(
+            &graphics.device,
+            &ui.viewport_target.view,
+            wgpu::FilterMode::Linear,
+            editor.viewport_tex_id,
+        );
+    }
+
+    scene_size.0.0 = engine_ui.viewport_target.size_ppx;
 }

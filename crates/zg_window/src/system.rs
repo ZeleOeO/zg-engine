@@ -1,7 +1,7 @@
 use zg_world::{EngineWindowEvents, EventReader};
 
 pub fn send_engine_events(mut event_reader: EventReader<EngineWindowEvents>) {
-    let events_read: Vec<EngineWindowEvents> = event_reader.events.read().clone();
+    let events_read: Vec<EngineWindowEvents> = event_reader.read().clone();
     event_reader.command_queue.push(Box::new(move |world| {
         for event in events_read {
             match event {
