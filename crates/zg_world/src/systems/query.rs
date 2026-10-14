@@ -21,7 +21,7 @@ where
         let entities = archetype.entities.clone();
         let item = entities
             .into_iter()
-            .map(move |entity| D::get(self.world, entity.0 as usize));
+            .map(move |entity| D::get(self.world, entity.id as usize));
         item
     }
 

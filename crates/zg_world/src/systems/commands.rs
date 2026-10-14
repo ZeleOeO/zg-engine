@@ -12,7 +12,7 @@ pub struct Commands<'c> {
 
 impl Commands<'_> {
     pub fn spawn<T: Bundle + Debug + 'static>(&mut self, bundle: T) -> Entity {
-        let entity = Entity(self.ids);
+        let entity = Entity::new(self.ids);
         self.ids += 1;
         self.command_queue.push(Box::new(move |world| {
             world.spawn(bundle);
@@ -25,6 +25,10 @@ impl Commands<'_> {
         D: QueryData<'w> + 'static,
     {
         self.world.get_entity::<D>(entity)
+    }
+
+    pub fn get_all_entities(&self) -> &Vec<Entity> {
+        &self.world.entities
     }
 
     pub fn insert_resource<R: Resource + 'static>(&mut self, resource: R) {

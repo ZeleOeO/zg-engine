@@ -32,7 +32,7 @@ pub fn camera_update_system(
     scene_size: Res<SceneTargetSize>,
     scene: Commands,
 ) {
-    if let Some(camera_entity) = renderer.default_camera {
+    if let Some(camera_entity) = renderer.default_camera.clone() {
         let camera = scene.get_entity::<(Camera,)>(camera_entity).0;
         let [width, height] = scene_size.0.0;
         camera.aspect = (width as f32) / height as f32;
@@ -54,7 +54,7 @@ pub fn camera_controller_udpate_sytem(
     time: Res<Time>,
     camera_controller: Res<CameraController>,
 ) {
-    let camera_entity = renderer.default_camera.unwrap();
+    let camera_entity = renderer.default_camera.clone().unwrap();
     let camera = scene.get_entity::<(Camera,)>(camera_entity).0;
     let delta = time.time_delta_secs().min(0.1);
     camera_controller.camera_update(camera, delta);

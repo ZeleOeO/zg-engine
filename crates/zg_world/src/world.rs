@@ -47,7 +47,7 @@ impl World {
         bundle.insert_into(archetype);
 
         // We store the entity data in archetype
-        let entity = Entity(self.entities.len() as u32);
+        let entity = Entity::new(self.entities.len() as u32);
         // Get the row it's in in the archetype
         let row = (archetype.entities.len()) as u32;
         archetype.entities.push(entity.clone());
@@ -139,7 +139,6 @@ impl World {
             }
         }
 
-
         archetype_ids
     }
 
@@ -172,7 +171,7 @@ impl World {
     where
         D: QueryData<'w> + 'static,
     {
-        self.query::<D>().get(entity.0)
+        self.query::<D>().get(entity.id)
     }
 
     pub fn get_all_entities_in_archetype<'w, D>(&'w self, archetype: &Archetype) -> Vec<D::Output>

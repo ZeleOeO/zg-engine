@@ -9,8 +9,19 @@ use crate::{bundle::Bundle, components::ComponentColumn};
 #[derive(Clone, Copy, Debug, PartialEq, PartialOrd)]
 pub struct ArchetypeID(pub u32);
 
-#[derive(Clone, Copy, Debug)]
-pub struct Entity(pub u32);
+#[derive(Clone, Debug)]
+// pub struct Entity(pub u32);
+pub struct Entity {
+    pub id: u32,
+    pub name: String,
+}
+
+impl Entity {
+    pub fn new(id: u32) -> Entity {
+        let name = format!("Entity {}", id);
+        Entity { id, name }
+    }
+}
 
 #[derive(Debug)]
 pub struct Archetype {
