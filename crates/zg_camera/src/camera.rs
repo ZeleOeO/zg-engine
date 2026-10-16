@@ -1,8 +1,9 @@
 use std::f32::consts::PI;
 
 use zg_utils::math::*;
+use zg_world::Component;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Component)]
 pub struct Camera {
     pub eye: Vec3,
     pub target: Vec3,

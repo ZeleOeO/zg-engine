@@ -29,9 +29,7 @@ pub fn update_ui_frame(
     mut editor: ResMut<EditorState>,
 ) {
     let raw_input = engine_ui.state.take_egui_input(&window.window);
-    let full_output = engine_ui
-        .context
-        .run_ui(raw_input, |ui| editor_ui(ui, &mut editor));
+    let full_output = engine_ui.context.run_ui(raw_input, |ui| {});
     engine_ui
         .state
         .handle_platform_output(&window.window, full_output.platform_output);

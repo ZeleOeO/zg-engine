@@ -35,6 +35,9 @@ pub fn render_items_system(
     graphics.cache.transform_bind_groups_index = 0;
 
     for (mesh, material, transform) in query.get_all_entities() {
+        let (Some(mesh), Some(material), Some(transform)) = (mesh, material, transform) else {
+            continue;
+        };
         let mesh_meta_data = assets.mesh_manager.get_mesh_data(mesh.0.0);
         render_queue.draw_items.push(DrawItem {
             layer: crate::RenderLayer::Opaque,
@@ -63,6 +66,9 @@ pub fn render_lights_system(
         });
     } else {
         for (light,) in entities {
+            let Some(light) = light else {
+                continue;
+            };
             render_queue.frame_binding.push(FrameBinding {
                 bind_group: create_light_bind_group(&mut graphics.0, light),
             });
@@ -79,6 +85,9 @@ pub fn render_light_gizmo_system(
     let _span = span!("render light gizmos");
 
     for (light, mesh) in query.get_all_entities() {
+        let (Some(light), Some(mesh)) = (light, mesh) else {
+            continue;
+        };
         let mesh_meta_data = assets.mesh_manager.get_mesh_data(mesh.0.0);
         let transform =
             Transform::from_translation(light.position[0], light.position[1], light.position[2]);

@@ -5,10 +5,11 @@ use zg_graphics::{
     BindGroupCacheHandle, BindGroupCacheKey, BindGroupResourceType, InternalGraphics,
 };
 use zg_utils::math::Vec3;
+use zg_world::Component;
 
 use crate::material::{MaterialManager, MaterialUniform};
 
-#[derive(Debug)]
+#[derive(Debug, Component)]
 pub struct PointLight {
     pub position: Vec3,
     pub color: Vec3,
@@ -41,8 +42,10 @@ pub fn create_light_bind_group(
     };
 
     if gpu.cache.light_bind_groups_index < gpu.cache.cached_light_bind_groups.len() {
-        let (buffer, handle) = &gpu.cache.cached_light_bind_groups[gpu.cache.light_bind_groups_index];
-        gpu.queue.write_buffer(buffer, 0, bytemuck::cast_slice(&[light_uniform]));
+        let (buffer, handle) =
+            &gpu.cache.cached_light_bind_groups[gpu.cache.light_bind_groups_index];
+        gpu.queue
+            .write_buffer(buffer, 0, bytemuck::cast_slice(&[light_uniform]));
         let handle_copy = *handle;
         gpu.cache.light_bind_groups_index += 1;
         handle_copy
@@ -64,7 +67,9 @@ pub fn create_light_bind_group(
         };
 
         let handle = gpu.get_or_create_bind_group(cache_key);
-        gpu.cache.cached_light_bind_groups.push((light_buffer, handle));
+        gpu.cache
+            .cached_light_bind_groups
+            .push((light_buffer, handle));
         gpu.cache.light_bind_groups_index += 1;
         handle
     }
