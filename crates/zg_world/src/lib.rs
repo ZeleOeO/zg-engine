@@ -10,7 +10,7 @@ mod world;
 
 pub use archetypes::Entity;
 pub use events::*;
-pub use resources::{Res, ResMut, Resource};
+pub use resources::{Res, ResMut, Resource, Component};
 pub use systems::*;
 pub use world::*;
-pub use zg_world_macros::{Resource, SystemSet};
+pub use zg_world_macros::{Resource, SystemSet, Component};

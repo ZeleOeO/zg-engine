@@ -13,7 +13,7 @@ macro_rules! impl_tuple_for_bundle {
         #[allow(non_snake_case)]
         impl< $($T),*> $crate::bundle::Bundle for ($($T,)*)
         where
-        $($T: 'static + std::fmt::Debug ),*
+        $($T: 'static + std::fmt::Debug + $crate::Component),*
         {
             fn insert_into(self,  archetype: &mut $crate::archetypes::Archetype) {
                 let ($($T,)*) = self;

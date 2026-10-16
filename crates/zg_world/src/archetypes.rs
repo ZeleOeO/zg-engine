@@ -9,8 +9,7 @@ use crate::{bundle::Bundle, components::ComponentColumn};
 #[derive(Clone, Copy, Debug, PartialEq, PartialOrd)]
 pub struct ArchetypeID(pub u32);
 
-#[derive(Clone, Debug)]
-// pub struct Entity(pub u32);
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Entity {
     pub id: u32,
     pub name: String,
@@ -33,7 +32,6 @@ pub struct Archetype {
 
 #[derive(Debug)]
 pub struct Column {
-    // Can't even remember why I wanted to use this
     pub column_type_id: TypeId,
     pub data: Box<dyn ComponentColumn>,
 }
@@ -73,67 +71,66 @@ impl Archetype {
     }
 
     pub fn insert_component<T: 'static>(&mut self, component: T) {
-        let col = self.get_column_mut(&component);
-        col.push(component);
+        if let Some(col) = self.get_column_mut(&component) {
+            col.push(component);
+        }
     }
 
-    pub fn get_column<T: 'static>(&self, value: &T) -> &Vec<T> {
+    pub fn get_column<T: 'static>(&self, value: &T) -> Option<&Vec<T>> {
+        if !self.has_component::<T>() {
+            return None;
+        }
         let column = self
             .columns
             .iter()
             .find(|col| col.column_type_id == value.type_id())
             .unwrap();
-        column.get_column::<T>()
+        Some(column.get_column::<T>())
     }
 
-    pub fn get_column_mut<T: 'static>(&mut self, value: &T) -> &mut Vec<T> {
+    pub fn get_column_mut<T: 'static>(&mut self, value: &T) -> Option<&mut Vec<T>> {
+        if !self.has_component::<T>() {
+            return None;
+        }
         let column = self
             .columns
             .iter_mut()
             .find(|col| col.column_type_id == value.type_id())
             .unwrap();
-        column.get_column_mut::<T>()
+        Some(column.get_column_mut::<T>())
     }
 
-    pub fn get_column_by_type<T: 'static>(&self) -> &Vec<T> {
+    pub fn get_column_by_type<T: 'static>(&self) -> Option<&Vec<T>> {
+        if !self.has_component::<T>() {
+            return None;
+        }
         let column = self
             .columns
             .iter()
             .find(|col| col.column_type_id == TypeId::of::<T>())
             .unwrap();
-        column.get_column::<T>()
+        Some(column.get_column::<T>())
     }
 
-    pub fn get_mut_column_by_type<T: 'static>(&mut self) -> &Vec<T> {
+    pub fn get_mut_column_by_type<T: 'static>(&mut self) -> Option<&Vec<T>> {
+        if !self.has_component::<T>() {
+            return None;
+        }
         let column = self
             .columns
             .iter_mut()
             .find(|col| col.column_type_id == TypeId::of::<T>())
             .unwrap();
-        column.get_column_mut::<T>()
+        Some(column.get_column_mut::<T>())
     }
 
-    pub fn get_column_by_type_id<T: 'static>(&self, value: TypeId) -> &Vec<T> {
-        let column = self
-            .columns
-            .iter()
-            .find(|col| col.column_type_id == value)
-            .unwrap();
-        column.get_column::<T>()
-    }
-
-    pub fn get_column_mut_by_type_id<T: 'static>(&mut self, value: TypeId) -> &mut Vec<T> {
-        let column = self
-            .columns
-            .iter_mut()
-            .find(|col| col.column_type_id == value)
-            .unwrap();
-        column.get_column_mut::<T>()
-    }
-
-    pub fn get_column_ptr_by_type<T: 'static>(&self) -> *mut Vec<T> {
-        let column = self.get_column_by_type::<T>();
-        column as *const Vec<T> as *mut Vec<T>
+    pub fn get_column_ptr_by_type<T: 'static>(&self) -> Option<*mut Vec<T>> {
+        let column_option = self.get_column_by_type::<T>();
+        if column_option.is_some() {
+            Some(column_option.unwrap() as *const Vec<T> as *mut Vec<T>)
+        } else {
+            return None;
+        }
     }
 
     pub fn has_component<T: 'static>(&self) -> bool {

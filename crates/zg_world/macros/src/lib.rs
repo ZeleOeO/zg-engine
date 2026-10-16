@@ -1,6 +1,6 @@
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{DeriveInput, parse_macro_input, Data, Fields};
+use syn::{Data, DeriveInput, Fields, parse_macro_input};
 
 #[proc_macro_derive(Resource)]
 pub fn derive_resource(input: TokenStream) -> TokenStream {
@@ -49,6 +49,19 @@ pub fn derive_system_set(input: TokenStream) -> TokenStream {
             fn variant(&self) -> usize {
                 #variant_body
             }
+        }
+    }
+    .into()
+}
+
+#[proc_macro_derive(Component)]
+pub fn derive_component(input: TokenStream) -> TokenStream {
+    let ast = parse_macro_input!(input as DeriveInput);
+    let name = &ast.ident;
+    let (impl_g, ty_g, where_c) = ast.generics.split_for_impl();
+
+    quote! {
+        impl #impl_g ::zg_world::Component for #name #ty_g #where_c {
         }
     }
     .into()

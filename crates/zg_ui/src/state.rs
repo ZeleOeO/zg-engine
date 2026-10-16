@@ -1,5 +1,5 @@
 use egui::TextureId;
-use zg_world::Resource;
+use zg_world::{Entity, Resource};
 
 #[derive(Debug, Resource)]
 pub struct EditorState {
@@ -10,6 +10,7 @@ pub struct EditorState {
     pub viewport_focused: bool,
     pub viewport_dragging: bool,
     pub camera_look_active: bool,
+    pub selected_entities: Option<Entity>,
 }
 
 #[derive(Default, Debug, Resource)]
@@ -35,6 +36,7 @@ impl EditorState {
             viewport_focused: false,
             viewport_dragging: false,
             camera_look_active: false,
+            selected_entities: None,
         }
     }
 }

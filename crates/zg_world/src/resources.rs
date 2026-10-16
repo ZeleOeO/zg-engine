@@ -7,6 +7,8 @@ use std::{
 
 use crate::systems::SystemParam;
 
+pub trait Component {}
+
 pub trait Resource: 'static + Debug {
     fn as_any(&self) -> &dyn Any;
     fn as_any_mut(&mut self) -> &mut dyn Any;

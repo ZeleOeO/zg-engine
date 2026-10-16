@@ -1,9 +1,9 @@
 use std::{any::Any, fmt::Debug};
 
-use crate::resources::Resource;
+use crate::Component;
 use zg_utils::math::Vec3;
 
-impl<T: Debug + 'static> ComponentColumn for Vec<T> {
+impl<T: Debug + Component + 'static> ComponentColumn for Vec<T> {
     fn len(&self) -> usize {
         self.len()
     }
@@ -16,17 +16,16 @@ impl<T: Debug + 'static> ComponentColumn for Vec<T> {
         self
     }
 
-    // fn get_entity(&self, row: u32) -> &dyn Any {
-    //     let ans = &self[row as usize];
-    //     ans.as_any()
-    // }
+    fn get_at_row(&self, row: usize) -> &dyn Any {
+        &self[row]
+    }
 }
 
 pub trait ComponentColumn: Any + Debug {
     fn len(&self) -> usize;
     fn as_any(&self) -> &dyn Any;
     fn as_any_mut(&mut self) -> &mut dyn Any;
-    // fn get_entity(&self, row: u32) -> &dyn Any;
+    fn get_at_row(&self, row: usize) -> &dyn Any;
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -35,7 +34,7 @@ pub struct MaterialHandle(pub u32);
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct MeshHandle(pub u32);
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Component)]
 pub struct Transform {
     position: Vec3,
     rotation: Vec3,
@@ -82,8 +81,8 @@ impl Transform {
     }
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Component)]
 pub struct MeshComponent(pub MeshHandle);
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Component)]
 pub struct MaterialComponent(pub MaterialHandle);

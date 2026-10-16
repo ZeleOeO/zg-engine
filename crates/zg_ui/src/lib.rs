@@ -1,4 +1,6 @@
 mod addon;
+mod editor;
+mod inspect;
 mod state;
 mod system;
 mod ui;

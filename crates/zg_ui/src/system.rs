@@ -1,4 +1,5 @@
 use crate::{
+    editor::editor_ui,
     state::{EditorState, InputFocus, UiFrame},
     ui::EngineUI,
 };
@@ -52,45 +53,4 @@ pub fn ui_input_focus(
     input_focus.game_pointer = editor_state.viewport_hovered || editor_state.viewport_dragging;
     input_focus.game_keyboard =
         editor_state.viewport_focused && !engine_ui.context.egui_wants_keyboard_input();
-}
-
-fn editor_ui(
-    ui: &mut egui::Ui,
-    editor: &mut EditorState,
-    /*world stuff*/
-) {
-    egui::Panel::left("entities").show(ui, |ui| {
-        // entity that's it
-    });
-    egui::Panel::right("components").show(ui, |ui| {
-        // entity name
-        // list of entity components
-        // for each component the attributes like transform, x, y,z
-        // mesh, a drop down maybe of the mesh
-        // material, a drop down of that
-        // light: type of light, point light etc
-        // possibly editable
-    });
-
-    egui::CentralPanel::default().show(ui, |ui| {
-        let size = ui.available_size();
-        let response = ui.add(
-            egui::Image::new((editor.viewport_tex_id, size)).sense(egui::Sense::click_and_drag()),
-        );
-
-        if response.clicked() || response.drag_started() {
-            response.request_focus();
-        }
-
-        let ppp = ui.ctx().pixels_per_point();
-        editor.viewport_rect = response.rect;
-        editor.viewport_wanted_px = [
-            (size.x * ppp).max(1.0) as u32,
-            (size.y * ppp).max(1.0) as u32,
-        ];
-        editor.viewport_hovered = response.hovered();
-        editor.viewport_focused = response.has_focus();
-        editor.viewport_dragging = response.dragged();
-        editor.camera_look_active = response.dragged_by(egui::PointerButton::Secondary);
-    });
 }

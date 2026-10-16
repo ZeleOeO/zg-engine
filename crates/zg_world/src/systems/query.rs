@@ -3,7 +3,7 @@ use crate::{SystemParam, archetypes::Archetype, bundle::Bundle, world::World};
 pub trait QueryData<'w> {
     type Output;
     type Bundle: Bundle;
-    fn get(world: &'w World, row: usize) -> Self::Output;
+    fn get(world: &'w World, row: usize) -> Option<Self::Output>;
 }
 pub struct Query<'w, D: QueryData<'w>> {
     pub world: &'w World,
@@ -13,7 +13,7 @@ impl<'w, D> Query<'w, D>
 where
     D: QueryData<'w> + 'static,
 {
-    pub fn get(&self, row: u32) -> D::Output {
+    pub fn get(&self, row: u32) -> Option<D::Output> {
         D::get(self.world, row as usize)
     }
 
@@ -61,11 +61,11 @@ macro_rules! impl_query_for_tuples {
     ($($T:ident),*) => {
         impl<'w, $($T),*> $crate::systems::query::QueryData<'w> for ($($T,)*)
         where
-        $($T: 'static + std::fmt::Debug ),*
+        $($T: 'static + std::fmt::Debug + $crate::Component),*
         {
             type Output = ($(&'w mut $T,)*);
             type Bundle = ($($T, ) *);
-            fn get(world: &'w  $crate::world::World, row: usize) -> Self::Output {
+            fn get(world: &'w  $crate::world::World, row: usize) -> Option<Self::Output> {
                 let location = &world.object_locations[row];
                 let archetype = world.get_archetype_by_id(location.archetype_id);
 

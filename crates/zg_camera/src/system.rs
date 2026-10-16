@@ -30,21 +30,22 @@ pub fn camera_update_system(
     mut render_queue: ResMut<RenderQueue>,
     renderer: Res<WorldRenderer>,
     scene_size: Res<SceneTargetSize>,
-    scene: Commands,
+    command: Commands,
 ) {
     if let Some(camera_entity) = renderer.default_camera.clone() {
-        let camera = scene.get_entity::<(Camera,)>(camera_entity).0;
-        let [width, height] = scene_size.0.0;
-        camera.aspect = (width as f32) / height as f32;
+        if let Some(camera) = command.get_entity::<(Camera,)>(camera_entity) {
+            let [width, height] = scene_size.0.0;
+            camera.aspect = (width as f32) / height as f32;
 
-        let view_proj = camera.build_projection_matrix();
+            let view_proj = camera.build_projection_matrix();
 
-        let camera_bind_group_cache_handle =
-            create_camera_bind_group(view_proj, camera.eye, &mut graphics.0, &renderer.0);
+            let camera_bind_group_cache_handle =
+                create_camera_bind_group(view_proj, camera.eye, &mut graphics.0, &renderer.0);
 
-        render_queue.frame_binding.push(FrameBinding {
-            bind_group: camera_bind_group_cache_handle,
-        });
+            render_queue.frame_binding.push(FrameBinding {
+                bind_group: camera_bind_group_cache_handle,
+            });
+        };
     }
 }
 
