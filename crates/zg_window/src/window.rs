@@ -33,12 +33,3 @@ impl SceneTargetSize {
         self.0 = new_size
     }
 }
-
-#[derive(Debug, Resource)]
-pub struct WindowSize(pub [u32; 2]);
-
-impl WindowSize {
-    pub fn update(&mut self, new_size: [u32; 2]) {
-        self.0 = new_size
-    }
-}

@@ -2,7 +2,7 @@ use zg_app::WindowHandle;
 use zg_graphics::InternalGraphics;
 use zg_world::{Commands, EngineWindowEvents, EventReader, Res, ResMut, ResizeEvent};
 
-use crate::{WindowRes, window::WindowSize};
+use crate::WindowRes;
 
 pub fn send_engine_events(mut event_reader: EventReader<EngineWindowEvents>) {
     let events_read: Vec<EngineWindowEvents> = event_reader.read().clone();

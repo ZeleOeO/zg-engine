@@ -4,7 +4,7 @@ use zg_world::{
     schedule_label::{PreUpdate, Setup},
 };
 
-use crate::{SceneTargetSize, system::*, window::WindowSize};
+use crate::{SceneTargetSize, system::*};
 
 pub struct WindowAddon;
 
