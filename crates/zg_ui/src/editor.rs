@@ -1,8 +1,16 @@
-use zg_world::Entity;
+use egui::Ui;
+use zg_managers::Assets;
+use zg_world::{Commands, Entity, components::MeshComponent};
 
-use crate::EditorState;
+use crate::{EditorState, inspect::show_component};
 
-pub(crate) fn editor_ui(ui: &mut egui::Ui, editor: &mut EditorState, entities: &Vec<Entity>) {
+pub(crate) fn editor_ui(
+    ui: &mut egui::Ui,
+    editor: &mut EditorState,
+    commands: &Commands,
+    assets: &Assets,
+) {
+    let entities = commands.get_all_entities();
     egui::Panel::left("scene").show(ui, |ui| {
         ui.heading("Scene");
         egui::ScrollArea::vertical().show(ui, |ui| {
@@ -19,23 +27,16 @@ pub(crate) fn editor_ui(ui: &mut egui::Ui, editor: &mut EditorState, entities: &
                     editor.selected_entities = Some(entity.clone());
                 }
             }
-            // ui.
         });
         // entity that's it
     });
-    egui::Panel::right("components").show(ui, |ui| {
+    egui::Panel::right("Inspector").show(ui, |ui| {
         let Some(entity) = &editor.selected_entities else {
             ui.label("Nothing is selected");
             return;
         };
-        // inspect_entity
-        // entity name
-        // list of entity components
-        // for each component the attributes like transform, x, y,z
-        // mesh, a drop down maybe of the mesh
-        // material, a drop down of that
-        // light: type of light, point light etc
-        // possibly editable
+
+        inspect_entity(ui, assets, commands, entity.clone());
     });
 
     egui::CentralPanel::default().show(ui, |ui| {
@@ -59,4 +60,9 @@ pub(crate) fn editor_ui(ui: &mut egui::Ui, editor: &mut EditorState, entities: &
         editor.viewport_dragging = response.dragged();
         editor.camera_look_active = response.dragged_by(egui::PointerButton::Secondary);
     });
+}
+
+pub(crate) fn inspect_entity(ui: &mut Ui, assets: &Assets, commands: &Commands, entity: Entity) {
+    // show_component::<MeshComponent>(ui, assets, commands, entity);
+    show_component::<MeshComponent>(ui, assets, commands, entity);
 }

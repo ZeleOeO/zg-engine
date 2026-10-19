@@ -28,11 +28,11 @@ impl EngineApp {
     }
 
     pub fn add_window(&mut self, window: Arc<Window>) {
-        window.set_cursor_visible(false);
-        window
-            .set_cursor_grab(CursorGrabMode::Confined)
-            .or_else(|_e| window.set_cursor_grab(CursorGrabMode::Locked))
-            .unwrap();
+        // window.set_cursor_visible(false);
+        // window
+        //     .set_cursor_grab(CursorGrabMode::Confined)
+        //     .or_else(|_e| window.set_cursor_grab(CursorGrabMode::Locked))
+        //     .unwrap();
         self.window = Some(window)
     }
 

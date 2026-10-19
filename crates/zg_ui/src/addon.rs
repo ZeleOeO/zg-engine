@@ -6,7 +6,7 @@ use zg_world::{
 };
 
 use crate::{
-    EditorState, EngineUI, UiFrame,
+    EditorState, EngineUI, InputFocus, UiFrame,
     system::{handle_ui_window_events, setup_ui_editor, ui_input_focus, update_ui_frame},
 };
 
@@ -16,10 +16,11 @@ impl Addon for UiAddon {
     fn build(&self, app: &mut zg_app::App) {
         app.add_resource(UiFrame::new())
             .add_resource(EditorState::new())
+            .add_resource(InputFocus::default())
             .add_system(Setup, create_engine_ui.in_set(UiSystemSet::Setup))
             .add_system(Setup, setup_ui_editor.in_set(UiSystemSet::Setup))
             .add_system(PreUpdate, handle_ui_window_events)
-            .add_system(Update, update_ui_frame)
+            .add_system(Update, update_ui_frame.in_set(UiSystemSet::Update))
             .add_system(Update, ui_input_focus);
     }
 }

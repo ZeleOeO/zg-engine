@@ -59,8 +59,13 @@ impl Model {
                     .collect();
 
                 let indices = mesh.indices.clone();
-                let mut mesh_data = MeshData { vertices, indices };
-                let mesh_handle = assets.mesh_manager.add_mesh_data(&mut mesh_data, &graphics);
+                let name = model.name;
+                let mesh_data = MeshData {
+                    name,
+                    vertices,
+                    indices,
+                };
+                let mesh_handle = assets.mesh_manager.add_mesh_data(mesh_data, &graphics);
                 let mesh_component = MeshComponent(mesh_handle);
                 println!("Material: {:#?}", mesh.material_id);
 

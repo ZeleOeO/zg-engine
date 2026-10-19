@@ -170,11 +170,12 @@ impl Assets {
         ];
 
         let mut mesh_data = MeshData {
+            name: "Cube".to_string(),
             vertices: vertices.to_vec(),
             indices: indices.to_vec(),
         };
 
-        let handle = self.mesh_manager.add_mesh_data(&mut mesh_data, graphics);
+        let handle = self.mesh_manager.add_mesh_data(mesh_data, graphics);
         MeshComponent(handle)
     }
 
@@ -287,11 +288,12 @@ impl Assets {
         ];
 
         let mut mesh_data = MeshData {
+            name: "Prsim".to_string(),
             vertices: vertices.to_vec(),
             indices: indices.to_vec(),
         };
 
-        let handle = self.mesh_manager.add_mesh_data(&mut mesh_data, graphics);
+        let handle = self.mesh_manager.add_mesh_data(mesh_data, graphics);
         MeshComponent(handle)
     }
 

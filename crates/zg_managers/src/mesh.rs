@@ -16,8 +16,10 @@ pub struct MeshManager {
 }
 
 // This is for draw
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub struct MeshMetaData {
+    pub name: String,
+    pub id: usize,
     pub vertex_count: u32,
     pub index_count: u32,
     pub byte_size: usize,
@@ -26,6 +28,7 @@ pub struct MeshMetaData {
 // Right now, only vertices with indices can be drawn
 #[derive(Debug, Clone)]
 pub struct MeshData {
+    pub name: String,
     pub vertices: Vec<ModelVertex>,
     pub indices: Vec<u32>,
 }
@@ -39,12 +42,25 @@ impl MeshManager {
         }
     }
 
-    pub fn add_mesh_data(
+    pub fn add_meta_data(
         &mut self,
-        mesh_data: &mut MeshData,
-        gpu: &InternalGraphics,
-    ) -> MeshHandle {
-        Self::calculate_normals(mesh_data);
+        name: String,
+        vertex_count: u32,
+        index_count: u32,
+        byte_size: usize,
+    ) {
+        let mesh_meta_data = MeshMetaData {
+            id: self.meshes.len(),
+            name,
+            index_count,
+            vertex_count,
+            byte_size,
+        };
+        self.meshes.push(mesh_meta_data);
+    }
+
+    pub fn add_mesh_data(&mut self, mut mesh_data: MeshData, gpu: &InternalGraphics) -> MeshHandle {
+        Self::calculate_normals(&mut mesh_data);
         let vertex_buffer = gpu.device.create_buffer_init(&BufferInitDescriptor {
             label: Some("Vertex Buffer"),
             contents: bytemuck::cast_slice(&mesh_data.vertices),
@@ -57,11 +73,12 @@ impl MeshManager {
             usage: BufferUsages::INDEX,
         });
 
-        self.meshes.push(MeshMetaData {
-            vertex_count: mesh_data.vertices.len() as u32,
-            index_count: mesh_data.indices.len() as u32,
-            byte_size: index_buffer.size() as usize,
-        });
+        self.add_meta_data(
+            mesh_data.name,
+            mesh_data.vertices.len() as u32,
+            mesh_data.indices.len() as u32,
+            index_buffer.size() as usize,
+        );
 
         self.vertex_buffers.push(vertex_buffer);
         self.index_buffers.push(index_buffer);
@@ -103,7 +120,7 @@ impl MeshManager {
         &self.index_buffers[mesh_handle as usize]
     }
 
-    pub fn get_mesh_data(&self, mesh_handle: u32) -> MeshMetaData {
-        self.meshes[mesh_handle as usize]
+    pub fn get_mesh_data(&self, mesh_handle: u32) -> &MeshMetaData {
+        &self.meshes[mesh_handle as usize]
     }
 }

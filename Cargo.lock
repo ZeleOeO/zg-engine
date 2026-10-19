@@ -4480,6 +4480,7 @@ dependencies = [
  "winit",
  "zg_app",
  "zg_graphics",
+ "zg_managers",
  "zg_window",
  "zg_world",
 ]
