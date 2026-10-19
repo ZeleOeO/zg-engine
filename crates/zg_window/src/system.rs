@@ -37,5 +37,8 @@ pub fn handle_resize(
         window_res.size = size.0;
         graphics.config.width = size.0[0];
         graphics.config.height = size.0[1];
+        graphics
+            .surface
+            .configure(&graphics.device, &graphics.config);
     };
 }

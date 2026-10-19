@@ -59,7 +59,6 @@ impl EngineUI {
 
 pub struct ViewportTarget {
     pub view: wgpu::TextureView,
-    // texture: wgpu::Texture,
     pub depth_view: wgpu::TextureView,
     pub size_ppx: [u32; 2],
 }
