@@ -131,7 +131,7 @@ impl ApplicationHandler for App {
 
     fn window_event(
         &mut self,
-        _event_loop: &winit::event_loop::ActiveEventLoop,
+        event_loop: &winit::event_loop::ActiveEventLoop,
         _window_id: winit::window::WindowId,
         event: winit::event::WindowEvent,
     ) {
@@ -167,6 +167,8 @@ impl ApplicationHandler for App {
                         size.height,
                     ])));
             }
+
+            WindowEvent::CloseRequested => event_loop.exit(),
             _ => {}
         }
     }

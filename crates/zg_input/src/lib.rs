@@ -5,4 +5,4 @@ mod system;
 
 pub use input::Input;
 pub use mouse::MouseMotion;
-pub use system::{InputAddon, InputSet};
+pub use system::{CloseSet, InputAddon, InputSet};

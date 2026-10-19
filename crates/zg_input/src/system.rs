@@ -3,8 +3,7 @@ use zg_app::{Addon, AppExit};
 use zg_ui::EditorState;
 use zg_window::WindowSet;
 use zg_world::{
-    EventReader, KeyboardInputEvent, MouseMotionEvent, Res, ResMut, ResizeEvent, SystemFunctionExt,
-    SystemSet,
+    EventReader, KeyboardInputEvent, MouseMotionEvent, Res, ResMut, SystemFunctionExt, SystemSet,
     schedule_label::{PreUpdate, Update},
 };
 
@@ -50,6 +49,9 @@ pub struct InputAddon;
 #[derive(SystemSet)]
 pub struct InputSet;
 
+#[derive(SystemSet)]
+pub struct CloseSet;
+
 impl Addon for InputAddon {
     fn build(&self, app: &mut zg_app::App) {
         app.set_order(WindowSet::PreUpdate, InputSet)
@@ -59,6 +61,6 @@ impl Addon for InputAddon {
             .add_event::<KeyboardInputEvent>()
             .add_system(PreUpdate, add_mouse_motion_event.in_set(InputSet))
             .add_system(PreUpdate, keyboard_send_event_system.in_set(InputSet))
-            .add_system(Update, check_for_quit);
+            .add_system(PreUpdate, check_for_quit.in_set(CloseSet));
     }
 }

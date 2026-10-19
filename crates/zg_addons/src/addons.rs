@@ -1,7 +1,7 @@
 use zg_app::{Addon, AppExit, WindowHandle};
 use zg_camera::{Camera3DAddon, CameraSet};
 use zg_graphics::InternalGraphics;
-use zg_input::InputAddon;
+use zg_input::{CloseSet, InputAddon};
 use zg_managers::Assets;
 use zg_render::{RenderAddon, RenderSet};
 use zg_time::TimeAddon;
@@ -15,11 +15,11 @@ impl Addon for DefaultAddon {
     fn build(&self, app: &mut zg_app::App) {
         app.set_order(GraphicsSystemSet, CameraSet::Setup)
             .set_order(GraphicsSystemSet, RenderSet::Setup)
-            .set_order(GraphicsSystemSet, WindowSet::PreUpdate)
             .set_order(GraphicsSystemSet, DefaultSet)
             .set_order(GraphicsSystemSet, UiSystemSet::Setup)
             .set_order(CameraSet::Setup, RenderSet::Setup)
             .set_order(DefaultSet, RenderSet::Setup)
+            .set_order(CloseSet, WindowSet::PreUpdate)
             .set_order(DefaultSet, RenderSet::Update)
             .set_order(UiSystemSet::Update, RenderSet::Update)
             .add_resource(AppExit::new())
