@@ -4502,6 +4502,7 @@ version = "0.1.0"
 dependencies = [
  "winit",
  "zg_app",
+ "zg_graphics",
  "zg_world",
 ]
 
