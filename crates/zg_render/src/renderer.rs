@@ -20,12 +20,3 @@ impl WorldRenderer {
         self.camera_buffer.as_ref().unwrap()
     }
 }
-
-#[derive(Debug, Resource)]
-pub struct SceneTargetSize(pub [u32; 2]);
-
-impl SceneTargetSize {
-    pub fn new() -> SceneTargetSize {
-        SceneTargetSize([1280, 720])
-    }
-}

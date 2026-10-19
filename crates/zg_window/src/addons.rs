@@ -1,23 +1,28 @@
 use zg_app::Addon;
 use zg_world::{
-    EngineWindowEvents, RawWinitWindowEvents, SystemFunctionExt, SystemSet,
+    EngineWindowEvents, RawWinitWindowEvents, ResizeEvent, SystemFunctionExt, SystemSet,
     schedule_label::{PreUpdate, Setup},
 };
 
-use crate::{system::send_engine_events, window::create_window_resource};
+use crate::{SceneTargetSize, system::*};
 
 pub struct WindowAddon;
 
 #[derive(SystemSet)]
 pub enum WindowSet {
     PreUpdate,
+    OtherPreupdate,
 }
 
 impl Addon for WindowAddon {
     fn build(&self, app: &mut zg_app::App) {
-        app.add_event::<EngineWindowEvents>()
+        app.set_order(WindowSet::PreUpdate, WindowSet::OtherPreupdate)
+            .add_event::<EngineWindowEvents>()
             .add_event::<RawWinitWindowEvents>()
+            .add_event::<ResizeEvent>()
+            .add_resource(SceneTargetSize::new())
             .add_system(PreUpdate, send_engine_events.in_set(WindowSet::PreUpdate))
+            .add_system(PreUpdate, handle_resize.in_set(WindowSet::OtherPreupdate))
             .add_system(Setup, create_window_resource);
     }
 }

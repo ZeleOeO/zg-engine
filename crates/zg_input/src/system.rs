@@ -3,7 +3,8 @@ use zg_app::{Addon, AppExit};
 use zg_ui::EditorState;
 use zg_window::WindowSet;
 use zg_world::{
-    EventReader, KeyboardInputEvent, MouseMotionEvent, Res, ResMut, SystemFunctionExt, SystemSet,
+    EventReader, KeyboardInputEvent, MouseMotionEvent, Res, ResMut, ResizeEvent, SystemFunctionExt,
+    SystemSet,
     schedule_label::{PreUpdate, Update},
 };
 

@@ -50,3 +50,9 @@ impl UiFrame {
         }
     }
 }
+
+impl Drop for UiFrame {
+    fn drop(&mut self) {
+        self.textures_delta.clear();
+    }
+}

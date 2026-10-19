@@ -1,5 +1,5 @@
 use std::{fmt::Debug, sync::Arc};
-use winit::window::{CursorGrabMode, Window};
+use winit::window::Window;
 
 use zg_world::{
     EngineWindowEvents, Events, IntoSystemConfig, RawWinitWindowEvents, Resource, SystemSet,
@@ -28,6 +28,7 @@ impl EngineApp {
     }
 
     pub fn add_window(&mut self, window: Arc<Window>) {
+        // TODO:: Still make this GRAB but have ESCAPE release it to UI
         // window.set_cursor_visible(false);
         // window
         //     .set_cursor_grab(CursorGrabMode::Confined)

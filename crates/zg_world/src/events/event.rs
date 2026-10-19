@@ -20,6 +20,10 @@ impl<E: Debug + Clone> Events<E> {
         self.events.drain(..).collect()
     }
 
+    pub fn last(&mut self) -> Option<E> {
+        self.events.drain(..).last()
+    }
+
     pub fn view(&self) -> &Vec<E> {
         &self.events
     }

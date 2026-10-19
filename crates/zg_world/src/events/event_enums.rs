@@ -13,9 +13,13 @@ pub struct MouseMotionEvent {
 }
 
 #[derive(Debug, Clone)]
+pub struct ResizeEvent(pub [u32; 2]);
+
+#[derive(Debug, Clone)]
 pub enum EngineWindowEvents {
     KeyboardInput(KeyboardInputEvent),
     MouseMotion(MouseMotionEvent),
+    Resize(ResizeEvent),
 }
 
 #[derive(Debug, Clone)]

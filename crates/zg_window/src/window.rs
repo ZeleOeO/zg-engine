@@ -1,8 +1,7 @@
 use std::sync::Arc;
 
 use winit::window::Window;
-use zg_app::WindowHandle;
-use zg_world::{Commands, EngineWindowEvents, Res, Resource};
+use zg_world::{EngineWindowEvents, Resource};
 
 #[derive(Debug, Resource)]
 pub struct WindowRes {
@@ -19,7 +18,15 @@ impl WindowRes {
     }
 }
 
-pub fn create_window_resource(window: Res<WindowHandle>, mut commands: Commands) {
-    let window_res = WindowRes::new(window.0.0.clone());
-    commands.insert_resource(window_res);
+impl SceneTargetSize {
+    pub fn new() -> SceneTargetSize {
+        SceneTargetSize([1280, 720])
+    }
+
+    pub fn update(&mut self, new_size: [u32; 2]) {
+        self.0 = new_size
+    }
 }
+
+#[derive(Debug, Resource)]
+pub struct SceneTargetSize(pub [u32; 2]);

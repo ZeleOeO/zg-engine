@@ -10,7 +10,7 @@ use winit::{
 };
 use zg_world::{
     EngineWindowEvents, IntoSystemConfig, KeyboardInputEvent, MouseMotionEvent,
-    RawWinitWindowEvents, Resource, SystemSet,
+    RawWinitWindowEvents, ResizeEvent, Resource, SystemSet,
     schedule_label::{PreUpdate, ScheduleLabel, Setup, Update},
 };
 
@@ -159,6 +159,13 @@ impl ApplicationHandler for App {
                         code: code,
                         key_pressed: state.is_pressed(),
                     }));
+            }
+            WindowEvent::Resized(size) => {
+                app.window_events
+                    .push(EngineWindowEvents::Resize(ResizeEvent([
+                        size.width,
+                        size.height,
+                    ])));
             }
             _ => {}
         }

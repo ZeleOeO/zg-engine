@@ -4,10 +4,10 @@ use wgpu::{CurrentSurfaceTexture, TextureView};
 use zg_managers::{PointLight, create_light_bind_group, get_or_create_default_light_material};
 use zg_time::Time;
 use zg_ui::{EditorState, EngineUI, UiFrame, create_viewport_target};
+use zg_window::SceneTargetSize;
 
 use crate::render_command::{DrawItem, FrameBinding};
 use crate::render_utils::{CameraUniform, create_transform_bind_group};
-use crate::renderer::SceneTargetSize;
 use crate::{RenderQueue, WorldRenderer};
 use zg_graphics::*;
 use zg_managers::Assets;
@@ -164,7 +164,7 @@ pub fn graphics_render_system(
     mut render_queue: ResMut<RenderQueue>,
     assets: Res<Assets>,
     mut engine_ui: ResMut<EngineUI>,
-    ui_frame: Res<UiFrame>,
+    mut ui_frame: ResMut<UiFrame>,
 ) {
     span!("redraw request");
     time.update();
@@ -249,6 +249,8 @@ pub fn graphics_render_system(
     for id in &ui_frame.textures_delta.free {
         engine_ui.renderer.free_texture(id);
     }
+
+    ui_frame.textures_delta.clear();
 
     graphics
         .queue

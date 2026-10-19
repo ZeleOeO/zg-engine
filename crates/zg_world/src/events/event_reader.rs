@@ -34,4 +34,8 @@ impl<'e, E: Debug + Clone> EventReader<'e, E> {
     pub fn view(&self) -> &Vec<E> {
         self.events.view()
     }
+
+    pub fn last(&mut self) -> Option<E> {
+        self.events.last()
+    }
 }

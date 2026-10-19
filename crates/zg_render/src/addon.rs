@@ -5,7 +5,7 @@ use zg_world::{
 };
 
 use crate::{
-    RenderQueue, SceneTargetSize, WorldRenderer, graphics_render_system, render_items_system,
+    RenderQueue, WorldRenderer, graphics_render_system, render_items_system,
     render_light_gizmo_system, render_lights_system, setup_world_renderer, viewport_resize_system,
 };
 
@@ -22,7 +22,6 @@ impl Addon for RenderAddon {
     fn build(&self, app: &mut zg_app::App) {
         app.add_resource(RenderQueue::new())
             .add_resource(WorldRenderer::new())
-            .add_resource(SceneTargetSize::new())
             .add_system(Setup, setup_world_renderer.in_set(RenderSet::Setup))
             .add_system(PreUpdate, viewport_resize_system)
             .add_system(Update, render_items_system.in_set(RenderSet::Update))

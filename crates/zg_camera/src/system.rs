@@ -2,14 +2,13 @@ use winit::keyboard::KeyCode;
 use zg_input::{Input, MouseMotion};
 use zg_time::Time;
 use zg_ui::InputFocus;
+use zg_window::SceneTargetSize;
 
 use crate::camera::Camera;
 use crate::camera_controller::CameraController;
 
 use zg_graphics::*;
-use zg_render::{
-    FrameBinding, RenderQueue, SceneTargetSize, WorldRenderer, create_camera_bind_group,
-};
+use zg_render::{FrameBinding, RenderQueue, WorldRenderer, create_camera_bind_group};
 use zg_world::{Commands, Res, ResMut};
 
 pub fn camera_controller_mouse_input_system(
