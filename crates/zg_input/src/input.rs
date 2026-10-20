@@ -40,3 +40,10 @@ impl<I: Hash + Debug + Clone + Eq + 'static> Input<I> {
         }
     }
 }
+
+#[derive(Default, Debug, Resource)]
+pub struct InputFocus {
+    pub game_pointer: bool,
+    pub game_keyboard: bool,
+    pub camera_look_active: bool,
+}

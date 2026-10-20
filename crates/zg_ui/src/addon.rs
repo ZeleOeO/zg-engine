@@ -1,12 +1,13 @@
 use zg_app::{Addon, WindowHandle};
 use zg_graphics::InternalGraphics;
+use zg_input::InputFocus;
 use zg_world::{
     Commands, Res, SystemFunctionExt, SystemSet,
     schedule_label::{PreUpdate, Setup, Update},
 };
 
 use crate::{
-    EditorState, EngineUI, InputFocus, UiFrame,
+    EditorState, EngineUI, UiFrame,
     system::{handle_ui_window_events, setup_ui_editor, ui_input_focus, update_ui_frame},
 };
 

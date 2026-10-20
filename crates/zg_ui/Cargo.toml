@@ -15,3 +15,4 @@ zg_world= {path = "../zg_world"}
 zg_window = {path = "../zg_window"}
 zg_app = {path = "../zg_app" }
 zg_managers = {path = "../zg_managers"}
+zg_input = {path = "../zg_input"}

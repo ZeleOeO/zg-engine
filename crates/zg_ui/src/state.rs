@@ -13,12 +13,6 @@ pub struct EditorState {
     pub selected_entities: Option<Entity>,
 }
 
-#[derive(Default, Debug, Resource)]
-pub struct InputFocus {
-    pub game_pointer: bool,
-    pub game_keyboard: bool,
-}
-
 #[derive(Debug, Resource)]
 pub struct UiFrame {
     pub triangle_mesh: Vec<egui::ClippedPrimitive>,

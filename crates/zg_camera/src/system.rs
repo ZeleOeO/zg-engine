@@ -1,7 +1,6 @@
 use winit::keyboard::KeyCode;
-use zg_input::{Input, MouseMotion};
+use zg_input::{Input, InputFocus, MouseMotion};
 use zg_time::Time;
-use zg_ui::{EditorState, InputFocus};
 use zg_window::SceneTargetSize;
 
 use crate::camera::Camera;
@@ -14,10 +13,9 @@ use zg_world::{Commands, Res, ResMut};
 pub fn camera_controller_mouse_input_system(
     mouse_motion: ResMut<MouseMotion>,
     mut camera_controller: ResMut<CameraController>,
-    editor_state: Res<EditorState>,
+    input_focus: Res<InputFocus>,
 ) {
-    if editor_state.camera_look_active {
-        println!("Camera is active");
+    if input_focus.camera_look_active {
         camera_controller.handle_mouse(mouse_motion.delta[0], mouse_motion.delta[1]);
     }
 }

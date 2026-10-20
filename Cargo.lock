@@ -4389,7 +4389,6 @@ dependencies = [
  "zg_input",
  "zg_render",
  "zg_time",
- "zg_ui",
  "zg_utils",
  "zg_window",
  "zg_world",
@@ -4425,7 +4424,6 @@ version = "0.1.0"
 dependencies = [
  "winit",
  "zg_app",
- "zg_ui",
  "zg_utils",
  "zg_window",
  "zg_world",
@@ -4482,6 +4480,7 @@ dependencies = [
  "winit",
  "zg_app",
  "zg_graphics",
+ "zg_input",
  "zg_managers",
  "zg_window",
  "zg_world",

@@ -1,6 +1,5 @@
 use winit::keyboard::KeyCode;
 use zg_app::{Addon, AppExit};
-use zg_ui::{EditorState, InputFocus};
 use zg_window::WindowSet;
 use zg_world::{
     EventReader, KeyboardInputEvent, MouseMotionEvent, Res, ResMut, SystemFunctionExt, SystemSet,
