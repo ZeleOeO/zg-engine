@@ -175,7 +175,6 @@ pub fn graphics_render_system(
             | CurrentSurfaceTexture::Suboptimal(texture) => texture,
             CurrentSurfaceTexture::Timeout | CurrentSurfaceTexture::Occluded => return,
             CurrentSurfaceTexture::Outdated | CurrentSurfaceTexture::Lost => {
-                println!("Error");
                 graphics
                     .surface
                     .configure(&graphics.device, &graphics.config);

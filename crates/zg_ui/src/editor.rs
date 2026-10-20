@@ -49,6 +49,18 @@ pub(crate) fn editor_ui(
             response.request_focus();
         }
 
+        ui.memory_mut(|m| {
+            m.set_focus_lock_filter(
+                response.id,
+                egui::EventFilter {
+                    horizontal_arrows: true,
+                    vertical_arrows: true,
+                    tab: false,
+                    escape: false,
+                },
+            );
+        });
+
         let ppp = ui.ctx().pixels_per_point();
         editor.viewport_rect = response.rect;
         editor.viewport_wanted_px = [

@@ -3,6 +3,7 @@ use crate::{
     state::{EditorState, InputFocus, UiFrame},
     ui::EngineUI,
 };
+use winit::window::CursorGrabMode;
 use zg_managers::Assets;
 use zg_window::WindowRes;
 use zg_world::{Commands, EventReader, RawWinitWindowEvents, Res, ResMut};
@@ -51,10 +52,25 @@ pub fn update_ui_frame(
 
 pub fn ui_input_focus(
     engine_ui: Res<EngineUI>,
-    editor_state: Res<EditorState>,
+    mut editor_state: ResMut<EditorState>,
     mut input_focus: ResMut<InputFocus>,
+    window_res: Res<WindowRes>,
 ) {
     input_focus.game_pointer = editor_state.viewport_hovered || editor_state.viewport_dragging;
     input_focus.game_keyboard =
-        editor_state.viewport_focused && !engine_ui.context.egui_wants_keyboard_input();
+        editor_state.viewport_focused && engine_ui.context.egui_wants_keyboard_input();
+
+    editor_state.camera_look_active = input_focus.game_pointer && editor_state.viewport_focused;
+
+    let window = &window_res.window;
+    if editor_state.camera_look_active {
+        window.set_cursor_visible(false);
+        window
+            .set_cursor_grab(CursorGrabMode::Confined)
+            .or_else(|_e| window.set_cursor_grab(CursorGrabMode::Locked))
+            .unwrap();
+    } else {
+        window.set_cursor_visible(true);
+        window.set_cursor_grab(CursorGrabMode::None).unwrap();
+    }
 }
