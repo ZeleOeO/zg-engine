@@ -1,8 +1,8 @@
 use egui::Ui;
-use zg_managers::Assets;
+use zg_managers::{Assets, PointLight};
 use zg_world::{
     Commands, Entity,
-    components::{MaterialComponent, MeshComponent, Transform},
+    components::{Camera, MaterialComponent, MeshComponent, Transform},
 };
 
 use crate::{EditorState, inspect::show_component};
@@ -78,8 +78,9 @@ pub(crate) fn editor_ui(
 }
 
 pub(crate) fn inspect_entity(ui: &mut Ui, assets: &Assets, commands: &Commands, entity: &Entity) {
+    show_component::<Camera>(ui, assets, commands, entity);
     show_component::<MeshComponent>(ui, assets, commands, entity);
-    // show_component::<Transform>(ui, assets, commands, entity);
+    show_component::<Transform>(ui, assets, commands, entity);
     show_component::<MaterialComponent>(ui, assets, commands, entity);
-    // show_component::<>(ui, assets, commands, entity);
+    show_component::<PointLight>(ui, assets, commands, entity);
 }

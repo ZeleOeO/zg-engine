@@ -165,7 +165,7 @@ impl InternalGraphics {
         &self.cache.cached_bind_groups[handle.0 as usize]
     }
 
-    pub fn get_pipeline_cache(&self, pipeline_id: PipelineID) -> &RenderPipeline {
+    pub fn get_render_pipeline_cache(&self, pipeline_id: PipelineID) -> &RenderPipeline {
         &self.cache.pipelines[pipeline_id as usize]
     }
 }

@@ -1,7 +1,8 @@
 use wgpu::{
-    BindGroupLayout, CompareFunction, DepthBiasState, DepthStencilState, Device, Face, FrontFace,
-    PipelineCompilationOptions, PipelineLayoutDescriptor, PolygonMode, RenderPipeline,
-    RenderPipelineDescriptor, StencilState, SurfaceConfiguration, TextureFormat, VertexState,
+    BindGroupLayout, CompareFunction, ComputePipeline, ComputePipelineDescriptor, DepthBiasState,
+    DepthStencilState, Device, Face, FrontFace, PipelineCompilationOptions,
+    PipelineLayoutDescriptor, PolygonMode, RenderPipeline, RenderPipelineDescriptor, StencilState,
+    SurfaceConfiguration, TextureFormat, VertexState,
 };
 
 use zg_utils::{ModelVertex, VertexTrait};
@@ -11,13 +12,14 @@ use zg_utils::{ModelVertex, VertexTrait};
 pub enum PipelineID {
     MAIN = 0,
     LIGHT = 1,
+    COMPUTE = 2,
 }
 
 pub fn main_pipeline(
     device: &Device,
     config: &SurfaceConfiguration,
     bg_layouts: &[Option<&BindGroupLayout>],
-) -> anyhow::Result<RenderPipeline> {
+) -> RenderPipeline {
     let shader =
         &device.create_shader_module(wgpu::include_wgsl!("./../../../assets/shaders/mesh.wgsl"));
     let render_pipeline_layout = device.create_pipeline_layout(&PipelineLayoutDescriptor {
@@ -68,14 +70,14 @@ pub fn main_pipeline(
         cache: None,
     });
 
-    Ok(render_pipeline)
+    render_pipeline
 }
 
 pub fn light_pipeline(
     device: &Device,
     config: &SurfaceConfiguration,
     bg_layouts: &[Option<&BindGroupLayout>],
-) -> anyhow::Result<RenderPipeline> {
+) -> RenderPipeline {
     let shader =
         device.create_shader_module(wgpu::include_wgsl!("./../../../assets/shaders/light.wgsl"));
 
@@ -128,5 +130,22 @@ pub fn light_pipeline(
         cache: None,
     });
 
-    Ok(render_pipeline)
+    render_pipeline
+}
+
+pub fn compute_pipeline(device: &Device) -> ComputePipeline {
+    let shader = device.create_shader_module(wgpu::include_wgsl!(
+        "./../../../assets/shaders/compute_shader.wgsl"
+    ));
+
+    let compute_pipeline = device.create_compute_pipeline(&ComputePipelineDescriptor {
+        label: Some("Compute Pipeline"),
+        layout: None,
+        module: &shader,
+        entry_point: None,
+        compilation_options: Default::default(),
+        cache: Default::default(),
+    });
+
+    compute_pipeline
 }

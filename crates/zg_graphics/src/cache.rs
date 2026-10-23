@@ -16,16 +16,17 @@ pub struct Cache {
     pub(crate) layouts: Vec<BindGroupLayout>,
     // Hashmap for matching the bind group cachekey and the bind group cache handle
     pub bind_groups_cache_map: HashMap<BindGroupCacheKey, BindGroupCacheHandle>,
-    pub pipelines: [wgpu::RenderPipeline; 2],
+    pub pipelines: [wgpu::RenderPipeline; 3],
+    pub compute_pipelines: [wgpu::ComputePipeline; 1],
     // Dense Array of bind groups
     pub cached_bind_groups: Vec<BindGroup>,
-    
+
     pub cached_transform_bind_groups: Vec<(wgpu::Buffer, BindGroupCacheHandle)>,
     pub transform_bind_groups_index: usize,
-    
+
     pub cached_light_bind_groups: Vec<(wgpu::Buffer, BindGroupCacheHandle)>,
     pub light_bind_groups_index: usize,
-    
+
     pub default_light_material: Option<BindGroupCacheHandle>,
 }
 
@@ -44,9 +45,11 @@ impl Cache {
         ];
 
         let pipelines = [
-            main_pipeline(device, config, &bg_layouts).unwrap(),
-            light_pipeline(device, config, &bg_layouts).unwrap(),
+            main_pipeline(device, config, &bg_layouts),
+            light_pipeline(device, config, &bg_layouts),
         ];
+
+        let compute_pipelines = [compute_pipeline(device)];
 
         let layouts = vec![
             camera_layout,
@@ -59,6 +62,7 @@ impl Cache {
             bind_groups_cache_map: HashMap::default(),
             cached_bind_groups: Vec::default(),
             pipelines,
+            compute_pipelines,
             cached_transform_bind_groups: Vec::default(),
             transform_bind_groups_index: 0,
             cached_light_bind_groups: Vec::default(),

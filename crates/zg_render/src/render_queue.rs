@@ -45,7 +45,7 @@ impl RenderQueue {
 
         for item in self.draw_items.drain(..) {
             if Some(item.pipeline) != current_pipeline {
-                let pipeline = graphics.get_pipeline_cache(item.pipeline);
+                let pipeline = graphics.get_render_pipeline_cache(item.pipeline);
                 render_pass.set_pipeline(pipeline);
                 current_pipeline = Some(item.pipeline);
             }

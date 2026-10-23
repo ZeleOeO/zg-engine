@@ -1,4 +1,5 @@
 mod addon;
+mod compute;
 mod render_command;
 mod render_queue;
 mod render_utils;
