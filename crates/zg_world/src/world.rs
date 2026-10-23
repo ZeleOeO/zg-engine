@@ -167,7 +167,7 @@ impl World {
         }
     }
 
-    pub fn get_entity<'w, D>(&'w self, entity: Entity) -> D::Output
+    pub fn get_entity<'w, D>(&'w self, entity: &Entity) -> D::Output
     where
         D: QueryData<'w> + 'static,
     {

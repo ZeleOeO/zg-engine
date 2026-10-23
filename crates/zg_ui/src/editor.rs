@@ -39,7 +39,7 @@ pub(crate) fn editor_ui(
             return;
         };
 
-        inspect_entity(ui, assets, commands, entity.clone());
+        inspect_entity(ui, assets, commands, &entity);
     });
 
     egui::CentralPanel::default().show(ui, |ui| {
@@ -77,9 +77,9 @@ pub(crate) fn editor_ui(
     });
 }
 
-pub(crate) fn inspect_entity(ui: &mut Ui, assets: &Assets, commands: &Commands, entity: Entity) {
+pub(crate) fn inspect_entity(ui: &mut Ui, assets: &Assets, commands: &Commands, entity: &Entity) {
     show_component::<MeshComponent>(ui, assets, commands, entity);
     // show_component::<Transform>(ui, assets, commands, entity);
-    // show_component::<MaterialComponent>(ui, assets, commands, entity);
+    show_component::<MaterialComponent>(ui, assets, commands, entity);
     // show_component::<>(ui, assets, commands, entity);
 }

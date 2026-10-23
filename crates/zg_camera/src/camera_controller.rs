@@ -1,7 +1,6 @@
 use winit::keyboard::KeyCode;
-use zg_world::Resource;
+use zg_world::{Resource, components::Camera};
 
-use crate::camera::Camera;
 use zg_utils::math::{vec3_add, vec3_cross_product, vec3_mult_scal, vec3_normalize, vec3_sub};
 
 #[derive(Clone, Debug, Resource)]

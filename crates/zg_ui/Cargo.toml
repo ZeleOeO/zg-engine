@@ -16,3 +16,4 @@ zg_window = {path = "../zg_window"}
 zg_app = {path = "../zg_app" }
 zg_managers = {path = "../zg_managers"}
 zg_input = {path = "../zg_input"}
+zg_utils = {path = "../zg_utils"}

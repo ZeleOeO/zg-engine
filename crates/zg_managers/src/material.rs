@@ -32,20 +32,32 @@ pub struct TextureData {
     pub sampler: wgpu::Sampler,
 }
 
+#[derive(Debug, Clone)]
+pub struct MaterialData {
+    // pub name: String,
+    pub material_type: MaterialType,
+}
+
 #[derive(Clone, Debug)]
 pub struct MaterialManager {
     material_bind_group: Vec<BindGroupCacheHandle>,
+    material_data: Vec<MaterialData>,
 }
 
 impl MaterialManager {
     pub fn new() -> MaterialManager {
         Self {
             material_bind_group: Vec::new(),
+            material_data: Vec::new(),
         }
     }
 
     pub fn get_material(&self, material_handle: MaterialHandle) -> BindGroupCacheHandle {
         self.material_bind_group[material_handle.0 as usize]
+    }
+
+    pub fn get_material_data(&self, material_handle: MaterialHandle) -> &MaterialData {
+        &self.material_data[material_handle.0 as usize]
     }
 
     pub fn add_obj_material(
@@ -96,7 +108,7 @@ impl MaterialManager {
         gpu: &mut InternalGraphics,
     ) -> MaterialHandle {
         let bind_group = match material_type {
-            MaterialType::Textured { location } => {
+            MaterialType::Textured { ref location } => {
                 let texture = Self::from_location(gpu, &location).unwrap();
                 let buffer = gpu.device.create_buffer_init(&BufferInitDescriptor {
                     label: Some("Buffer Init Descriptor Matieral Color"),
@@ -163,6 +175,7 @@ impl MaterialManager {
             }
         };
         self.material_bind_group.push(bind_group);
+        self.material_data.push(MaterialData { material_type });
         MaterialHandle(self.material_bind_group.len() as u32 - 1)
     }
 

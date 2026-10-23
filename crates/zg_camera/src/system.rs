@@ -3,12 +3,11 @@ use zg_input::{Input, InputFocus, MouseMotion};
 use zg_time::Time;
 use zg_window::SceneTargetSize;
 
-use crate::camera::Camera;
 use crate::camera_controller::CameraController;
 
 use zg_graphics::*;
 use zg_render::{FrameBinding, RenderQueue, WorldRenderer, create_camera_bind_group};
-use zg_world::{Commands, Res, ResMut};
+use zg_world::{Commands, Res, ResMut, components::Camera};
 
 pub fn camera_controller_mouse_input_system(
     mouse_motion: ResMut<MouseMotion>,
@@ -34,7 +33,7 @@ pub fn camera_update_system(
     command: Commands,
 ) {
     if let Some(camera_entity) = renderer.default_camera.clone() {
-        if let Some(camera) = command.get_entity::<(Camera,)>(camera_entity).0 {
+        if let Some(camera) = command.get_entity::<(Camera,)>(&camera_entity).0 {
             let [width, height] = scene_size.0.0;
             camera.aspect = (width as f32) / height as f32;
 
@@ -58,7 +57,7 @@ pub fn camera_controller_udpate_sytem(
 ) {
     let camera_entity = renderer.default_camera.clone().unwrap();
     let delta = time.time_delta_secs().min(0.1);
-    if let Some(camera) = scene.get_entity::<(Camera,)>(camera_entity).0 {
+    if let Some(camera) = scene.get_entity::<(Camera,)>(&camera_entity).0 {
         camera_controller.camera_update(camera, delta);
     }
 }
