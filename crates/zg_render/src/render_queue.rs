@@ -3,7 +3,7 @@ use zg_managers::Assets;
 use zg_graphics::{BindGroupCacheHandle, InternalGraphics, PipelineID};
 use zg_world::{Resource, components::MeshHandle};
 
-use crate::render_command::{DrawItem, FrameBinding};
+use crate::pipeline_commands::{DrawItem, FrameBinding};
 
 #[derive(Default, Debug, Resource)]
 pub struct RenderQueue {

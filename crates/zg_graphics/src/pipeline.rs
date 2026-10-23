@@ -12,7 +12,12 @@ use zg_utils::{ModelVertex, VertexTrait};
 pub enum PipelineID {
     MAIN = 0,
     LIGHT = 1,
-    COMPUTE = 2,
+}
+
+#[repr(usize)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug)]
+pub enum ComputePipelineID {
+    COMPUTE = 0,
 }
 
 pub fn main_pipeline(

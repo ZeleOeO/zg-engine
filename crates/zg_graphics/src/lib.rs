@@ -7,4 +7,4 @@ mod pipeline;
 pub use buffer::*;
 pub use cache::BindGroupCacheHandle;
 pub use gpu::InternalGraphics;
-pub use pipeline::PipelineID;
+pub use pipeline::{ComputePipelineID, PipelineID};

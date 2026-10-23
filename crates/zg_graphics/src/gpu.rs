@@ -2,9 +2,9 @@ use std::collections::hash_map;
 use std::sync::Arc;
 
 use wgpu::{
-    Backends, BindGroup, BindingResource, Device, DeviceDescriptor, ExperimentalFeatures, Features,
-    Instance, Limits, RenderPipeline, RequestAdapterOptions, Surface, SurfaceConfiguration,
-    TextureFormat,
+    Backends, BindGroup, BindingResource, ComputePipeline, Device, DeviceDescriptor,
+    ExperimentalFeatures, Features, Instance, Limits, RenderPipeline, RequestAdapterOptions,
+    Surface, SurfaceConfiguration, TextureFormat,
 };
 use wgpu::{Queue, TextureView};
 use winit::window::Window;
@@ -12,7 +12,7 @@ use zg_world::Resource;
 
 use crate::buffer::{BindGroupCacheKey, BindGroupResourceType};
 use crate::cache::*;
-use crate::pipeline::PipelineID;
+use crate::pipeline::{ComputePipelineID, PipelineID};
 
 #[derive(Debug, Resource)]
 pub struct InternalGraphics {
@@ -167,5 +167,9 @@ impl InternalGraphics {
 
     pub fn get_render_pipeline_cache(&self, pipeline_id: PipelineID) -> &RenderPipeline {
         &self.cache.pipelines[pipeline_id as usize]
+    }
+
+    pub fn get_compute_pipeline_cache(&self, pipeline_id: ComputePipelineID) -> &ComputePipeline {
+        &self.cache.compute_pipelines[pipeline_id as usize]
     }
 }
