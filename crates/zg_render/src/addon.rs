@@ -1,4 +1,5 @@
 use zg_app::Addon;
+use zg_ui::UiSystemSet;
 use zg_window::WindowSet;
 use zg_world::{
     SystemFunctionExt, SystemSet,
@@ -22,6 +23,7 @@ pub enum RenderSet {
 impl Addon for RenderAddon {
     fn build(&self, app: &mut zg_app::App) {
         app.set_order(WindowSet::PreUpdate, RenderSet::PreUpdate)
+            .set_order(UiSystemSet::PreUpdate, RenderSet::PreUpdate)
             .add_resource(RenderQueue::new())
             .add_resource(WorldRenderer::new())
             .add_system(Setup, setup_world_renderer.in_set(RenderSet::Setup))

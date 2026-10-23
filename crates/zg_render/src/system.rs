@@ -229,7 +229,7 @@ pub fn graphics_render_system(
                 depth_slice: None,
                 resolve_target: None,
                 ops: wgpu::Operations {
-                    load: wgpu::LoadOp::Clear(wgpu::Color::BLACK),
+                    load: wgpu::LoadOp::Clear(wgpu::Color::RED),
                     store: wgpu::StoreOp::Store,
                 },
             })],

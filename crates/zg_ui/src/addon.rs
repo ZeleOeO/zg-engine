@@ -20,7 +20,10 @@ impl Addon for UiAddon {
             .add_resource(InputFocus::default())
             .add_system(Setup, create_engine_ui.in_set(UiSystemSet::Setup))
             .add_system(Setup, setup_ui_editor.in_set(UiSystemSet::Setup))
-            .add_system(PreUpdate, handle_ui_window_events)
+            .add_system(
+                PreUpdate,
+                handle_ui_window_events.in_set(UiSystemSet::PreUpdate),
+            )
             .add_system(Update, update_ui_frame.in_set(UiSystemSet::Update))
             .add_system(Update, ui_input_focus);
     }
@@ -29,6 +32,7 @@ impl Addon for UiAddon {
 #[derive(SystemSet)]
 pub enum UiSystemSet {
     Setup,
+    PreUpdate,
     Update,
 }
 
