@@ -71,7 +71,7 @@ pub fn compute_setup_test_sytem(
     test_struct.test_buffer = Some(read_buffer.clone());
 
     let cache_key = BindGroupCacheKey {
-        layout_num: 1,
+        layout_num: None,
         entries: vec![
             (
                 0,

@@ -22,7 +22,7 @@ impl ComputeQueue {
                 let pipeline = graphics.get_compute_pipeline_cache(item.pipeline_id);
                 compute_pass.set_pipeline(pipeline);
                 let bind_group_cached = graphics.get_bind_group_by_handle(item.bind_group_handle);
-                compute_pass.set_bind_group(item.bind_group_handle.1, bind_group_cached, &[]);
+                compute_pass.set_bind_group(0, bind_group_cached, &[]);
                 compute_pass.dispatch_workgroups(2, 1, 1);
             }
         }

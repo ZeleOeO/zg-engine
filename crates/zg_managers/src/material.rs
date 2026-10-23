@@ -77,7 +77,7 @@ impl MaterialManager {
             });
 
             let cache_key = BindGroupCacheKey {
-                layout_num: 1,
+                layout_num: Some(1),
                 entries: vec![
                     (2, BindGroupResourceType::Buffer { buffer }),
                     (
@@ -120,7 +120,7 @@ impl MaterialManager {
                 });
 
                 let cache_key = BindGroupCacheKey {
-                    layout_num: 1,
+                    layout_num: Some(1),
                     entries: vec![
                         (2, BindGroupResourceType::Buffer { buffer }),
                         (
@@ -153,7 +153,7 @@ impl MaterialManager {
                 let dummy_texture = Self::create_dummy_texture(gpu);
 
                 let cache_key = BindGroupCacheKey {
-                    layout_num: 1,
+                    layout_num: Some(1),
                     entries: vec![
                         (2, BindGroupResourceType::Buffer { buffer }),
                         (

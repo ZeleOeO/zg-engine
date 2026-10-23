@@ -48,7 +48,10 @@ impl InternalGraphics {
                 label: None,
                 required_features: Features::empty(),
                 experimental_features: ExperimentalFeatures::disabled(),
-                required_limits: Limits::default(),
+                required_limits: Limits {
+                    max_bind_groups: 5,
+                    ..Default::default()
+                },
                 trace: wgpu::Trace::Off,
                 memory_hints: Default::default(),
             })
@@ -122,7 +125,12 @@ impl InternalGraphics {
             hash_map::Entry::Occupied(occupied) => *occupied.get(),
             hash_map::Entry::Vacant(vacant) => {
                 let key_ref = vacant.key();
-                let layout = &self.cache.layouts[key_ref.layout_num as usize];
+                let mut layout = &self.cache.compute_pipelines[0].get_bind_group_layout(0);
+                let mut bind_group_slot = 0;
+                if let Some(key) = key_ref.layout_num {
+                    layout = &self.cache.layouts[key as usize];
+                    bind_group_slot = key;
+                };
                 let entries = key_ref
                     .entries
                     .iter()
@@ -152,7 +160,7 @@ impl InternalGraphics {
 
                 let index = self.cache.cached_bind_groups.len() as u32;
                 self.cache.cached_bind_groups.push(raw_bind_group);
-                let handle = BindGroupCacheHandle(index, key_ref.layout_num);
+                let handle = BindGroupCacheHandle(index, bind_group_slot);
                 vacant.insert(handle);
 
                 handle

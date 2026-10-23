@@ -39,8 +39,10 @@ pub fn create_transform_bind_group(
         ],
     };
     if gpu.cache.transform_bind_groups_index < gpu.cache.cached_transform_bind_groups.len() {
-        let (buffer, handle) = &gpu.cache.cached_transform_bind_groups[gpu.cache.transform_bind_groups_index];
-        gpu.queue.write_buffer(buffer, 0, bytemuck::cast_slice(&[item_uniform]));
+        let (buffer, handle) =
+            &gpu.cache.cached_transform_bind_groups[gpu.cache.transform_bind_groups_index];
+        gpu.queue
+            .write_buffer(buffer, 0, bytemuck::cast_slice(&[item_uniform]));
         let handle_copy = *handle;
         gpu.cache.transform_bind_groups_index += 1;
         handle_copy
@@ -52,11 +54,18 @@ pub fn create_transform_bind_group(
         });
 
         let cache_key = BindGroupCacheKey {
-            layout_num: 2,
-            entries: vec![(0, BindGroupResourceType::Buffer { buffer: buffer.clone() })],
+            layout_num: Some(2),
+            entries: vec![(
+                0,
+                BindGroupResourceType::Buffer {
+                    buffer: buffer.clone(),
+                },
+            )],
         };
         let handle = gpu.get_or_create_bind_group(cache_key);
-        gpu.cache.cached_transform_bind_groups.push((buffer, handle));
+        gpu.cache
+            .cached_transform_bind_groups
+            .push((buffer, handle));
         gpu.cache.transform_bind_groups_index += 1;
         handle
     }
@@ -89,7 +98,7 @@ pub fn create_camera_bind_group(
     );
 
     let cache_key = BindGroupCacheKey {
-        layout_num: 0,
+        layout_num: Some(0),
         entries: vec![(
             0,
             BindGroupResourceType::Buffer {

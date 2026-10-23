@@ -1,5 +1,6 @@
 use wgpu::{
-    BindGroupLayout, BindGroupLayoutDescriptor, BindGroupLayoutEntry, Device, ShaderStages,
+    BindGroupEntry, BindGroupLayout, BindGroupLayoutDescriptor, BindGroupLayoutEntry, Device,
+    ShaderStages,
 };
 
 pub fn create_camera_layout(device: &Device) -> BindGroupLayout {
@@ -81,5 +82,33 @@ pub fn create_light_uniform_layout(device: &Device) -> BindGroupLayout {
                 min_binding_size: None,
             },
         }],
+    })
+}
+
+pub fn create_compute_bg_layout(device: &Device) -> BindGroupLayout {
+    device.create_bind_group_layout(&BindGroupLayoutDescriptor {
+        label: Some("Compute Uniform Layout"),
+        entries: &[
+            BindGroupLayoutEntry {
+                binding: 0,
+                count: None,
+                visibility: ShaderStages::COMPUTE,
+                ty: wgpu::BindingType::Buffer {
+                    ty: wgpu::BufferBindingType::Storage { read_only: true },
+                    has_dynamic_offset: false,
+                    min_binding_size: None,
+                },
+            },
+            BindGroupLayoutEntry {
+                binding: 1,
+                count: None,
+                visibility: ShaderStages::COMPUTE,
+                ty: wgpu::BindingType::Buffer {
+                    ty: wgpu::BufferBindingType::Storage { read_only: false },
+                    has_dynamic_offset: false,
+                    min_binding_size: None,
+                },
+            },
+        ],
     })
 }

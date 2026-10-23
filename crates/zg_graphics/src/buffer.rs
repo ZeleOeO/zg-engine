@@ -1,3 +1,5 @@
+use crate::PipelineID;
+
 #[derive(Hash, PartialEq, Eq, Debug)]
 pub enum BindGroupResourceType {
     Buffer { buffer: wgpu::Buffer },
@@ -7,6 +9,6 @@ pub enum BindGroupResourceType {
 
 #[derive(Hash, PartialEq, Eq, Debug)]
 pub struct BindGroupCacheKey {
-    pub layout_num: u32,
+    pub layout_num: Option<u32>,
     pub entries: Vec<(u32, BindGroupResourceType)>,
 }

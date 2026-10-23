@@ -36,6 +36,7 @@ impl Cache {
         let material_layout = create_material_bg_layout(&device);
         let item_uniform_layout = create_item_uniform_layout(&device);
         let light_layout = create_light_uniform_layout(&device);
+        let compute_layout = create_compute_bg_layout(&device);
 
         let bg_layouts = [
             Some(&camera_layout),
@@ -49,13 +50,14 @@ impl Cache {
             light_pipeline(device, config, &bg_layouts),
         ];
 
-        let compute_pipelines = [compute_pipeline(device)];
+        let compute_pipelines = [compute_pipeline(&device)];
 
         let layouts = vec![
             camera_layout,
             material_layout,
             item_uniform_layout,
             light_layout,
+            compute_layout,
         ];
         Cache {
             layouts,

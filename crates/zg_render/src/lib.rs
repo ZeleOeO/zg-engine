@@ -7,7 +7,6 @@ mod renderer;
 mod system;
 
 pub use addon::*;
-use compute::*;
 pub use pipeline_commands::*;
 pub use render_queue::RenderQueue;
 pub use render_utils::create_camera_bind_group;

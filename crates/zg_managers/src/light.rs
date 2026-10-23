@@ -57,7 +57,7 @@ pub fn create_light_bind_group(
         });
 
         let cache_key = BindGroupCacheKey {
-            layout_num: 3,
+            layout_num: Some(3),
             entries: vec![(
                 0,
                 BindGroupResourceType::Buffer {
@@ -92,7 +92,7 @@ pub fn get_or_create_default_light_material(gpu: &mut InternalGraphics) -> BindG
     let dummy_texture = MaterialManager::create_dummy_texture(gpu);
 
     let cache_key = BindGroupCacheKey {
-        layout_num: 1,
+        layout_num: Some(1),
         entries: vec![
             (2, BindGroupResourceType::Buffer { buffer }),
             (
