@@ -169,7 +169,7 @@ impl Assets {
             20, 21, 22, 20, 22, 23, // Bottom
         ];
 
-        let mut mesh_data = MeshData {
+        let mesh_data = MeshData {
             name: "Cube".to_string(),
             vertices: vertices.to_vec(),
             indices: indices.to_vec(),
@@ -287,7 +287,7 @@ impl Assets {
             14, 15, 16, 14, 16, 17, // Right
         ];
 
-        let mut mesh_data = MeshData {
+        let mesh_data = MeshData {
             name: "Prsim".to_string(),
             vertices: vertices.to_vec(),
             indices: indices.to_vec(),

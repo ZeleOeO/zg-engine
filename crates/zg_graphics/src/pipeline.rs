@@ -1,6 +1,6 @@
 use wgpu::{
     BindGroupLayout, CompareFunction, ComputePipeline, ComputePipelineDescriptor, DepthBiasState,
-    DepthStencilState, Device, Face, FrontFace, PipelineCompilationOptions, PipelineLayout,
+    DepthStencilState, Device, Face, FrontFace, PipelineCompilationOptions,
     PipelineLayoutDescriptor, PolygonMode, RenderPipeline, RenderPipelineDescriptor, StencilState,
     SurfaceConfiguration, TextureFormat, VertexState,
 };

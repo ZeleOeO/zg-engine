@@ -114,8 +114,6 @@ pub fn do_some_compute_stuff(test_struct: Res<RandomTestStruct>, graphics: Res<I
         rx.recv().unwrap().unwrap();
 
         let output_data = temp_buffer.get_mapped_range(..).unwrap();
-
-        println!("Ladies and gentelemen, we got it: {:#?}", output_data);
     }
 
     temp_buffer.unmap();

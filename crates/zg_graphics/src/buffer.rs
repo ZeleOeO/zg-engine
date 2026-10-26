@@ -1,5 +1,3 @@
-use crate::PipelineID;
-
 #[derive(Hash, PartialEq, Eq, Debug)]
 pub enum BindGroupResourceType {
     Buffer { buffer: wgpu::Buffer },

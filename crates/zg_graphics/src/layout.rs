@@ -1,6 +1,5 @@
 use wgpu::{
-    BindGroupEntry, BindGroupLayout, BindGroupLayoutDescriptor, BindGroupLayoutEntry, Device,
-    ShaderStages,
+    BindGroupLayout, BindGroupLayoutDescriptor, BindGroupLayoutEntry, Device, ShaderStages,
 };
 
 pub fn create_camera_layout(device: &Device) -> BindGroupLayout {
